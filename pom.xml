@@ -11,47 +11,6 @@
 		<artifactId>oss-parent</artifactId>
 		<version>8</version>
 	</parent>
-<!--
-	<inceptionYear>2013</inceptionYear>
-	<description>
-	 	A Java library used to read and extract data from EMV paycard.
-	</description>
-	<issueManagement>
-		<url>https://github.com/devnied/EMV-NFC-Paycard-Enrollment/issues</url>
-	</issueManagement>
-	<url>https://github.com/devnied/EMV-NFC-Paycard-Enrollment</url>
-	<developers>
-		<developer>
-			<name>MILLAU Julien</name>
-			<id>devnied</id>
-			<email>mxjulien@gmail.com</email>
-			<roles>
-				<role>Java Developer</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<scm>
-		<connection>scm:git:git@github.com:devnied/EMV-NFC-Paycard-Enrollment.git</connection>
-		<developerConnection>scm:git:git@github.com:devnied/EMV-NFC-Paycard-Enrollment.git</developerConnection>
-		<url>scm:git:git@github.com:devnied/EMV-NFC-Paycard-Enrollment.git</url>
-		<tag>HEAD</tag>
-	</scm>
-
-
-	<properties>
-		<additionalparam>-Xdoclint:none</additionalparam>
-		<powermock.version>2.0.7</powermock.version>
-	</properties>
--->
 
 	<modules>
 		<module>tec-library</module>
@@ -108,20 +67,6 @@
 
 		</dependencies>
 	</dependencyManagement>
-<!--
-	<distributionManagement>
-		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
-			<name>Sonatype Nexus Snapshots</name>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-	</distributionManagement>
--->
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

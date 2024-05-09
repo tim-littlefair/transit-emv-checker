@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>tec-library</artifactId>
 	<version>0.1.0</version>
-	<groupId>tl-pcsc</groupId>
+	<groupId>tec-library</groupId>
 
 	<packaging>jar</packaging>
 	<name>EMV Paycard - PCSC TL version</name>

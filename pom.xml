@@ -3,15 +3,15 @@
 	<groupId>net.heretical_camelid.transit_emv_checker</groupId>
 	<artifactId>parent</artifactId>
 	<packaging>pom</packaging>
-	<version>3.0.2-SNAPSHOT</version>
-	<name>EMV Paycard - Parent</name>
+	<version>0.1.0</version>
+	<name>Transit EMV Checker - Parent</name>
 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
 		<version>8</version>
 	</parent>
-
+<!--
 	<inceptionYear>2013</inceptionYear>
 	<description>
 	 	A Java library used to read and extract data from EMV paycard.
@@ -46,14 +46,16 @@
 		<tag>HEAD</tag>
 	</scm>
 
-	<modules>
-		<module>tec-library</module>
-	</modules>
 
 	<properties>
 		<additionalparam>-Xdoclint:none</additionalparam>
 		<powermock.version>2.0.7</powermock.version>
 	</properties>
+-->
+
+	<modules>
+		<module>tec-library</module>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>
@@ -106,7 +108,7 @@
 
 		</dependencies>
 	</dependencyManagement>
-
+<!--
 	<distributionManagement>
 		<snapshotRepository>
 			<id>sonatype-nexus-snapshots</id>
@@ -119,6 +121,7 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 	</distributionManagement>
+-->
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -184,7 +187,7 @@
 						<aggregate>true</aggregate>
 						<instrumentation>
 							<excludes>
-								<exclude>com/github/devnied/emvpcsccard/**/*.class</exclude>
+								<exclude>**/*.class</exclude>
 							</excludes>
 						</instrumentation>
 					</configuration>

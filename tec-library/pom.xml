@@ -5,7 +5,7 @@
 	<groupId>tec-library</groupId>
 
 	<packaging>jar</packaging>
-	<name>EMV Paycard - PCSC TL version</name>
+	<name>Transit EMV Checker - Library</name>
 
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>

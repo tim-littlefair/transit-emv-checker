@@ -13,11 +13,10 @@ public class PageViewModel extends ViewModel {
     private MutableLiveData<String> mText; // = map(mIndex, input -> "Hello world from section: " + input);
 
     public void setIndex(int index) {
-
         mIndex.setValue(index);
         mText = new MutableLiveData<String>();
         mText.setValue("HW from " + index);
-       }
+    }
 
     public LiveData<String> getText() {
         return mText;

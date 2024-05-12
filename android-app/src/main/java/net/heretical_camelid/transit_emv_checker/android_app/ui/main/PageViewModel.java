@@ -1,6 +1,6 @@
 package net.heretical_camelid.transit_emv_checker.android_app.ui.main;
 
-import static androidx.lifecycle.Transformations.map;
+// import static androidx.lifecycle.Transformations.map;
 
 import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
@@ -10,10 +10,12 @@ import android.arch.lifecycle.ViewModel;
 public class PageViewModel extends ViewModel {
 
     private MutableLiveData<Integer> mIndex = new MutableLiveData<>();
-    private LiveData<String> mText = map(mIndex, input -> "Hello world from section: " + input);
+    private MutableLiveData<String> mText; // = map(mIndex, input -> "Hello world from section: " + input);
 
     public void setIndex(int index) {
         mIndex.setValue(index);
+        mText = new MutableLiveData<String>();
+        mText.setValue("HW from " + index);
     }
 
     public LiveData<String> getText() {

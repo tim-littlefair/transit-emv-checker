@@ -1,15 +1,11 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import net.heretical_camelid.transit_emv_checker.android_app.ui.main.SectionsPagerAdapter;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.widget.ViewPager2;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+// import net.heretical_camelid.transit_emv_checker.android_app.ui.main.SectionsPagerAdapter;
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,10 +17,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        /*
         setContentView(binding.getRoot());
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = binding.viewPager;
+        ViewPager2 viewPager = binding.viewPager;
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = binding.tabs;
         tabs.setupWithViewPager(viewPager);
@@ -37,5 +34,6 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+         */
     }
 }

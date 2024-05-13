@@ -19,10 +19,14 @@
              android:layout_width="match_parent">
 
          <androidx.appcompat.widget.Toolbar
-                 app:layout_scrollFlags="scroll|enterAlways"/>
+                 app:layout_scrollFlags="scroll|enterAlways"
+                 android:layout_height="wrap_content"
+                 android:layout_width="match_parent"/>
 
          <com.google.android.material.tabs.TabLayout
-                 app:layout_scrollFlags="scroll|enterAlways"/>
+                 app:layout_scrollFlags="scroll|enterAlways"
+                 android:layout_height="wrap_content"
+                 android:layout_width="match_parent"/>
 
      </com.google.android.material.appbar.AppBarLayout>
 

@@ -20,5 +20,10 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
+local.properties
+
+.idea
+
+
 */target/
 _work/

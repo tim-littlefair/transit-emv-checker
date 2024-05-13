@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'net.heretical_camelid.transit_emv_checker.android_app'
-    compileSdk 28
+    compileSdk 34
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"

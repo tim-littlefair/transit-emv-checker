@@ -1,7 +1,7 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
 import android.content.Context;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
 import org.junit.Test;

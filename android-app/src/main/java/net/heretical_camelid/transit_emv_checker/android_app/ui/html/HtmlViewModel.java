@@ -10,7 +10,7 @@ public class HtmlViewModel extends ViewModel {
 
     public HtmlViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        mText.setValue("<html><body><h1>HTML</h1><p>Text</p></body></html>");
     }
 
     public LiveData<String> getText() {

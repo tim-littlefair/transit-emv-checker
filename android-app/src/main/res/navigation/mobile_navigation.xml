@@ -12,6 +12,19 @@
             tools:layout="@layout/fragment_home"/>
 
     <fragment
+            android:id="@+id/navigation_transit"
+            android:name="net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlFragment"
+            android:label="@string/title_transit"
+            tools:layout="@layout/fragment_html"/>
+
+    <fragment
+            android:id="@+id/navigation_emv_details"
+            android:name="net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlFragment"
+            android:label="@string/title_emv_details"
+            tools:layout="@layout/fragment_html"/>
+
+<!--
+    <fragment
             android:id="@+id/navigation_dashboard"
             android:name="net.heretical_camelid.transit_emv_checker.android_app.ui.dashboard.DashboardFragment"
             android:label="@string/title_dashboard"
@@ -22,4 +35,11 @@
             android:name="net.heretical_camelid.transit_emv_checker.android_app.ui.notifications.NotificationsFragment"
             android:label="@string/title_notifications"
             tools:layout="@layout/fragment_notifications"/>
+-->
+    <fragment
+            android:id="@+id/navigation_about"
+            android:name="net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlFragment"
+            android:label="@string/title_about"
+            tools:layout="@layout/fragment_html"/>
+
 </navigation>

@@ -2,10 +2,11 @@ plugins {
     id 'java'
 }
 
-group = 'net.heretical_camelid.transit_emv_checker.library'
+group = 'net.heretical_camelid.transit_emv_checker.pcsc_cli_app'
 version = '0.1.0'
 
 dependencies {
+    implementation project(':tec-library')
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"
     implementation "org.apache.commons:commons-lang3:3.8.1"

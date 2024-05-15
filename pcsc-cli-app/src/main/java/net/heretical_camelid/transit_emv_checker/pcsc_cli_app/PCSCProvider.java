@@ -1,4 +1,4 @@
-package net.heretical_camelid.transit_emv_checker.library;
+package net.heretical_camelid.transit_emv_checker.pcsc_cli_app;
 
 import java.nio.ByteBuffer;
 
@@ -9,6 +9,8 @@ import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CardChannel;
 // import static javax.smartcardio.CardChannel.getBasicChannel;
 
+import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
+import net.heretical_camelid.transit_emv_checker.library.MyProviderBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

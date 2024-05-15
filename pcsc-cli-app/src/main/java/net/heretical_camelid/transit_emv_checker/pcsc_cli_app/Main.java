@@ -1,4 +1,4 @@
-package net.heretical_camelid.transit_emv_checker.library;
+package net.heretical_camelid.transit_emv_checker.pcsc_cli_app;
 
 import java.util.List;
 import java.nio.file.Paths;
@@ -14,6 +14,7 @@ import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CardChannel;
 
+import net.heretical_camelid.transit_emv_checker.library.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

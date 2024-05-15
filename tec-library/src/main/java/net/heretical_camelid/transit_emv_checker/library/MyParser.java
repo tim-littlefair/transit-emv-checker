@@ -24,7 +24,7 @@ import com.github.devnied.emvnfccard.enums.CommandEnum;
 
 import fr.devnied.bitlib.BytesUtils;
 
-class MyParser extends EmvParser {
+public class MyParser extends EmvParser {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MyParser.class);
 
     private APDUObserver m_apduObserver = null;

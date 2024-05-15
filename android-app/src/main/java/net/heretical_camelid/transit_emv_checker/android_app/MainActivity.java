@@ -3,7 +3,6 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
-import androidx.fragment.app.FragmentContainerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -18,9 +17,7 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
-
-    static private HashMap<String, HtmlViewModel> s_viewModelRegistry = new HashMap<>();
+    private static final HashMap<Integer, HtmlViewModel> s_viewModelRegistry = new HashMap<>();
     private BottomNavigationView m_navView;
     private NavController m_navController;
 
@@ -28,11 +25,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home,
                 R.id.navigation_transit,
@@ -44,9 +39,18 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, m_navController);
 
         m_navView = findViewById(R.id.nav_view);
-        FragmentContainerView fcv = new FragmentContainerView(this);
 
         setInitialState();
+    }
+
+    static private void setPageHtmlText(int pageNavigationId, String htmlText) {
+        HtmlViewModel hvm = s_viewModelRegistry.get(pageNavigationId);
+        assert hvm != null;
+        hvm.setText(htmlText);
+    }
+
+    static private void populateAboutPage() {
+        setPageHtmlText(R.id.navigation_about,"<html><body><p>TEC by TJL</p></body></html>");
     }
 
     private void setInitialState() {
@@ -54,8 +58,12 @@ public class MainActivity extends AppCompatActivity {
         setItemState(R.id.navigation_emv_details,false);
     }
 
-    static public void registerHtmlViewModel(String whichModel, HtmlViewModel theModel) {
+    static public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
         s_viewModelRegistry.put(whichModel, theModel);
+
+        if(whichModel==R.id.navigation_about) {
+            populateAboutPage();
+        }
     }
 
     private void setItemState(int itemId, boolean isEnabled) {
@@ -63,22 +71,18 @@ public class MainActivity extends AppCompatActivity {
         assert itemView != null;
         if(isEnabled==false) {
             itemView.setEnabled(false);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    m_navController.navigate(R.id.navigation_home);
-                    Toast.makeText(
-                            MainActivity.this,
-                            "No current EMV media",
-                            Toast.LENGTH_SHORT
-                    ).show();
-                }
+            itemView.setOnClickListener(v -> {
+                m_navController.navigate(R.id.navigation_home);
+                Toast.makeText(
+                        MainActivity.this,
+                        "No current EMV media",
+                        Toast.LENGTH_SHORT
+                ).show();
             });
             // itemView.setClickable(true);
         } else {
             itemView.setOnClickListener(null);
             itemView.setEnabled(true);
-            // itemView.setClickable(false);
         }
     }
 

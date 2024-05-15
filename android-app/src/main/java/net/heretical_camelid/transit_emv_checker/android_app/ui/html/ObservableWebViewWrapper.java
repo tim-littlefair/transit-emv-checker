@@ -1,12 +1,10 @@
 package net.heretical_camelid.transit_emv_checker.android_app.ui.html;
 
-import android.content.Context;
 import android.util.Base64;
 import android.webkit.WebView;
-import androidx.annotation.NonNull;
 
 public class ObservableWebViewWrapper {
-    private WebView m_webView;
+    private final WebView m_webView;
     public ObservableWebViewWrapper(WebView webView) {
         m_webView = webView;
     }

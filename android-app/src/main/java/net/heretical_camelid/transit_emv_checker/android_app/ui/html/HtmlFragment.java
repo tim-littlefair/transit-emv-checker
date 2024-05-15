@@ -6,11 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import net.heretical_camelid.transit_emv_checker.android_app.MainActivity;
 import net.heretical_camelid.transit_emv_checker.android_app.R;
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.FragmentHtmlBinding;
@@ -29,15 +29,7 @@ public class HtmlFragment extends Fragment {
         ;
 
         View root = binding.getRoot();
-        View parent = container.getChildAt(container.getChildCount()-1);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body>");
-        sb.append("<p>root.id=" + root.getId() + " " + root.getTag() + "</p>");
-        sb.append("<p>parent.id=" + parent.getId() + " " + parent.getTag() + "</p>");
-        sb.append("</body></html>");
         m_htmlViewModel = new ViewModelProvider(this).get(HtmlViewModel.class);
-        m_htmlViewModel.setText(sb.toString());
 
         m_htmlViewModel.getText().observe(
                 getViewLifecycleOwner(),
@@ -55,18 +47,14 @@ public class HtmlFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        FragmentActivity activity = getActivity();
+        assert activity != null;
         NavController navController = Navigation.findNavController(
-                (MainActivity) getActivity(),
+                activity,
                 R.id.nav_host_fragment_activity_main
         );
         NavDestination currentDestination = navController.getCurrentDestination();
         assert currentDestination != null;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html><body>");
-        sb.append("<p>destination.id: " + currentDestination.getId() + "</p>");
-        sb.append("<p>destination.label: " + currentDestination.getLabel() + "</p>");
-        sb.append("</body></html>");
-        m_htmlViewModel.setText(sb.toString());
+        MainActivity.registerHtmlViewModel(currentDestination.getId(),m_htmlViewModel);
     }
 }

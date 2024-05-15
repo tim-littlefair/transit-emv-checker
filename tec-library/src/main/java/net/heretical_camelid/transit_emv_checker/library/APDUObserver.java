@@ -235,7 +235,7 @@ public class APDUObserver {
         StringBuffer commandInterpretation = new StringBuffer();
 
         ArrayList<Integer> acceptableStatusWordValues = new ArrayList<>();
-        acceptableStatusWordValues.add(new Integer(0x9000));
+        acceptableStatusWordValues.add(0x9000);
 
         switch(cla_ins) {
             case 0x00a4: {
@@ -324,8 +324,8 @@ public class APDUObserver {
                 // most recent online tap handled, and is not set if there 
                 // has never been such a tap)
                 if (p1_p2 == 0x9F17) {
-                    acceptableStatusWordValues.add(new Integer(0x6A81));                    
-                    acceptableStatusWordValues.add(new Integer(0x6A88));                    
+                    acceptableStatusWordValues.add(0x6A81);
+                    acceptableStatusWordValues.add(0x6A88);
                 }
             }
             break;

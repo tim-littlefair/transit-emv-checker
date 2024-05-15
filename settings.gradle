@@ -13,5 +13,6 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "transit-emv-checker"
-//include ':android-app-try1'
-include ':android-app'
+//include ':android-app'
+include ':tec-library'
+

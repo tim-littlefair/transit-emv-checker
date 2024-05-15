@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group = 'net.heretical_camelid.transit_emv_checker.library'
+version = '0.1.0'
+
+dependencies {
+    implementation "com.github.devnied.emvnfccard:library:3.0.1"
+    implementation "com.github.devnied:bit-lib4j:1.5.2"
+    implementation "org.apache.commons:commons-lang3:3.8.1"
+    implementation "org.apache.commons:commons-collections4:4.2"
+    implementation "commons-io:commons-io:2.6"
+    implementation "net.sf.scuba:scuba-smartcards:0.0.18"
+    testImplementation "org.slf4j:slf4j-log4j12:*"
+}
+
+test {
+    useJUnitPlatform()
+}
+

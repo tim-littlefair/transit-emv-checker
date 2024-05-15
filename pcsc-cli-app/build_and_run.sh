@@ -4,6 +4,8 @@ variant=pcsc-cli-app
 version=0.1.0
 mainclass=net.heretical_camelid.transit_emv_checker.pcsc_cli_app.Main
 
+rm -rf */build
+
 # Using the gradlew file generated as part of the IntelliJ IDEA project
 gradle=./gradlew
 

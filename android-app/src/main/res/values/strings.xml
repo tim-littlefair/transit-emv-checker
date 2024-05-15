@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name">BottomNavigationTemplate</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_transit">Transit</string>
+    <string name="menu_emv_details">EMV</string>
+    <string name="menu_about">About</string>
     <string name="title_home">Home</string>
-    <string name="title_transit">Transit</string>
-    <string name="title_emv_details">EMV Details</string>
+    <string name="title_transit">Transit Capabilities</string>
+    <string name="title_emv_details">EMV Application Details</string>
+    <string name="title_about">About</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
-    <string name="title_about">About</string>
 </resources>

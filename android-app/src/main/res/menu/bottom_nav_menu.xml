@@ -9,27 +9,15 @@
     <item
             android:id="@+id/navigation_transit"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="@string/title_transit"/>
+            android:title="@string/menu_transit"/>
 
     <item
             android:id="@+id/navigation_emv_details"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="@string/title_emv_details"/>
-
-    <!--
-        <item
-                android:id="@+id/navigation_dashboard"
-                android:icon="@drawable/ic_dashboard_black_24dp"
-                android:title="@string/title_dashboard"/>
-
-        <item
-                android:id="@+id/navigation_notifications"
-                android:icon="@drawable/ic_notifications_black_24dp"
-                android:title="@string/title_notifications"/>
+            android:title="@string/menu_emv_details"/>
 
         <item
                 android:id="@+id/navigation_about"
                 android:icon="@drawable/ic_home_black_24dp"
-                android:title="@string/title_about"/>
-    -->
+                android:title="@string/menu_about"/>
 </menu>

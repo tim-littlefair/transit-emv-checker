@@ -61,14 +61,14 @@ public class EMVMediaActivity extends FragmentActivity {
         m_nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         enableDetection();
     }
-
+/*
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Tag nfcMediaTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         processMedia(nfcMediaTag);
     }
-
+*/
     public void enableDetection() {
         PendingIntent pi = PendingIntent.getActivity(
             this, 0,
@@ -83,7 +83,9 @@ public class EMVMediaActivity extends FragmentActivity {
     }
 
     void processMedia(Tag emvMediaTag) {
-        Toast.makeText(this, "Something detected",Toast.LENGTH_LONG);
+        Toast.makeText(
+            this, "Something detected",Toast.LENGTH_LONG
+        ).show();
     }
 
 }

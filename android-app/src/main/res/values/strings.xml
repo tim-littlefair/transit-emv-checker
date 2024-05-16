@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BottomNavigationTemplate</string>
+    <string name="app_name">Transit EMV Checker</string>
     <string name="menu_home">Home</string>
     <string name="menu_transit">Transit</string>
     <string name="menu_emv_details">EMV</string>

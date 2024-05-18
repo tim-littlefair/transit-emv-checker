@@ -6,11 +6,10 @@ import androidx.lifecycle.ViewModel;
 
 public class HtmlViewModel extends ViewModel {
 
-    private final MutableLiveData<String> mText;
+    private MutableLiveData<String> mText;
 
     public HtmlViewModel() {
-        mText = new MutableLiveData<>();
-        setText("<html><body><h1>HtmlViewModel</h1><p>Empty</p></body></html>");
+        mText = null;
     }
 
     public void setText(String s) {
@@ -19,5 +18,9 @@ public class HtmlViewModel extends ViewModel {
 
     public LiveData<String> getText() {
         return mText;
+    }
+
+    public void setData(MutableLiveData<String> stringMutableLiveData) {
+        mText = stringMutableLiveData;
     }
 }

@@ -24,12 +24,9 @@ public class MainActivity extends AppCompatActivity {
     private NavController m_navController;
 
     // Model attributes driving fragment UI elements
-    private final HashMap<Integer, HtmlViewModel> m_viewModelRegistry = new HashMap<>();
+    private final HashMap<Integer, MutableLiveData<String> > m_htmlPageRegistry = new HashMap<>();
     private MutableLiveData<String> m_homePageStatus;
     private MutableLiveData<String> m_homePageLog = null;
-    private MutableLiveData<String> m_transitPageHTML;
-    private MutableLiveData<String> m_emvPageHTML;
-    private MutableLiveData<String> m_aboutPageHTML;
 
     // NFC/EMV operations controller
     private EMVMediaAgent m_emvMediaAgent;
@@ -38,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         m_emvMediaAgent = new EMVMediaAgent(this);
+
+        m_htmlPageRegistry.put(R.id.navigation_transit,new MutableLiveData<>());
+        m_htmlPageRegistry.put(R.id.navigation_emv_details,new MutableLiveData<>());
+        m_htmlPageRegistry.put(R.id.navigation_about,new MutableLiveData<>());
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -51,16 +52,15 @@ public class MainActivity extends AppCompatActivity {
         m_navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, m_navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, m_navController);
-
         m_navView = findViewById(R.id.nav_view);
-
-        // setInitialState();
+        populateAboutPage();
+        setInitialState();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
-        HtmlViewModel hvm = m_viewModelRegistry.get(pageNavigationId);
-        if(hvm != null) {
-            hvm.setText(htmlText);
+        MutableLiveData<String> pageHtml = m_htmlPageRegistry.get(pageNavigationId);
+        if(pageHtml != null) {
+            pageHtml.postValue(htmlText);
         }
     }
 
@@ -68,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
         setPageHtmlText(R.id.navigation_about,"<html><body><p>TEC by TJL</p></body></html>");
     }
 
-    private void setInitialState() {
-        setItemState(R.id.navigation_transit,false);
-        setItemState(R.id.navigation_emv_details,false);
+    public void setInitialState() {
+        setPageHtmlText(R.id.navigation_transit,"<html><body><p>Card not read yet</p></body></html>");
+        setPageHtmlText(R.id.navigation_emv_details,"<html><body><p>Card not read yet</p></body></html>");
+        //setItemState(R.id.navigation_transit,false);
+        //setItemState(R.id.navigation_emv_details,false);
     }
 
     public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails) {
@@ -94,10 +96,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
-        m_viewModelRegistry.put(whichModel, theModel);
-        if(whichModel==R.id.navigation_about) {
-            populateAboutPage();
-        }
+        theModel.setData(m_htmlPageRegistry.get(whichModel));
     }
 
     private void setItemState(int itemId, boolean isEnabled) {

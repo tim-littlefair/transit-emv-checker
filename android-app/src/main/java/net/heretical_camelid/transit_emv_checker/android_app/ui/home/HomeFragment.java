@@ -31,6 +31,8 @@ public class HomeFragment extends Fragment {
         m_log = binding.textView2;
         m_button = binding.button;
 
+        m_button.setText("Start EMV Media Detection");
+
         homeViewModel.getLog().observe(getViewLifecycleOwner(), m_log::setText);
         homeViewModel.getLog().setValue("Starting up...");
 
@@ -39,7 +41,10 @@ public class HomeFragment extends Fragment {
         m_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mainActivity.setInitialState();
                 mainActivity.tryToDetectMedia();
+                v.setEnabled(false);
+                ((Button) v).setText("Waiting for EMV media");
             }
         });
 
@@ -51,13 +56,6 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    private void detectNFCAdapter() {
-
-    }
-
-    private void detectEMVMedia() {
     }
 
 }

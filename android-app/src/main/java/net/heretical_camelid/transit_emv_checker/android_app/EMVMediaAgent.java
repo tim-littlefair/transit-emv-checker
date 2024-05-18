@@ -44,7 +44,6 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     public void onTagDiscovered(Tag tag) {
         m_mainActivity.homePageLogAppend("Tag discovered: " + tag.describeContents());
         processMedia(tag);
-        m_nfcAdapter.ignore(tag, 1000, null, null);
         m_nfcAdapter.disableReaderMode(m_mainActivity);
     }
 

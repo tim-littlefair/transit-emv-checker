@@ -8,10 +8,7 @@ import com.github.devnied.emvnfccard.exception.CommunicationException;
 import com.github.devnied.emvnfccard.model.EmvCard;
 import com.github.devnied.emvnfccard.parser.EmvTemplate;
 
-import net.heretical_camelid.transit_emv_checker.library.PCIMaskingAgent;
-import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
-import net.heretical_camelid.transit_emv_checker.library.TransitTerminal;
-import net.heretical_camelid.transit_emv_checker.library.MyParser;
+import net.heretical_camelid.transit_emv_checker.library.*;
 
 import java.io.IOException;
 
@@ -61,7 +58,6 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     }
 
     void processMedia(Tag emvMediaTag) {
-        m_mainActivity.homePageLogAppend("TODO: processing tag");
         IsoDep tagAsIsoDep = IsoDep.get(emvMediaTag);
         if(tagAsIsoDep == null) {
             m_mainActivity.homePageLogAppend("Media does not support IsoDep mode");
@@ -116,9 +112,8 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                     );
                     continue;
                 }
-                m_mainActivity.homePageLogAppend(
-                    "TODO: Populate pages 'Transit' and 'EMV Applcation Details'"
-                );
+                TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
+                m_mainActivity.setDisplayMediaDetailsState(tcc.capabilityReport(),apduObserver.summary());
             }
             while (false);
 

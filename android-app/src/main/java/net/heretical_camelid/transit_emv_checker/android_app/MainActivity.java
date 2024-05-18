@@ -59,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
         HtmlViewModel hvm = m_viewModelRegistry.get(pageNavigationId);
-        assert hvm != null;
-        hvm.setText(htmlText);
+        if(hvm != null) {
+            hvm.setText(htmlText);
+        }
     }
 
     private void populateAboutPage() {
@@ -72,12 +73,28 @@ public class MainActivity extends AppCompatActivity {
         setItemState(R.id.navigation_emv_details,false);
     }
 
+    public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails) {
+        setPageHtmlText(R.id.navigation_transit,
+            "<html><body><pre>" +
+            transitCapabilities +
+            "</pre></body></html>"
+        );
+        setPageHtmlText(R.id.navigation_emv_details,
+            "<html><body><pre>" +
+                emvApplicationDetails +
+                "</pre></body></html>"
+        );
+        setItemState(R.id.navigation_transit,true);
+        setItemState(R.id.navigation_emv_details,true);
+        // m_navController.navigate(R.id.navigation_transit);
+    }
+
     public void registerHomeViewModel(HomeViewModel theModel) {
         m_homePageLog = theModel.getLog();
     }
+
     public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
         m_viewModelRegistry.put(whichModel, theModel);
-
         if(whichModel==R.id.navigation_about) {
             populateAboutPage();
         }

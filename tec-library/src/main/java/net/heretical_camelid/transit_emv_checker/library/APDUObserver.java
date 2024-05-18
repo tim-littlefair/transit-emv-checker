@@ -114,11 +114,12 @@ public class APDUObserver {
     public void extractTags(CommandAndResponse carItem) {
         // Interpretation of PDOL tags attached to the GPO 
         // command is done in interpretCommand
-
-        final byte[] responseTlvBytes = Arrays.copyOfRange(
-            carItem.rawResponse,0,carItem.rawResponse.length-2
-        );
-        extractTags(responseTlvBytes, carItem);
+        if(carItem.rawResponse!=null) {
+            final byte[] responseTlvBytes = Arrays.copyOfRange(
+                carItem.rawResponse, 0, carItem.rawResponse.length - 2
+            );
+            extractTags(responseTlvBytes, carItem);
+        }
     }
 
     void extractTags(byte[] tlvBytes, CommandAndResponse carItem) {

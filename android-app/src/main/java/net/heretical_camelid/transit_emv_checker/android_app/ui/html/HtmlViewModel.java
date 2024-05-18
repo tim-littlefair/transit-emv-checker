@@ -14,7 +14,7 @@ public class HtmlViewModel extends ViewModel {
     }
 
     public void setText(String s) {
-        mText.setValue(s);
+        mText.postValue(s);
     }
 
     public LiveData<String> getText() {

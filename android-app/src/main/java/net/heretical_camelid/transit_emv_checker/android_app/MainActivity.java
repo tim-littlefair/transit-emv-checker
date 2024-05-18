@@ -19,12 +19,12 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static MutableLiveData<String> s_homePageStatus;
-    private static MutableLiveData<String> s_homePageLog;
-    private static MutableLiveData<String> s_transitPageHTML;
-    private static MutableLiveData<String> s_emvPageHTML;
-    private static MutableLiveData<String> s_aboutPageHTML;
-    private static final HashMap<Integer, HtmlViewModel> s_viewModelRegistry = new HashMap<>();
+    private MutableLiveData<String> m_homePageStatus;
+    private MutableLiveData<String> m_homePageLog;
+    private MutableLiveData<String> m_transitPageHTML;
+    private MutableLiveData<String> m_emvPageHTML;
+    private MutableLiveData<String> m_aboutPageHTML;
+    private final HashMap<Integer, HtmlViewModel> m_viewModelRegistry = new HashMap<>();
     private BottomNavigationView m_navView;
     private NavController m_navController;
 
@@ -50,13 +50,13 @@ public class MainActivity extends AppCompatActivity {
         setInitialState();
     }
 
-    static private void setPageHtmlText(int pageNavigationId, String htmlText) {
-        HtmlViewModel hvm = s_viewModelRegistry.get(pageNavigationId);
+    private void setPageHtmlText(int pageNavigationId, String htmlText) {
+        HtmlViewModel hvm = m_viewModelRegistry.get(pageNavigationId);
         assert hvm != null;
         hvm.setText(htmlText);
     }
 
-    static private void populateAboutPage() {
+    private void populateAboutPage() {
         setPageHtmlText(R.id.navigation_about,"<html><body><p>TEC by TJL</p></body></html>");
     }
 
@@ -65,11 +65,11 @@ public class MainActivity extends AppCompatActivity {
         setItemState(R.id.navigation_emv_details,false);
     }
 
-    static public void registerHomeViewModel(HomeViewModel theModel) {
-        s_homePageLog = theModel.getLog();
+    public void registerHomeViewModel(HomeViewModel theModel) {
+        m_homePageLog = theModel.getLog();
     }
-    static public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
-        s_viewModelRegistry.put(whichModel, theModel);
+    public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
+        m_viewModelRegistry.put(whichModel, theModel);
 
         if(whichModel==R.id.navigation_about) {
             populateAboutPage();
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private void setItemState(int itemId, boolean isEnabled) {
         View itemView = m_navView.findViewById(itemId);
         assert itemView != null;
-        if(isEnabled==false) {
+        if(isEnabled == false) {
             itemView.setEnabled(false);
             itemView.setOnClickListener(v -> {
                 m_navController.navigate(R.id.navigation_home);
@@ -97,9 +97,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public static void logOnHomePage(String s) {
-        s_homePageLog.setValue(
-            s_homePageLog.getValue() + "\n" + s
+    public void homePageLogAppend(String s) {
+        m_homePageLog.setValue(
+            m_homePageLog.getValue() + "\n" + s
         );
     }
 }

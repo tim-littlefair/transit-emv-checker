@@ -33,12 +33,13 @@ public class HomeFragment extends Fragment {
 
         homeViewModel.getLog().observe(getViewLifecycleOwner(), m_log::setText);
         homeViewModel.getLog().setValue("Starting up...");
-        MainActivity.registerHomeViewModel(homeViewModel);
 
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.registerHomeViewModel(homeViewModel);
         m_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.logOnHomePage("About to detect EMV media");
+                mainActivity.homePageLogAppend("About to detect EMV media");
             }
         });
 

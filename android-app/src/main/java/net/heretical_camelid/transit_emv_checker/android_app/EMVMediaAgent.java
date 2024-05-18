@@ -11,7 +11,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         m_mainActivity = mainActivity;
         m_nfcAdapter = NfcAdapter.getDefaultAdapter(m_mainActivity);
         if(m_nfcAdapter!=null) {
-            m_mainActivity.logOnHomePage("Adapter initialized: " + m_nfcAdapter);
+            m_mainActivity.homePageLogAppend("Adapter initialized: " + m_nfcAdapter);
         }
     }
 
@@ -33,13 +33,13 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
 
     @Override
     public void onTagDiscovered(Tag tag) {
-        m_mainActivity.logOnHomePage("Tag discovered: " + tag.describeContents());
+        m_mainActivity.homePageLogAppend("Tag discovered: " + tag.describeContents());
         processMedia(tag);
         m_nfcAdapter.ignore(tag, 1000, null, null);
         m_nfcAdapter.disableReaderMode(m_mainActivity);
     }
 
     void processMedia(Tag emvMediaTag) {
-        m_mainActivity.logOnHomePage("TODO: processing tag");
+        m_mainActivity.homePageLogAppend("TODO: processing tag");
     }
 }

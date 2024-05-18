@@ -47,7 +47,7 @@ public class HtmlFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        FragmentActivity activity = getActivity();
+        MainActivity activity = (MainActivity) getActivity();
         assert activity != null;
         NavController navController = Navigation.findNavController(
                 activity,
@@ -55,6 +55,6 @@ public class HtmlFragment extends Fragment {
         );
         NavDestination currentDestination = navController.getCurrentDestination();
         assert currentDestination != null;
-        MainActivity.registerHtmlViewModel(currentDestination.getId(),m_htmlViewModel);
+        activity.registerHtmlViewModel(currentDestination.getId(),m_htmlViewModel);
     }
 }

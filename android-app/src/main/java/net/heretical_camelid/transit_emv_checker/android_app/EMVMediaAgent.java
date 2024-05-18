@@ -12,18 +12,27 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         m_nfcAdapter = NfcAdapter.getDefaultAdapter(m_mainActivity);
         if(m_nfcAdapter!=null) {
             m_mainActivity.homePageLogAppend("Adapter initialized: " + m_nfcAdapter);
+        } else {
+            m_mainActivity.homePageLogAppend("No NFC adapter found");
         }
     }
 
     public void enableDetection() {
-        m_nfcAdapter.enableReaderMode(
-            m_mainActivity, this,
-            (
-                NfcAdapter.FLAG_READER_NFC_A |
-                NfcAdapter.FLAG_READER_NFC_B |
-                NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
-            ),null
-        );
+        if(m_nfcAdapter != null) {
+            m_mainActivity.homePageLogAppend("About to enable NFC reader");
+            m_nfcAdapter.enableReaderMode(
+                m_mainActivity, this,
+                (
+                    NfcAdapter.FLAG_READER_NFC_A |
+                        NfcAdapter.FLAG_READER_NFC_B |
+                        NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
+                ), null
+            );
+            m_mainActivity.homePageLogAppend("NFC reader enabled");
+        } else {
+            m_mainActivity.homePageLogAppend("No NFC adapter => cant enable detection");
+        }
+
     }
 
     public void disableDetection() {

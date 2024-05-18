@@ -39,7 +39,7 @@ public class HomeFragment extends Fragment {
         m_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainActivity.homePageLogAppend("About to detect EMV media");
+                mainActivity.tryToDetectMedia();
             }
         });
 

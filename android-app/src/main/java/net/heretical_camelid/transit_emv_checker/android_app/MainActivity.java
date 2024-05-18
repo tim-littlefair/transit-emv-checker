@@ -19,18 +19,25 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Activity wide UI elements
+    private BottomNavigationView m_navView;
+    private NavController m_navController;
+
+    // Model attributes driving fragment UI elements
+    private final HashMap<Integer, HtmlViewModel> m_viewModelRegistry = new HashMap<>();
     private MutableLiveData<String> m_homePageStatus;
-    private MutableLiveData<String> m_homePageLog;
+    private MutableLiveData<String> m_homePageLog = null;
     private MutableLiveData<String> m_transitPageHTML;
     private MutableLiveData<String> m_emvPageHTML;
     private MutableLiveData<String> m_aboutPageHTML;
-    private final HashMap<Integer, HtmlViewModel> m_viewModelRegistry = new HashMap<>();
-    private BottomNavigationView m_navView;
-    private NavController m_navController;
+
+    // NFC/EMV operations controller
+    private EMVMediaAgent m_emvMediaAgent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        m_emvMediaAgent = new EMVMediaAgent(this);
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -98,8 +105,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void homePageLogAppend(String s) {
-        m_homePageLog.setValue(
-            m_homePageLog.getValue() + "\n" + s
-        );
+        if(m_homePageLog != null) {
+            m_homePageLog.postValue(
+                m_homePageLog.getValue() + "\n" + s
+            );
+        }
+    }
+
+    public void tryToDetectMedia() {
+        m_homePageLog.setValue("About to try to detect EMV media");
+        m_emvMediaAgent.enableDetection();
     }
 }

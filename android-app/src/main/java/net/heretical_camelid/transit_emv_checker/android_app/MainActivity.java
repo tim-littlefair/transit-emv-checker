@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         m_navView = findViewById(R.id.nav_view);
 
-        setInitialState();
+        // setInitialState();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -75,17 +75,17 @@ public class MainActivity extends AppCompatActivity {
 
     public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails) {
         setPageHtmlText(R.id.navigation_transit,
-            "<html><body><pre>" +
+            "<html><body><pre style='white-space: pre-wrap;'>" +
             transitCapabilities +
             "</pre></body></html>"
         );
         setPageHtmlText(R.id.navigation_emv_details,
-            "<html><body><pre>" +
+            "<html><body><pre style='white-space: pre-wrap;'>" +
                 emvApplicationDetails +
                 "</pre></body></html>"
         );
-        setItemState(R.id.navigation_transit,true);
-        setItemState(R.id.navigation_emv_details,true);
+        //setItemState(R.id.navigation_transit,true);
+        //setItemState(R.id.navigation_emv_details,true);
         // m_navController.navigate(R.id.navigation_transit);
     }
 

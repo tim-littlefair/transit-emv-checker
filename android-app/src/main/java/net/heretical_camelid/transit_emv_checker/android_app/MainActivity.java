@@ -3,6 +3,7 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -11,12 +12,18 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
+import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
 
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static MutableLiveData<String> s_homePageStatus;
+    private static MutableLiveData<String> s_homePageLog;
+    private static MutableLiveData<String> s_transitPageHTML;
+    private static MutableLiveData<String> s_emvPageHTML;
+    private static MutableLiveData<String> s_aboutPageHTML;
     private static final HashMap<Integer, HtmlViewModel> s_viewModelRegistry = new HashMap<>();
     private BottomNavigationView m_navView;
     private NavController m_navController;
@@ -58,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
         setItemState(R.id.navigation_emv_details,false);
     }
 
+    static public void registerHomeViewModel(HomeViewModel theModel) {
+        s_homePageLog = theModel.getLog();
+    }
     static public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
         s_viewModelRegistry.put(whichModel, theModel);
 
@@ -87,4 +97,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public static void logOnHomePage(String s) {
+        s_homePageLog.setValue(
+            s_homePageLog.getValue() + "\n" + s
+        );
+    }
 }

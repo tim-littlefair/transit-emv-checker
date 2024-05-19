@@ -27,9 +27,8 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        m_status = binding.textView1;
-        m_log = binding.textView2;
-        m_button = binding.button;
+        m_log = binding.logHome;
+        m_button = binding.buttonHome;
 
         m_button.setText("Start EMV Media Detection");
 

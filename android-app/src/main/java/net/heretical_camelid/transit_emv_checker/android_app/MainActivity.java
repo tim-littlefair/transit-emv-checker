@@ -3,6 +3,7 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
+import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -11,19 +12,33 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
+import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
 
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final HashMap<Integer, HtmlViewModel> s_viewModelRegistry = new HashMap<>();
+    // Activity wide UI elements
     private BottomNavigationView m_navView;
     private NavController m_navController;
+
+    // Model attributes driving fragment UI elements
+    private final HashMap<Integer, MutableLiveData<String> > m_htmlPageRegistry = new HashMap<>();
+    private MutableLiveData<String> m_homePageStatus;
+    private MutableLiveData<String> m_homePageLog = null;
+
+    // NFC/EMV operations controller
+    private EMVMediaAgent m_emvMediaAgent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        m_emvMediaAgent = new EMVMediaAgent(this);
+
+        m_htmlPageRegistry.put(R.id.navigation_transit,new MutableLiveData<>());
+        m_htmlPageRegistry.put(R.id.navigation_emv_details,new MutableLiveData<>());
+        m_htmlPageRegistry.put(R.id.navigation_about,new MutableLiveData<>());
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -37,39 +52,57 @@ public class MainActivity extends AppCompatActivity {
         m_navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, m_navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, m_navController);
-
         m_navView = findViewById(R.id.nav_view);
-
+        populateAboutPage();
         setInitialState();
     }
 
-    static private void setPageHtmlText(int pageNavigationId, String htmlText) {
-        HtmlViewModel hvm = s_viewModelRegistry.get(pageNavigationId);
-        assert hvm != null;
-        hvm.setText(htmlText);
+    private void setPageHtmlText(int pageNavigationId, String htmlText) {
+        MutableLiveData<String> pageHtml = m_htmlPageRegistry.get(pageNavigationId);
+        if(pageHtml != null) {
+            pageHtml.postValue(htmlText);
+        }
     }
 
-    static private void populateAboutPage() {
+    private void populateAboutPage() {
         setPageHtmlText(R.id.navigation_about,"<html><body><p>TEC by TJL</p></body></html>");
     }
 
-    private void setInitialState() {
-        setItemState(R.id.navigation_transit,false);
-        setItemState(R.id.navigation_emv_details,false);
+    public void setInitialState() {
+        setPageHtmlText(R.id.navigation_transit,"<html><body><p>Card not read yet</p></body></html>");
+        setPageHtmlText(R.id.navigation_emv_details,"<html><body><p>Card not read yet</p></body></html>");
+        //setItemState(R.id.navigation_transit,false);
+        //setItemState(R.id.navigation_emv_details,false);
     }
 
-    static public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
-        s_viewModelRegistry.put(whichModel, theModel);
+    public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails) {
+        setPageHtmlText(R.id.navigation_transit,
+            "<html><body><pre style='white-space: pre-wrap;'>" +
+            transitCapabilities +
+            "</pre></body></html>"
+        );
+        setPageHtmlText(R.id.navigation_emv_details,
+            "<html><body><pre style='white-space: pre-wrap;'>" +
+                emvApplicationDetails +
+                "</pre></body></html>"
+        );
+        //setItemState(R.id.navigation_transit,true);
+        //setItemState(R.id.navigation_emv_details,true);
+        // m_navController.navigate(R.id.navigation_transit);
+    }
 
-        if(whichModel==R.id.navigation_about) {
-            populateAboutPage();
-        }
+    public void registerHomeViewModel(HomeViewModel theModel) {
+        m_homePageLog = theModel.getLog();
+    }
+
+    public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
+        theModel.setData(m_htmlPageRegistry.get(whichModel));
     }
 
     private void setItemState(int itemId, boolean isEnabled) {
         View itemView = m_navView.findViewById(itemId);
         assert itemView != null;
-        if(isEnabled==false) {
+        if(isEnabled == false) {
             itemView.setEnabled(false);
             itemView.setOnClickListener(v -> {
                 m_navController.navigate(R.id.navigation_home);
@@ -87,4 +120,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void homePageLogAppend(String s) {
+        if(m_homePageLog != null) {
+            m_homePageLog.postValue(
+                m_homePageLog.getValue() + "\n" + s
+            );
+        }
+    }
+
+    public void tryToDetectMedia() {
+        m_homePageLog.setValue("About to try to detect EMV media");
+        m_emvMediaAgent.enableDetection();
+    }
 }

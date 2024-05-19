@@ -114,11 +114,12 @@ public class APDUObserver {
     public void extractTags(CommandAndResponse carItem) {
         // Interpretation of PDOL tags attached to the GPO 
         // command is done in interpretCommand
-
-        final byte[] responseTlvBytes = Arrays.copyOfRange(
-            carItem.rawResponse,0,carItem.rawResponse.length-2
-        );
-        extractTags(responseTlvBytes, carItem);
+        if(carItem.rawResponse!=null) {
+            final byte[] responseTlvBytes = Arrays.copyOfRange(
+                carItem.rawResponse, 0, carItem.rawResponse.length - 2
+            );
+            extractTags(responseTlvBytes, carItem);
+        }
     }
 
     void extractTags(byte[] tlvBytes, CommandAndResponse carItem) {
@@ -357,13 +358,19 @@ public class APDUObserver {
         // (for most commands the expected value is 0x9000, but 
         // GET DATA is expected to fail with 0x6892 if the 
         // last online ATC has never been set)
-        int status_word = BytesUtils.byteArrayToInt(
-            cr.rawResponse,cr.rawResponse.length-2,2
-        );
-        if(!acceptableStatusWordValues.contains(status_word)) {
+        if(cr.rawResponse != null) {
+            int status_word = BytesUtils.byteArrayToInt(
+                cr.rawResponse, cr.rawResponse.length - 2, 2
+            );
+            if (!acceptableStatusWordValues.contains(status_word)) {
+                LOGGER.warn(String.format(
+                    "Unexpected status word %04x for step %s",
+                    status_word, cr.stepName
+                ));
+            }
+        } else {
             LOGGER.warn(String.format(
-                "Unexpected status word %04x for step %s",
-                status_word, cr.stepName
+                "Null response for step %s", cr.stepName
             ));
         }
     }

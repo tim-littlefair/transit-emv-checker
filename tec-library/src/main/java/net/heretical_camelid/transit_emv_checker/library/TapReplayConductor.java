@@ -21,17 +21,19 @@ public class TapReplayConductor {
     public static final Logger LOGGER = LoggerFactory.getLogger(TapReplayConductor.class);
 
     final ArrayList<CommandAndResponse> m_commandsAndResponses;
-    APDUObserver m_apduObserver;
-    TapReplayArbiter m_arbiter;
-    TapReplayProvider m_provider;
-    ITerminal m_terminal;
+    private final PCIMaskingAgent m_pciMaskingAgent;
+    private final APDUObserver m_apduObserver;
+    private final TapReplayArbiter m_arbiter;
+    private final TapReplayProvider m_provider;
+    private final ITerminal m_terminal;
 
     public TapReplayConductor(
         InputStream captureXml,
         ITerminal terminal
     ) {
         m_commandsAndResponses = parseXml(captureXml);
-        m_apduObserver = new APDUObserver(new PCIMaskingAgent());
+        m_pciMaskingAgent = new PCIMaskingAgent();
+        m_apduObserver = new APDUObserver(m_pciMaskingAgent);
         m_arbiter = new TapReplayArbiter();
         m_provider = new TapReplayProvider(this);
         if(terminal!=null) {
@@ -76,6 +78,10 @@ public class TapReplayConductor {
         }
     }
 
+    public boolean doPCIMasking() {
+        return m_pciMaskingAgent.maskAccountData(m_apduObserver);
+    }
+
     private ArrayList<CommandAndResponse> parseXml(InputStream captureXml) {
         ArrayList<CommandAndResponse> commandsAndResponses = new ArrayList<>();
         CommandAndResponse carItem = null;
@@ -91,17 +97,18 @@ public class TapReplayConductor {
                         carItem = new CommandAndResponse();
                         carItem.stepName = reader.getAttributeValue(null, "step_name");
                     } else {
-                        assert carItem != null;
                         if (elementName.equals("raw_command")) {
+                            assert carItem != null;
                             carItem.rawCommand = BytesUtils.fromString(reader.getElementText());
                         } else if (elementName.equals("raw_response")) {
+                            assert carItem != null;
                             carItem.rawResponse = BytesUtils.fromString(reader.getElementText());
                         }
                     }
                 } else if (nextToken == XMLStreamConstants.END_ELEMENT) {
-                    assert carItem != null;
                     String elementName = String.valueOf(reader.getName());
                     if (elementName.equals("command_and_response")) {
+                        assert carItem != null;
                         assert carItem.rawCommand != null;
                         assert carItem.rawResponse != null;
                         TapReplayConductor.LOGGER.info("Adding step: " + carItem.stepName);
@@ -117,7 +124,6 @@ public class TapReplayConductor {
     }
 
     public static void main(String[] args) {
-        MyProviderBase.LOGGER.info(String.join("\n", args));
         TapReplayConductor trc;
         try {
             trc = new TapReplayConductor(

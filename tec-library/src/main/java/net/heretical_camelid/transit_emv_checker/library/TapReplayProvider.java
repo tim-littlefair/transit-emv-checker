@@ -2,29 +2,94 @@ package net.heretical_camelid.transit_emv_checker.library;
 
 import com.github.devnied.emvnfccard.exception.CommunicationException;
 import com.github.devnied.emvnfccard.parser.IProvider;
-import fr.devnied.bitlib.BytesUtils;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-
-import javax.xml.stream.XMLStreamConstants;
+import java.util.Arrays;
 
 public class TapReplayProvider extends MyProviderBase implements IProvider {
 
-    ArrayList<CommandAndResponse> m_commandsAndResponses;
+    final TapReplayConductor m_trc;
+    final ArrayList<CommandAndResponse> m_commandsAndResponses;
+    int m_stepIndex;
 
     public TapReplayProvider(TapReplayConductor trc) {
         super(trc.getAPDUObserver());
-        m_commandsAndResponses = new ArrayList<>();
+        m_trc = trc;
+        m_commandsAndResponses = m_trc.getCommandsAndResponses();
+        m_stepIndex = 0;
     }
 
     @Override
     protected byte[] implementationTransceive(byte[] pCommand, ByteBuffer receiveBuffer) throws CommunicationException {
-        return new byte[0];
+        CommandAndResponse stepCarItem = m_commandsAndResponses.get(m_stepIndex);
+        byte[] replayCommand = stepCarItem.rawCommand;
+
+        // Allow the arbiter to control whether the command generated
+        // by the framework is used unchanged, used with substitutions,
+        // or replaced entirely by the command which was captured when
+        // the replay data was generated.
+        TapReplayArbiter.ReplayCompareOutcome commandOutcome = m_trc.getArbiter().compareAPDU(
+            stepCarItem.stepName,
+            TapReplayArbiter.APDUDirection.TERMINAL_TO_MEDIA,
+            pCommand, replayCommand
+        );
+
+        switch(commandOutcome) {
+            case ERROR_ABORT_NOW:
+                throw new CommunicationException(
+                    "Command mismatch at step " + stepCarItem.stepName
+                );
+
+            case OK_USE_CAPTURED_VALUE:
+            case WARN_USE_CAPTURED_VALUE:
+                // Replace the command passed in by the framework with the
+                // one recorded during the preceding capture
+                pCommand = replayCommand;
+                break;
+
+            default:
+                // Use the command passed in by the framework
+                // (which might have undergone some substitutions
+                // during the arbiter/compare APDU operation)
+        }
+
+        byte[] replayResponse = stepCarItem.rawResponse;
+        byte[] substitutedReplayResponse = Arrays.copyOf(
+            replayResponse,replayResponse.length
+        );
+        final byte[] selectedResponse;
+        TapReplayArbiter.ReplayCompareOutcome responseOutcome = m_trc.getArbiter().compareAPDU(
+            stepCarItem.stepName,
+            TapReplayArbiter.APDUDirection.MEDIA_TO_TERMINAL,
+            substitutedReplayResponse, replayResponse
+        );
+        switch(responseOutcome) {
+            case ERROR_ABORT_NOW:
+                throw new CommunicationException(
+                    "Response mismatch at step " + stepCarItem.stepName
+                );
+
+            case OK_USE_CAPTURED_VALUE:
+            case WARN_USE_CAPTURED_VALUE:
+                // Replace the command passed in by the framework with the
+                // one recorded during the preceding capture
+                selectedResponse = replayResponse;
+                break;
+
+            default:
+                // Use the command passed in by the framework
+                // (which might have undergone some substitutions
+                // during the arbiter/compare APDU operation)
+                selectedResponse = substitutedReplayResponse;
+        }
+        LOGGER.info(String.format(
+            "Replaying step %s: commandOutcome=%s responseOutcome=%s",
+            stepCarItem.stepName, commandOutcome, responseOutcome
+        ));
+
+        m_stepIndex++;
+        return selectedResponse;
     }
 
     @Override

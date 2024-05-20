@@ -131,4 +131,7 @@ public class TapReplayConductor {
         trc.play(template);
     }
 
+    public ArrayList<CommandAndResponse> getCommandsAndResponses() {
+        return m_commandsAndResponses;
+    }
 }

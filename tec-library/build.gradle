@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 group = 'net.heretical_camelid.transit_emv_checker.library'
@@ -21,6 +22,11 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn  test
 }
 
 // Capability to build a 'fat' JAR following:

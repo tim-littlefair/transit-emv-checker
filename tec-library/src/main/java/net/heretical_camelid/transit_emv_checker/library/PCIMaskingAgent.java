@@ -92,7 +92,14 @@ public class PCIMaskingAgent {
                 maskingString,
                 panWithoutSpaces.substring(panWithoutSpaces.length()-4)
             );
-            maskPairs.put(panWithoutSpaces, maskedPanWithoutSpaces);
+            // When we use the TapReplay{Conductor/Provider/Arbiter} classes,
+            // we will read in PANs from captured data which have already been
+            // masked, so if there is no difference between the input to the
+            // masking above and its output, we do not need to include this
+            // PAN in the store of sensitive maskable values.
+            if(!panWithoutSpaces.equals(maskedPanWithoutSpaces)) {
+                maskPairs.put(panWithoutSpaces, maskedPanWithoutSpaces);
+            }
         }
     
         ArrayList<CommandAndResponse> maskedCommandsAndResponses = new ArrayList<>();

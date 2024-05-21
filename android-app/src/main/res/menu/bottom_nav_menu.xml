@@ -8,16 +8,16 @@
 
     <item
             android:id="@+id/navigation_transit"
-            android:icon="@drawable/ic_home_black_24dp"
+            android:icon="@drawable/commute_24px"
             android:title="@string/menu_transit"/>
 
     <item
             android:id="@+id/navigation_emv_details"
-            android:icon="@drawable/ic_home_black_24dp"
+            android:icon="@drawable/credit_card_24px"
             android:title="@string/menu_emv_details"/>
 
     <item
             android:id="@+id/navigation_about"
-            android:icon="@drawable/ic_home_black_24dp"
+            android:icon="@drawable/info_24px"
             android:title="@string/menu_about"/>
 </menu>

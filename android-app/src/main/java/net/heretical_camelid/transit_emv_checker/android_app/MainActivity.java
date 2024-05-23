@@ -15,6 +15,8 @@ import net.heretical_camelid.transit_emv_checker.android_app.databinding.Activit
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,7 +67,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateAboutPage() {
-        setPageHtmlText(R.id.navigation_about,"<html><body><p>TEC by TJL</p></body></html>");
+        String aboutHtmlText = "<html><body><p>TEC by TJL</p></body></html>";
+        try {
+            InputStream aboutHtmlStream;
+            aboutHtmlStream = getAssets().open("about.html");
+            int lengthInBytes = aboutHtmlStream.available();
+            byte[] buffer = new byte[lengthInBytes];
+            aboutHtmlStream.read(buffer);
+            aboutHtmlStream.close();
+            aboutHtmlText = new String(buffer, "UTF-8");
+        }
+        catch(IOException e) {
+            throw new RuntimeException(e);
+        }
+        setPageHtmlText(R.id.navigation_about,aboutHtmlText);
     }
 
     public void setInitialState() {

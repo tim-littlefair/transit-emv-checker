@@ -1,12 +1,18 @@
 package net.heretical_camelid.transit_emv_checker.android_app.ui.html;
 
 import android.util.Base64;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 public class ObservableWebViewWrapper {
     private final WebView m_webView;
     public ObservableWebViewWrapper(WebView webView) {
         m_webView = webView;
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setAllowFileAccess(true);
+        webSettings.setAllowFileAccessFromFileURLs(true);
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
+        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
     }
 
     public void loadHtmlText(String htmlText) {

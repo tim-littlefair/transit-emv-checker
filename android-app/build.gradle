@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.jaredsburrows.license' version '0.9.7'
 }
 
 
@@ -60,25 +61,24 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.7.7'
     implementation 'androidx.navigation:navigation-ui:2.7.7'
 
+    // The following line ensures that a report is generated
+    // listing dependency copyrights and licenses
+    implementation 'com.jaredsburrows:gradle-license-plugin:0.9.7'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
-tasks.register('collectLicenseFile', Copy) {
-    from layout.projectDirectory.file("../LICENSE")
-    into layout.projectDirectory.dir("build/intermediates/assets/release")
-    into layout.projectDirectory.dir("build/intermediates/assets/debug")
-    println("License file collected");
-    // TODO: Extend this to collect license files from all
-    // dependency JARs collected from upstream Maven repositories
+licenseReport {
+    generateHtmlReport = true
+    generateCsvReport = false
+    generateJsonReport = false
+    generateTextReport = false
+    copyHtmlReportToAssets = true
+    useVariantSpecificAssetDirs = false
 }
 
-// TODO: Can run the task above by Gradle CLI but don't know how to
-// integrate it as an automatic dependency of the default build
-project.afterEvaluate {
-    project.getTasks().getByName('compressReleaseAssets').dependsOn('collectLicenseFile')
-    project.getTasks().getByName('compressDebugAssets').dependsOn('collectLicenseFile')
-}
+
 
 

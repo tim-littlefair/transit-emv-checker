@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
 }
 
+
 android {
     namespace 'net.heretical_camelid.transit_emv_checker.android_app'
     compileSdk 34
@@ -28,6 +29,11 @@ android {
     }
     buildFeatures {
         viewBinding true
+    }
+    packaging {
+        resources {
+            merge "build/licenses"
+        }
     }
 }
 
@@ -58,3 +64,21 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+
+tasks.register('collectLicenseFile', Copy) {
+    from layout.projectDirectory.file("../LICENSE")
+    into layout.projectDirectory.dir("build/intermediates/assets/release")
+    into layout.projectDirectory.dir("build/intermediates/assets/debug")
+    println("License file collected");
+    // TODO: Extend this to collect license files from all
+    // dependency JARs collected from upstream Maven repositories
+}
+
+// TODO: Can run the task above by Gradle CLI but don't know how to
+// integrate it as an automatic dependency of the default build
+project.afterEvaluate {
+    project.getTasks().getByName('compressReleaseAssets').dependsOn('collectLicenseFile')
+    project.getTasks().getByName('compressDebugAssets').dependsOn('collectLicenseFile')
+}
+
+

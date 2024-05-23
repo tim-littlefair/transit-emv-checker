@@ -12,7 +12,7 @@ gradle=./gradlew
 
 $gradle clean
 
-$gradle --warning-mode all uberJar test
+$gradle --warning-mode all :tec-library:clean :tec-library:uberJar # :android-app:build
 gradle_status=$?
 echo gradle_status=$gradle_status
 

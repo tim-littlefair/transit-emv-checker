@@ -8,11 +8,6 @@ public class ObservableWebViewWrapper {
     private final WebView m_webView;
     public ObservableWebViewWrapper(WebView webView) {
         m_webView = webView;
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setAllowFileAccess(true);
-        webSettings.setAllowFileAccessFromFileURLs(true);
-        webSettings.setAllowUniversalAccessFromFileURLs(true);
-        webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
     }
 
     public void loadHtmlText(String htmlText) {

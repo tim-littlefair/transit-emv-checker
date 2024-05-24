@@ -1,6 +1,8 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Toast;
 import androidx.lifecycle.MutableLiveData;
@@ -11,13 +13,19 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
+import net.heretical_camelid.transit_emv_checker.android_app.BuildConfig;
+import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,20 +75,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void populateAboutPage() {
-        String aboutHtmlText = "<html><body><p>TEC by TJL</p></body></html>";
+        String aboutText = null;
+        String openSourceLicensesText;
         try {
-            InputStream aboutHtmlStream;
-            aboutHtmlStream = getAssets().open("about.html");
-            int lengthInBytes = aboutHtmlStream.available();
-            byte[] buffer = new byte[lengthInBytes];
-            aboutHtmlStream.read(buffer);
-            aboutHtmlStream.close();
-            aboutHtmlText = new String(buffer, "UTF-8");
+            aboutText = getTextFromAsset("about.html");
+            openSourceLicensesText = getTextFromAsset("open_source_licenses.html");
         }
         catch(IOException e) {
-            throw new RuntimeException(e);
+            // Placeholders
+            if(aboutText == null) {
+                aboutText = "<html><body><p>TEC by TJL</p></body></html>";
+            }
+            openSourceLicensesText = "";
         }
-        setPageHtmlText(R.id.navigation_about,aboutHtmlText);
+
+        String versionString = BuildConfig.VERSION_NAME;
+        int versionCode = BuildConfig.VERSION_CODE;
+        if(versionCode==1) {
+            // In developer builds from unmodified git source,
+            // versionCode will be equal to 1 and is not interesting.
+            versionString += "-dev";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                versionString +=
+                    "@" + ZonedDateTime.now( ZoneOffset.UTC )
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
+                    ;
+            }
+            // .format( DateTimeFormatter.ISO_DATE_TIME )
+
+        } else {
+            // In CI builds, versionCode will contain an integer
+            // parsed from the 7-hex-digit prefix of the git
+            // commit hash.
+            versionString += String.format(".%07x",versionCode);
+        }
+        aboutText = aboutText.replace("%VERSION%",versionString);
+        aboutText = aboutText.replace(
+            "%OPEN_SOURCE_LICENSES_HTML_BASE64%",
+            Base64.encodeToString(openSourceLicensesText.getBytes(),Base64.NO_PADDING)
+        );
+        setPageHtmlText(R.id.navigation_about,aboutText);
+    }
+
+    private @NotNull String getTextFromAsset(String assetFilename) throws IOException {
+        InputStream assetStream = getAssets().open(assetFilename);
+        int lengthInBytes = assetStream.available();
+        byte[] buffer = new byte[lengthInBytes];
+        assetStream.read(buffer);
+        assetStream.close();
+        return new String(buffer, "UTF-8");
     }
 
     public void setInitialState() {

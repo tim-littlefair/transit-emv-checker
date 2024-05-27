@@ -632,7 +632,7 @@ public class APDUObserver {
         AppAccountIdentifier mediumAccountIdentifier = primaryAccountIdentifier();
         if(mediumAccountIdentifier!=null) {
             return String.format(
-                "%s@atc=%04d",
+                "%satc%04d",
                 mediumAccountIdentifier,m_mediumTransactionCounterNow
             );
         } else {

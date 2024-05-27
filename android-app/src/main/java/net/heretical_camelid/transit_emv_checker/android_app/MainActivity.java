@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     boolean m_saveDirectoryDisabled = false;
     private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 101;
     private final int REQUEST_CODE_CREATE_DOCUMENT = 102;
+    private String m_xmlTextToSave = null;
     private final String DOCUMENT_NAME = "net.heretical_camelid.transit_emv_checker.android_app.DOCUMENT_NAME";
     private final String DOCUMENT_TEXT = "net.heretical_camelid.transit_emv_checker.android_app.DOCUMENT_TEXT";
 
@@ -221,14 +222,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
+        return saveViaIntent(xmlFilename, xmlContent);
+    }
+
+    private @NotNull String saveViaIntent(String xmlFilename, String xmlContent) {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/xml");
         intent.putExtra(Intent.EXTRA_TITLE, xmlFilename);
-        intent.putExtra(DOCUMENT_NAME, xmlFilename);
-        intent.putExtra(DOCUMENT_TEXT, xmlContent);
+        m_xmlTextToSave = xmlContent;
         startActivityForResult(intent, REQUEST_CODE_CREATE_DOCUMENT, null);
         return m_xmlSaveDirectoryUri.getPath() + "/" + xmlFilename;
+    }
+
+    private @NotNull String saveDirectly(String xmlFilename, String xmlContent) {
+        Uri.Builder documentUriBuilder = m_xmlSaveDirectoryUri.buildUpon();
+        documentUriBuilder.appendPath(xmlFilename);
+        Uri documentUri = documentUriBuilder.build();
+        OutputStream outputStream;
+        try {
+            outputStream = getContentResolver().openOutputStream(documentUri);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write("something, anything\n");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return documentUri.getPath();
     }
 
     @Override
@@ -252,12 +273,13 @@ public class MainActivity extends AppCompatActivity {
             try {
                 outputStream = getContentResolver().openOutputStream(documentUri);
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-                writer.write("something, anything\n");
+                writer.write(m_xmlTextToSave);
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            m_xmlTextToSave = null;
         }
 
 

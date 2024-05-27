@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
@@ -269,7 +272,11 @@ public class APDUObserver {
             case 0x80A8: {
                 int lengthOfExtraBytes = cr.rawCommand[4];
                 byte[] extraBytes = Arrays.copyOfRange(cr.rawCommand,5,5+lengthOfExtraBytes);
-                cr.stepName = "GET_PROCESSING_OPTIONS for " + m_currentAppSelectionContext.toString();
+                if(m_currentAppSelectionContext != null) {
+                    cr.stepName = "GET_PROCESSING_OPTIONS for " + m_currentAppSelectionContext.toString();
+                } else {
+                    cr.stepName = "GET_PROCESSING_OPTIONS for unidentified application";
+                }
                 commandInterpretation.append(cr.stepName + "\n");
 
                 if(m_currentAppSelectionContext.pdol != null) {
@@ -636,7 +643,7 @@ public class APDUObserver {
                 mediumAccountIdentifier,m_mediumTransactionCounterNow
             );
         } else {
-            return null;
+            return String.format("incomplete_media_" + LocalDateTime.now().toString());
         }
     }
 }

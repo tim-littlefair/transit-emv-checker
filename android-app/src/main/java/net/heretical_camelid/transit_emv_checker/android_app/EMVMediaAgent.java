@@ -19,6 +19,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     public static final int TIMEOUT_5000_MS = 5000;
     private final MainActivity m_mainActivity;
     private final NfcAdapter m_nfcAdapter;
+    private final EmvTemplate.Builder m_templateBuilder;
 
     public EMVMediaAgent(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
@@ -28,6 +29,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         } else {
             m_mainActivity.homePageLogAppend("No NFC adapter found");
         }
+        m_templateBuilder = createTemplateBuilder();
     }
 
     public void enableDetection() {
@@ -87,10 +89,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                 PCIMaskingAgent pciMaskingAgent = new PCIMaskingAgent();
                 APDUObserver apduObserver = new APDUObserver(pciMaskingAgent);
                 AndroidNFCProvider provider = new AndroidNFCProvider(apduObserver, tagAsIsoDep);
-
-                EmvTemplate.Builder templateBuilder = createTemplateBuilder();
-
-                EmvTemplate template = templateBuilder.setProvider(provider).build();
+                EmvTemplate template = m_templateBuilder.setProvider(provider).build();
                 MyParser mParser = new MyParser(template, apduObserver);
                 template.addParsers(mParser);
 

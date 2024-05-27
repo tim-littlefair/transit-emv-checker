@@ -13,7 +13,7 @@ dependencies {
     implementation "org.apache.commons:commons-collections4:4.2"
     implementation "commons-io:commons-io:2.6"
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
-    testImplementation "org.slf4j:slf4j-log4j12:*"
+    testImplementation "ch.qos.reload4j:reload4j:1.2.22"
 }
 
 test {

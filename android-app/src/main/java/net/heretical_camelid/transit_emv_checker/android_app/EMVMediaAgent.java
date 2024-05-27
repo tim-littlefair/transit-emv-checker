@@ -136,25 +136,21 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     String writeXMLToExternalStorage(APDUObserver apduObserver) {
         String xmlFilename = apduObserver.mediumStateId() + ".xml";
         String xmlContent = apduObserver.toXmlString(false);
-        String xmlPath = null;
+        String xmlPath = m_mainActivity.saveXmlCaptureFile(xmlFilename, xmlContent);
+/*
+        null;
         try {
             File[] dirs = m_mainActivity.getExternalFilesDirs(null);
             // We expect that dirs will contain one or two directories - if
             // there are two, the second will be on a removable SD card and is
             // preferred.
             File baseDir = dirs[dirs.length-1];
-            File saveDir = new File(baseDir.getAbsolutePath() + "/CET_Captures");
-            saveDir.mkdirs();
-            File saveFile = new File(saveDir + "/" + xmlFilename);
-            FileWriter outFileWriter = new FileWriter(saveFile.getAbsoluteFile());
-            outFileWriter.write(xmlContent);
-            outFileWriter.close();
-            xmlPath = saveFile.getAbsolutePath();
             m_mainActivity.homePageLogAppend("Tap captured to file " + xmlPath);
         }
         catch(IOException e) {
             m_mainActivity.homePageLogAppend("Tap not captured");
         }
+ */
         return xmlPath;
     }
 }

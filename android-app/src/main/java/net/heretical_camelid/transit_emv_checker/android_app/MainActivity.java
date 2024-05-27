@@ -1,10 +1,16 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.storage.StorageManager;
+import android.provider.DocumentsContract;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Toast;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,13 +24,13 @@ import java.io.InputStream;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
-
+import java.io.FileWriter;
+import java.io.File;
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
-import net.heretical_camelid.transit_emv_checker.android_app.BuildConfig;
+
 import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
 
     // NFC/EMV operations controller
     private EMVMediaAgent m_emvMediaAgent;
+
+    // Saving XML capture files depends on these
+    Uri m_xmlSaveDirectoryUri = null;
+    boolean m_saveDirectoryDisabled = false;
+    private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 101;
+    private final int REQUEST_CODE_CREATE_DOCUMENT = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
+        configureXmlSaveDirectory();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -189,5 +202,67 @@ public class MainActivity extends AppCompatActivity {
     public void tryToDetectMedia() {
         m_homePageLog.setValue("About to try to detect EMV media");
         m_emvMediaAgent.enableDetection();
+    }
+
+    private void configureXmlSaveDirectory() {
+        StorageManager sm = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+
+        // ref https://stackoverflow.com/a/72404595
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.setFlags(
+            Intent.FLAG_GRANT_READ_URI_PERMISSION |
+            Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        );
+        String URI_PREFIX = "content://com.android.externalstorage.documents/tree/primary%3A";
+        String URI_SUFFIX = "Android%2F";
+        Uri initialUri = Uri.parse(URI_PREFIX + URI_SUFFIX);
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
+        startActivityForResult(intent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
+    }
+
+    public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/xml");
+        intent.putExtra(Intent.EXTRA_TITLE, xmlFilename);
+        intent.putExtra(Intent.EXTRA_STREAM, xmlContent);
+        startActivityForResult(intent, REQUEST_CODE_CREATE_DOCUMENT, null);
+        return m_xmlSaveDirectoryUri.getPath() + "/" + xmlFilename;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if(resultCode != RESULT_OK) {
+            Toast.makeText(this,"Request declined",Toast.LENGTH_LONG).show();
+        } else if(resultData==null) {
+            Toast.makeText(this, "Request approved but null data", Toast.LENGTH_LONG).show();
+        } else if(requestCode== REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS) {
+            m_xmlSaveDirectoryUri = resultData.getData();
+            getContentResolver().takePersistableUriPermission(
+                m_xmlSaveDirectoryUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+            );
+            Toast.makeText(this,"Permission to save XML files granted",Toast.LENGTH_LONG).show();
+        } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
+            String xmlFilename = resultData.getParcelableExtra(Intent.EXTRA_TITLE);
+            String xmlContent =  resultData.getParcelableExtra(Intent.EXTRA_STREAM);
+            File saveDir = new File(m_xmlSaveDirectoryUri.getPath());
+            saveDir.mkdirs();
+            File saveFile = new File(saveDir + "/" + xmlFilename);
+            FileWriter outFileWriter = null;
+            try {
+                outFileWriter = new FileWriter(saveFile);
+                outFileWriter.write(xmlContent);
+                outFileWriter.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+
+
+
     }
 }

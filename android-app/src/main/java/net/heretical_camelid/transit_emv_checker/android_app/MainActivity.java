@@ -19,14 +19,12 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.io.FileWriter;
-import java.io.File;
+
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
@@ -52,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     boolean m_saveDirectoryDisabled = false;
     private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 101;
     private final int REQUEST_CODE_CREATE_DOCUMENT = 102;
+    private final String DOCUMENT_NAME = "net.heretical_camelid.transit_emv_checker.android_app.DOCUMENT_NAME";
+    private final String DOCUMENT_TEXT = "net.heretical_camelid.transit_emv_checker.android_app.DOCUMENT_TEXT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,7 +225,8 @@ public class MainActivity extends AppCompatActivity {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/xml");
         intent.putExtra(Intent.EXTRA_TITLE, xmlFilename);
-        intent.putExtra(Intent.EXTRA_STREAM, xmlContent);
+        intent.putExtra(DOCUMENT_NAME, xmlFilename);
+        intent.putExtra(DOCUMENT_TEXT, xmlContent);
         startActivityForResult(intent, REQUEST_CODE_CREATE_DOCUMENT, null);
         return m_xmlSaveDirectoryUri.getPath() + "/" + xmlFilename;
     }
@@ -245,16 +246,15 @@ public class MainActivity extends AppCompatActivity {
             );
             Toast.makeText(this,"Permission to save XML files granted",Toast.LENGTH_LONG).show();
         } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
-            String xmlFilename = resultData.getParcelableExtra(Intent.EXTRA_TITLE);
-            String xmlContent =  resultData.getParcelableExtra(Intent.EXTRA_STREAM);
-            File saveDir = new File(m_xmlSaveDirectoryUri.getPath());
-            saveDir.mkdirs();
-            File saveFile = new File(saveDir + "/" + xmlFilename);
-            FileWriter outFileWriter = null;
+            // String xmlFilename = resultData.getParcelableExtra(Intent.EXTRA_TITLE);
+            Uri documentUri = resultData.getData();
+            OutputStream outputStream;
             try {
-                outFileWriter = new FileWriter(saveFile);
-                outFileWriter.write(xmlContent);
-                outFileWriter.close();
+                outputStream = getContentResolver().openOutputStream(documentUri);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+                writer.write("something, anything\n");
+                writer.flush();
+                writer.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

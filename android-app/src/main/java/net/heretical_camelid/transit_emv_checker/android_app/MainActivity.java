@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 public class MainActivity extends AppCompatActivity {
     static final Logger LOGGER = LoggerFactory.getLogger(MainActivity.class);
+
 
     // Activity wide UI elements
     private BottomNavigationView m_navView;
@@ -53,7 +55,12 @@ public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
     private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 102;
     private final int REQUEST_CODE_CREATE_DOCUMENT = 103;
-    private int m_permissionRequestsSent;
+
+    // Permission management
+    static final String PERMISSION_STATE_GRANTED = "granted";
+    static final String PERMISSION_STATE_DENIED = "denied";
+    private TreeMap<String,String> m_permissionStatuses;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +86,8 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
-        requestPermissions();
         m_fileSaver = new ExternalFileManager(this);
-        m_fileSaver.configureSaveDirectory(REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
-        LOGGER.info("Save directory configured");
+        requestPermissions();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -230,28 +235,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestPermissions() {
-        m_permissionRequestsSent = 0;
-        String[] permissionsRequired = {
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        String[] permissionsDesired = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.MANAGE_EXTERNAL_STORAGE,
         };
-        ArrayList<String> permissionsToRequest = new ArrayList<>();
-        for(String permissionName: permissionsRequired) {
+        m_permissionStatuses = new TreeMap<String,String>();
+        ArrayList<String> permissionsToBeRequested = new ArrayList<>();
+        for(String permissionName: permissionsDesired) {
             boolean permissionOutcome =
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(
                     this, permissionName
                 )
             ;
-            LOGGER.info("Permission " + permissionName + (permissionOutcome ? " granted":" denied") );
-            if(permissionOutcome == false) {
-                permissionsToRequest.add(permissionName);
+            String permissionStatus;
+            if(permissionOutcome == true) {
+                permissionStatus = PERMISSION_STATE_GRANTED;
+            } else {
+                permissionStatus = null; // null interpreted as 'unknown pending request'
+                permissionsToBeRequested.add(permissionName);
             }
+            m_permissionStatuses.put(permissionName,permissionStatus);
+            LOGGER.info("Permission " + permissionName + " initial_status=" + permissionStatus);
         }
-        requestPermissions(
-            permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
-            REQUEST_CODE_REQUEST_PERMISSIONS
-        );
+        if(permissionsToBeRequested.size()>0) {
+            requestPermissions(
+                permissionsToBeRequested.toArray(new String[permissionsToBeRequested.size()]),
+                REQUEST_CODE_REQUEST_PERMISSIONS
+            );
+            // We need to wait until we see the permission request result before
+            // configuring the save directory
+        } else {
+            m_fileSaver.configureSaveDirectory(m_permissionStatuses);
+        }
     }
 
     @Override
@@ -262,10 +278,12 @@ public class MainActivity extends AppCompatActivity {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for(int i=0; i<permissions.length; ++i) {
-            LOGGER.info(
-                "Permission " + permissions[i] +
-                    ( (PackageManager.PERMISSION_GRANTED==grantResults[i]) ? " granted":" denied" )
-            );
+            String permissionStatus =
+                (PackageManager.PERMISSION_GRANTED==grantResults[i]) ?
+                PERMISSION_STATE_GRANTED: PERMISSION_STATE_DENIED
+            ;
+            m_permissionStatuses.put(permissions[i], permissionStatus);
         }
+        m_fileSaver.configureSaveDirectory(m_permissionStatuses);
     }
 }

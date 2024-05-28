@@ -1,29 +1,15 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.os.Looper;
-import android.os.storage.StorageManager;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.provider.Settings;
-import android.widget.Toast;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.core.content.ContextCompat;
-import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
 import org.jetbrains.annotations.NotNull;
 
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.TreeMap;
 import android.Manifest;
 
 public class ExternalFileManager {
@@ -40,27 +26,42 @@ public class ExternalFileManager {
         m_mainActivity = mainActivity;
     }
 
-    public void configureSaveDirectory(int intentRequestCode) {
+    public void configureSaveDirectory(TreeMap<String, String> permissionStatuses) {
         m_xmlSaveDirectoryUri = null;
-        File[] appCacheDirs = m_mainActivity.getExternalCacheDirs();
-        LOGGER.info("Number of cache dirs: " + appCacheDirs.length);
-        File appCacheDir = appCacheDirs[appCacheDirs.length-1];
-        if(appCacheDir == null) {
-            LOGGER.warn("Can't save files: cache directory not available");
+        for(String permissionName: permissionStatuses.keySet()) {
+            LOGGER.info(String.format(
+                "Permission: %s status: %s",
+                permissionName, permissionStatuses.get(permissionName)
+            ));
+        }
+        String externalStoragePermissionStatus = permissionStatuses.get(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if(MainActivity.PERMISSION_STATE_GRANTED.equals(externalStoragePermissionStatus)) {
+            File downloadDirFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            if(downloadDirFile != null) {
+                m_xmlSaveDirectoryUri = Uri.fromFile(downloadDirFile);
+                LOGGER.info("Files can be saved in " + m_xmlSaveDirectoryUri.getPath());
+            }
         } else {
-            boolean appCacheDirExists = appCacheDir.exists();
-            if(appCacheDirExists == false) {
-                appCacheDirExists = appCacheDir.mkdirs();
-            }
-            if(appCacheDirExists == false) {
-                LOGGER.warn("Can't save files: cache directory did not exist and could not be created");
-                appCacheDirExists = appCacheDir.mkdirs();
-            }
-            if(appCacheDir.canWrite() == false) {
-                LOGGER.warn("Can't save files: cache directory not writeable");
+            File[] appCacheDirs = m_mainActivity.getExternalCacheDirs();
+            LOGGER.info("Number of cache dirs: " + appCacheDirs.length);
+            File appCacheDir = appCacheDirs[appCacheDirs.length - 1];
+            if (appCacheDir == null) {
+                LOGGER.warn("Can't save files: cache directory not available");
             } else {
-                m_xmlSaveDirectoryUri = Uri.fromFile(appCacheDir);
-                LOGGER.info("Files can be saved in " + appCacheDir.getPath());
+                boolean appCacheDirExists = appCacheDir.exists();
+                if (appCacheDirExists == false) {
+                    appCacheDirExists = appCacheDir.mkdirs();
+                }
+                if (appCacheDirExists == false) {
+                    LOGGER.warn("Can't save files: cache directory did not exist and could not be created");
+                    appCacheDirExists = appCacheDir.mkdirs();
+                }
+                if (appCacheDir.canWrite() == false) {
+                    LOGGER.warn("Can't save files: cache directory not writeable");
+                } else {
+                    m_xmlSaveDirectoryUri = Uri.fromFile(appCacheDir);
+                    LOGGER.info("Files can be saved in " + appCacheDir.getPath());
+                }
             }
         }
 

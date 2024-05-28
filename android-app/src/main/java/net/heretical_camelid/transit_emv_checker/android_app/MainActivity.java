@@ -46,13 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private EMVMediaAgent m_emvMediaAgent;
 
     // Saving XML capture files depends on these
-    Uri m_xmlSaveDirectoryUri = null;
-    boolean m_saveDirectoryDisabled = false;
+    private FileSaver m_fileSaver;
     private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 101;
     private final int REQUEST_CODE_CREATE_DOCUMENT = 102;
-    private String m_xmlTextToSave = null;
-    private final String DOCUMENT_NAME = "net.heretical_camelid.transit_emv_checker.android_app.DOCUMENT_NAME";
-    private final String DOCUMENT_TEXT = "net.heretical_camelid.transit_emv_checker.android_app.DOCUMENT_TEXT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
-        configureXmlSaveDirectory();
+        m_fileSaver = new FileSaver(this);
+        m_fileSaver.configureXmlSaveDirectory(REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -115,8 +112,6 @@ public class MainActivity extends AppCompatActivity {
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
                     ;
             }
-            // .format( DateTimeFormatter.ISO_DATE_TIME )
-
         } else {
             // In CI builds, versionCode will contain an integer
             // parsed from the 7-hex-digit prefix of the git
@@ -205,54 +200,6 @@ public class MainActivity extends AppCompatActivity {
         m_emvMediaAgent.enableDetection();
     }
 
-    private void configureXmlSaveDirectory() {
-// /*
-        StorageManager sm = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
-
-        // ref https://stackoverflow.com/a/72404595
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.setFlags(
-            Intent.FLAG_GRANT_READ_URI_PERMISSION |
-            Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-        );
-        String URI_PREFIX = "content://com.android.externalstorage.documents/tree/primary%3A";
-        String URI_SUFFIX = "Android%2F";
-        Uri initialUri = Uri.parse(URI_PREFIX + URI_SUFFIX);
-        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
-        startActivityForResult(intent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
-// */
-    }
-
-    public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
-        return saveViaIntent(xmlFilename, xmlContent);
-    }
-
-    private @NotNull String saveViaIntent(String xmlFilename, String xmlContent) {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("text/xml");
-        intent.putExtra(Intent.EXTRA_TITLE, xmlFilename);
-        m_xmlTextToSave = xmlContent;
-        startActivityForResult(intent, REQUEST_CODE_CREATE_DOCUMENT, null);
-        return m_xmlSaveDirectoryUri.getPath() + "/" + xmlFilename;
-    }
-
-    private @NotNull String saveDirectly(String xmlFilename, String xmlContent) {
-        Uri.Builder documentUriBuilder = m_xmlSaveDirectoryUri.buildUpon();
-        documentUriBuilder.appendPath(xmlFilename);
-        Uri documentUri = documentUriBuilder.build();
-        OutputStream outputStream;
-        try {
-            outputStream = getContentResolver().openOutputStream(documentUri);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-            writer.write("something, anything\n");
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return documentUri.getPath();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
@@ -262,31 +209,15 @@ public class MainActivity extends AppCompatActivity {
         } else if(resultData==null) {
             Toast.makeText(this, "Request approved but null data", Toast.LENGTH_LONG).show();
         } else if(requestCode== REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS) {
-            m_xmlSaveDirectoryUri = resultData.getData();
-            getContentResolver().takePersistableUriPermission(
-                m_xmlSaveDirectoryUri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            );
-            Toast.makeText(this,"Permission to save XML files granted",Toast.LENGTH_LONG).show();
+            m_fileSaver.setSaveDirectory(resultData.getData());
         } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
             // String xmlFilename = resultData.getParcelableExtra(Intent.EXTRA_TITLE);
             Uri documentUri = resultData.getData();
-            OutputStream outputStream;
-            try {
-                outputStream = getContentResolver().openOutputStream(documentUri);
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-                writer.write(m_xmlTextToSave);
-                writer.flush();
-                writer.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            m_xmlTextToSave = null;
+            m_fileSaver.storeFileContent(documentUri);
         }
+    }
 
-
-
-
-
+    public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
+        return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
     }
 }

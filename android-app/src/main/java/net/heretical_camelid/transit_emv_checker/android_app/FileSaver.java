@@ -3,42 +3,77 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.storage.StorageManager;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
 public class FileSaver {
     final private MainActivity m_mainActivity;
     boolean m_permissionAcquired;
+    Uri m_xmlSaveDirectoryUri = null;
+    boolean m_saveDirectoryDisabled = false;
+    private String m_xmlTextToSave = null;
+
 
     public FileSaver(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
         m_permissionAcquired = true; // checkPermission();
     }
 
-/*
-    private boolean checkPermission() {
-        // https://stackoverflow.com/a/49378201
-        int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
-        if (ContextCompat.checkSelfPermission(m_mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            // Request for permission
-            ActivityCompat.requestPermissions(m_mainActivity,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-            return false;
-        } else {
-            return true;
-        }
+    public void configureXmlSaveDirectory(int intentRequestCode) {
+        StorageManager sm = (StorageManager) m_mainActivity.getSystemService(Context.STORAGE_SERVICE);
+
+        // ref https://stackoverflow.com/a/72404595
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.setFlags(
+            Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+        );
+        String URI_PREFIX = "content://com.android.externalstorage.documents/tree/primary%3A";
+        String URI_SUFFIX = "Android%2F";
+        Uri initialUri = Uri.parse(URI_PREFIX + URI_SUFFIX);
+        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
+        m_mainActivity.startActivityForResult(intent, intentRequestCode);
     }
-*/
+
+    public @NotNull String saveViaIntent(String xmlFilename, String xmlContent, int intentRequestCode) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/xml");
+        intent.putExtra(Intent.EXTRA_TITLE, xmlFilename);
+        m_xmlTextToSave = xmlContent;
+        m_mainActivity.startActivityForResult(intent, intentRequestCode, null);
+        return m_xmlSaveDirectoryUri.getPath() + "/" + xmlFilename;
+    }
+
+    private @NotNull String saveDirectly(String xmlFilename, String xmlContent) {
+        Uri.Builder documentUriBuilder = m_xmlSaveDirectoryUri.buildUpon();
+        documentUriBuilder.appendPath(xmlFilename);
+        Uri documentUri = documentUriBuilder.build();
+        OutputStream outputStream;
+        try {
+            outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write("something, anything\n");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return documentUri.getPath();
+    }
+
 
     public int saveFile(String fileBaseName, byte[] fileContent) {
         if(m_permissionAcquired == false) {
@@ -114,4 +149,27 @@ public class FileSaver {
     }
 
     private Context getApplicationContext() { return m_mainActivity;  }
+
+    public void setSaveDirectory(Uri uri) {
+        m_xmlSaveDirectoryUri = uri;
+        m_mainActivity.getContentResolver().takePersistableUriPermission(
+            m_xmlSaveDirectoryUri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        );
+        m_saveDirectoryDisabled = false;
+    }
+
+    public void storeFileContent(Uri documentUri) {
+        OutputStream outputStream;
+        try {
+            outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write(m_xmlTextToSave);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        m_xmlTextToSave = null;
+    }
 }

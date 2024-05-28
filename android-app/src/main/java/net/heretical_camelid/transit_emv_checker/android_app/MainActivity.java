@@ -206,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void configureXmlSaveDirectory() {
+// /*
         StorageManager sm = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
 
         // ref https://stackoverflow.com/a/72404595
@@ -219,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
         Uri initialUri = Uri.parse(URI_PREFIX + URI_SUFFIX);
         intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
         startActivityForResult(intent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
+// */
     }
 
     public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {

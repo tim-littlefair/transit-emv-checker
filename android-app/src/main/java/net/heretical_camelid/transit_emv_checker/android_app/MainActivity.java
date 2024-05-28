@@ -1,12 +1,15 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Toast;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +22,7 @@ import java.io.*;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
@@ -26,8 +30,11 @@ import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewMod
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainActivity extends AppCompatActivity {
+    static final Logger LOGGER = LoggerFactory.getLogger(MainActivity.class);
 
     // Activity wide UI elements
     private BottomNavigationView m_navView;
@@ -43,8 +50,10 @@ public class MainActivity extends AppCompatActivity {
 
     // Saving XML capture files depends on these
     private ExternalFileManager m_fileSaver;
-    private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 101;
-    private final int REQUEST_CODE_CREATE_DOCUMENT = 102;
+    private final int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
+    private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 102;
+    private final int REQUEST_CODE_CREATE_DOCUMENT = 103;
+    private int m_permissionRequestsSent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +79,10 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
+        requestPermissions();
         m_fileSaver = new ExternalFileManager(this);
         m_fileSaver.configureSaveDirectory(REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
+        LOGGER.info("Save directory configured");
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -214,6 +225,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
-        return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
+        //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
+        return m_fileSaver.saveDirectly(xmlFilename, xmlContent);
+    }
+
+    private void requestPermissions() {
+        m_permissionRequestsSent = 0;
+        String[] permissionsRequired = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+        };
+        ArrayList<String> permissionsToRequest = new ArrayList<>();
+        for(String permissionName: permissionsRequired) {
+            boolean permissionOutcome =
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(
+                    this, permissionName
+                )
+            ;
+            LOGGER.info("Permission " + permissionName + (permissionOutcome ? " granted":" denied") );
+            if(permissionOutcome == false) {
+                permissionsToRequest.add(permissionName);
+            }
+        }
+        requestPermissions(
+            permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
+            REQUEST_CODE_REQUEST_PERMISSIONS
+        );
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+        final int requestCode,
+        final String[] permissions,
+        final int[] grantResults
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for(int i=0; i<permissions.length; ++i) {
+            LOGGER.info(
+                "Permission " + permissions[i] +
+                    ( (PackageManager.PERMISSION_GRANTED==grantResults[i]) ? " granted":" denied" )
+            );
+        }
     }
 }

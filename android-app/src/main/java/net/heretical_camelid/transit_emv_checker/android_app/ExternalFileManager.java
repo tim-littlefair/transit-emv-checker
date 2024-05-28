@@ -4,17 +4,31 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Looper;
 import android.os.storage.StorageManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.widget.Toast;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.core.content.ContextCompat;
+import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
 import org.jetbrains.annotations.NotNull;
 
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
+import android.Manifest;
 
 public class ExternalFileManager {
+    static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileManager.class);
+
     final private MainActivity m_mainActivity;
     boolean m_permissionAcquired;
     Uri m_xmlSaveDirectoryUri = null;
@@ -24,10 +38,43 @@ public class ExternalFileManager {
 
     public ExternalFileManager(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
-        m_permissionAcquired = true; // checkPermission();
     }
 
     public void configureSaveDirectory(int intentRequestCode) {
+        m_xmlSaveDirectoryUri = null;
+        File[] appCacheDirs = m_mainActivity.getExternalCacheDirs();
+        LOGGER.info("Number of cache dirs: " + appCacheDirs.length);
+        File appCacheDir = appCacheDirs[appCacheDirs.length-1];
+        if(appCacheDir == null) {
+            LOGGER.warn("Can't save files: cache directory not available");
+        } else {
+            boolean appCacheDirExists = appCacheDir.exists();
+            if(appCacheDirExists == false) {
+                appCacheDirExists = appCacheDir.mkdirs();
+            }
+            if(appCacheDirExists == false) {
+                LOGGER.warn("Can't save files: cache directory did not exist and could not be created");
+                appCacheDirExists = appCacheDir.mkdirs();
+            }
+            if(appCacheDir.canWrite() == false) {
+                LOGGER.warn("Can't save files: cache directory not writeable");
+            } else {
+                m_xmlSaveDirectoryUri = Uri.fromFile(appCacheDir);
+                LOGGER.info("Files can be saved in " + appCacheDir.getPath());
+            }
+        }
+
+/*
+        Uri applicationUri = Uri.parse("package:${BuildConfig.APPLICATION_ID}");
+        Intent intent = new Intent(
+            Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+            applicationUri
+        );
+        m_mainActivity.startActivityForResult(intent, intentRequestCode);
+ */
+
+
+/*
         StorageManager sm = (StorageManager) m_mainActivity.getSystemService(Context.STORAGE_SERVICE);
 
         // ref https://stackoverflow.com/a/72404595
@@ -44,6 +91,7 @@ public class ExternalFileManager {
         Uri initialUri = Uri.parse(URI_PREFIX + URI_SUFFIX);
         intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
         m_mainActivity.startActivityForResult(intent, intentRequestCode);
+*/
     }
 
     public @NotNull String saveViaIntent(String xmlFilename, String xmlContent, int intentRequestCode) {
@@ -60,14 +108,17 @@ public class ExternalFileManager {
         Uri.Builder documentUriBuilder = m_xmlSaveDirectoryUri.buildUpon();
         documentUriBuilder.appendPath(xmlFilename);
         Uri documentUri = documentUriBuilder.build();
+        LOGGER.info("Attempting to save to " + documentUri.getPath());
         OutputStream outputStream;
         try {
             outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri);
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-            writer.write("something, anything\n");
+            writer.write(xmlContent);
             writer.flush();
             writer.close();
+            LOGGER.error("Saved to " + documentUri.getPath());
         } catch (IOException e) {
+            LOGGER.error("Failed to save with message: " + e.getMessage());
             throw new RuntimeException(e);
         }
         return documentUri.getPath();

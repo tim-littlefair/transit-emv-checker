@@ -1,16 +1,12 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.storage.StorageManager;
-import android.provider.DocumentsContract;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Toast;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private EMVMediaAgent m_emvMediaAgent;
 
     // Saving XML capture files depends on these
-    private FileSaver m_fileSaver;
+    private ExternalFileManager m_fileSaver;
     private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 101;
     private final int REQUEST_CODE_CREATE_DOCUMENT = 102;
 
@@ -74,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
-        m_fileSaver = new FileSaver(this);
-        m_fileSaver.configureXmlSaveDirectory(REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
+        m_fileSaver = new ExternalFileManager(this);
+        m_fileSaver.configureSaveDirectory(REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {

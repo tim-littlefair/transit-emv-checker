@@ -31,6 +31,11 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
         m_mainActivity = mainActivity;
     }
 
+    @Override
+    public void requestPermissions() {
+        // Nothing to do for this implementation
+    }
+
     public void configureSaveDirectory(TreeMap<String, String> permissionStatuses) {
         m_xmlSaveDirectoryUri = null;
 

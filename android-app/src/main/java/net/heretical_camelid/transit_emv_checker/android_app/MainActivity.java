@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     final static int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
     static final String PERMISSION_STATE_GRANTED = "granted";
     static final String PERMISSION_STATE_DENIED = "denied";
-    private TreeMap<String,String> m_permissionStatuses;
+    TreeMap<String,String> m_permissionStatuses;
 
     // Saving XML capture files depends on these
     private ExternalFileManagerBase m_externalFileManager;
@@ -85,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
-        requestPermissions();
         m_externalFileManager = new LegacyExternalFileManager(this);
+        m_externalFileManager.requestPermissions();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -231,42 +231,6 @@ public class MainActivity extends AppCompatActivity {
     public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
         //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
         return m_externalFileManager.saveFile(xmlFilename, xmlContent);
-    }
-
-    private void requestPermissions() {
-        String[] permissionsDesired = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
-        };
-        m_permissionStatuses = new TreeMap<String,String>();
-        ArrayList<String> permissionsToBeRequested = new ArrayList<>();
-        for(String permissionName: permissionsDesired) {
-            boolean permissionOutcome =
-                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(
-                    this, permissionName
-                )
-            ;
-            String permissionStatus;
-            if(permissionOutcome == true) {
-                permissionStatus = PERMISSION_STATE_GRANTED;
-            } else {
-                permissionStatus = null; // null interpreted as 'unknown pending request'
-                permissionsToBeRequested.add(permissionName);
-            }
-            m_permissionStatuses.put(permissionName,permissionStatus);
-            LOGGER.info("Permission " + permissionName + " initial_status=" + permissionStatus);
-        }
-        if(permissionsToBeRequested.size()>0) {
-            requestPermissions(
-                permissionsToBeRequested.toArray(new String[permissionsToBeRequested.size()]),
-                REQUEST_CODE_REQUEST_PERMISSIONS
-            );
-            // We need to wait until we see the permission request result before
-            // configuring the save directory
-        } else {
-            m_externalFileManager.configureSaveDirectory(m_permissionStatuses);
-        }
     }
 
     @Override

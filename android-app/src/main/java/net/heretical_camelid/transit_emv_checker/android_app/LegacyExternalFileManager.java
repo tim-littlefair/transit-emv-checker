@@ -2,13 +2,16 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
+import androidx.core.content.ContextCompat;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class LegacyExternalFileManager extends ExternalFileManagerBase {
@@ -23,6 +26,43 @@ public class LegacyExternalFileManager extends ExternalFileManagerBase {
 
     public LegacyExternalFileManager(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
+    }
+
+    @Override
+    public void requestPermissions() {
+        String[] permissionsDesired = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+        };
+        m_mainActivity.m_permissionStatuses = new TreeMap<String,String>();
+        ArrayList<String> permissionsToBeRequested = new ArrayList<>();
+        for(String permissionName: permissionsDesired) {
+            boolean permissionOutcome =
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(
+                    m_mainActivity, permissionName
+                )
+                ;
+            String permissionStatus;
+            if(permissionOutcome == true) {
+                permissionStatus = MainActivity.PERMISSION_STATE_GRANTED;
+            } else {
+                permissionStatus = null; // null interpreted as 'unknown pending request'
+                permissionsToBeRequested.add(permissionName);
+            }
+            m_mainActivity.m_permissionStatuses.put(permissionName,permissionStatus);
+            LOGGER.info("Permission " + permissionName + " initial_status=" + permissionStatus);
+        }
+        if(permissionsToBeRequested.size()>0) {
+            m_mainActivity.requestPermissions(
+                permissionsToBeRequested.toArray(new String[permissionsToBeRequested.size()]),
+                MainActivity.REQUEST_CODE_REQUEST_PERMISSIONS
+            );
+            // We need to wait until we see the permission request result before
+            // configuring the save directory
+        } else {
+            configureSaveDirectory(m_mainActivity.m_permissionStatuses);
+        }
     }
 
     @Override

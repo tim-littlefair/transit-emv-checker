@@ -12,8 +12,8 @@ import java.io.*;
 import java.util.TreeMap;
 import android.Manifest;
 
-public class ExternalFileManager {
-    static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileManager.class);
+public class ModernExternalFileManager implements ExternalFileManagerInterface {
+    static final Logger LOGGER = LoggerFactory.getLogger(ModernExternalFileManager.class);
 
     final private MainActivity m_mainActivity;
     boolean m_permissionAcquired;
@@ -22,7 +22,7 @@ public class ExternalFileManager {
     private String m_xmlTextToSave = null;
 
 
-    public ExternalFileManager(MainActivity mainActivity) {
+    public ModernExternalFileManager(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
     }
 

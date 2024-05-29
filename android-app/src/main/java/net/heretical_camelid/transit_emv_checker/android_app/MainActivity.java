@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private EMVMediaAgent m_emvMediaAgent;
 
     // Saving XML capture files depends on these
-    private ExternalFileManager m_fileSaver;
+    private ExternalFileManagerInterface m_externalFileManager;
     private final int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
     private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 102;
     private final int REQUEST_CODE_CREATE_DOCUMENT = 103;
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
-        m_fileSaver = new ExternalFileManager(this);
+        m_externalFileManager = new ModernExternalFileManager(this);
         requestPermissions();
     }
 
@@ -221,17 +221,17 @@ public class MainActivity extends AppCompatActivity {
         } else if(resultData==null) {
             Toast.makeText(this, "Request approved but null data", Toast.LENGTH_LONG).show();
         } else if(requestCode== REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS) {
-            m_fileSaver.setSaveDirectory(resultData.getData());
+            m_externalFileManager.setSaveDirectory(resultData.getData());
         } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
             // String xmlFilename = resultData.getParcelableExtra(Intent.EXTRA_TITLE);
             Uri documentUri = resultData.getData();
-            m_fileSaver.storeFileContent(documentUri);
+            m_externalFileManager.storeFileContent(documentUri);
         }
     }
 
     public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
         //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
-        return m_fileSaver.saveDirectly(xmlFilename, xmlContent);
+        return m_externalFileManager.saveDirectly(xmlFilename, xmlContent);
     }
 
     private void requestPermissions() {
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
             // We need to wait until we see the permission request result before
             // configuring the save directory
         } else {
-            m_fileSaver.configureSaveDirectory(m_permissionStatuses);
+            m_externalFileManager.configureSaveDirectory(m_permissionStatuses);
         }
     }
 
@@ -284,6 +284,6 @@ public class MainActivity extends AppCompatActivity {
             ;
             m_permissionStatuses.put(permissions[i], permissionStatus);
         }
-        m_fileSaver.configureSaveDirectory(m_permissionStatuses);
+        m_externalFileManager.configureSaveDirectory(m_permissionStatuses);
     }
 }

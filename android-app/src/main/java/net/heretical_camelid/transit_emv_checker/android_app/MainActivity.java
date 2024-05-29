@@ -50,17 +50,16 @@ public class MainActivity extends AppCompatActivity {
     // NFC/EMV operations controller
     private EMVMediaAgent m_emvMediaAgent;
 
-    // Saving XML capture files depends on these
-    private ExternalFileManagerInterface m_externalFileManager;
-    private final int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
-    private final int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 102;
-    private final int REQUEST_CODE_CREATE_DOCUMENT = 103;
-
     // Permission management
+    final static int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
     static final String PERMISSION_STATE_GRANTED = "granted";
     static final String PERMISSION_STATE_DENIED = "denied";
     private TreeMap<String,String> m_permissionStatuses;
 
+    // Saving XML capture files depends on these
+    private ExternalFileManagerBase m_externalFileManager;
+    final static int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 201;
+    final static int REQUEST_CODE_CREATE_DOCUMENT = 202;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
-        m_externalFileManager = new ModernExternalFileManager(this);
         requestPermissions();
+        m_externalFileManager = new LegacyExternalFileManager(this);
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -221,17 +220,17 @@ public class MainActivity extends AppCompatActivity {
         } else if(resultData==null) {
             Toast.makeText(this, "Request approved but null data", Toast.LENGTH_LONG).show();
         } else if(requestCode== REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS) {
-            m_externalFileManager.setSaveDirectory(resultData.getData());
+            LOGGER.warn("Unexpected directory access result received at MainActivity");
         } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
-            // String xmlFilename = resultData.getParcelableExtra(Intent.EXTRA_TITLE);
-            Uri documentUri = resultData.getData();
-            m_externalFileManager.storeFileContent(documentUri);
+            LOGGER.warn("Unexpected create document result received at MainActivity");
+        } else {
+            LOGGER.warn("Unexpected result received at MainActivity for request code " + requestCode);
         }
     }
 
     public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
         //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
-        return m_externalFileManager.saveDirectly(xmlFilename, xmlContent);
+        return m_externalFileManager.saveFile(xmlFilename, xmlContent);
     }
 
     private void requestPermissions() {

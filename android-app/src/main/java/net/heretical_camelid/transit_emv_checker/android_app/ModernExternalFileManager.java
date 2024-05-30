@@ -34,6 +34,7 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
     @Override
     public void requestPermissions() {
         // Nothing to do for this implementation
+        configureSaveDirectory(null);
     }
 
     public void configureSaveDirectory(TreeMap<String, String> permissionStatuses) {
@@ -84,11 +85,34 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
     }
 
     public @NotNull String saveFile(String xmlFilename, String xmlContent) {
+/*
+        Uri.Builder documentUriBuilder = m_xmlSaveDirectoryUri.buildUpon();
+        documentUriBuilder.appendPath(xmlFilename);
+        Uri documentUri = documentUriBuilder.build();
+        LOGGER.info("Attempting to save to " + documentUri.getPath());
+        OutputStream outputStream;
+        try {
+            outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            writer.write(xmlContent);
+            writer.flush();
+            writer.close();
+            LOGGER.error("Saved to " + documentUri.getPath());
+        } catch (IOException e) {
+            LOGGER.error("Failed to save with message: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return documentUri.getPath();
+/* */
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/xml");
         intent.putExtra(Intent.EXTRA_TITLE, xmlFilename);
         m_xmlTextToSave = xmlContent;
+
+        m_mainActivity.startActivityForResult(intent,MainActivity.REQUEST_CODE_CREATE_DOCUMENT);
+
+        /*
 
         final Uri[] userSelectedDocumentUriHolder = {null};
         ActivityResultLauncher<Intent> fileSaveRequestLauncher =
@@ -111,18 +135,26 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
             userSelectedDocumentPath = userSelectedDocumentUriHolder[0].getPath();
         }
         return userSelectedDocumentPath;
+/* */
+        return null;
     }
 
     public void storeFileContent(Uri documentUri) {
         OutputStream outputStream;
         try {
-            outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri);
+            LOGGER.info("Before call to openOutputStream for URI " + documentUri);
+            outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri,"wt");
+            LOGGER.info("Before BufferedWriter construction");
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            LOGGER.info("Before write");
             writer.write(m_xmlTextToSave);
+            LOGGER.info("Before flush");
             writer.flush();
+            LOGGER.info("Before close");
             writer.close();
+            LOGGER.info("All done");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Exception: " + e.getMessage());
         }
         m_xmlTextToSave = null;
     }

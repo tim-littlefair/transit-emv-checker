@@ -29,6 +29,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
+                <action android:name="android.intent.action.CREATE_DOCUMENT"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>

@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
-        m_externalFileManager = new LegacyExternalFileManager(this);
+        m_externalFileManager = new ModernExternalFileManager(this);
         m_externalFileManager.requestPermissions();
     }
 
@@ -211,7 +211,6 @@ public class MainActivity extends AppCompatActivity {
         m_emvMediaAgent.enableDetection();
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         super.onActivityResult(requestCode, resultCode, resultData);
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         } else if(requestCode== REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS) {
             LOGGER.warn("Unexpected directory access result received at MainActivity");
         } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
-            LOGGER.warn("Unexpected create document result received at MainActivity");
+            m_externalFileManager.storeFileContent(resultData.getData());
         } else {
             LOGGER.warn("Unexpected result received at MainActivity for request code " + requestCode);
         }
@@ -249,4 +248,24 @@ public class MainActivity extends AppCompatActivity {
         }
         m_externalFileManager.configureSaveDirectory(m_permissionStatuses);
     }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        LOGGER.info(String.format("onNewIntent action=%s uri=%s",intent.getAction(),intent.getData()));
+        if(intent.getAction() == Intent.ACTION_CREATE_DOCUMENT) {
+            m_externalFileManager.storeFileContent(intent.getData());
+        }
+    }
+
+    /*
+    @Override
+    public void startActivity(Intent intent, Bundle bundle) {
+        super.startActivity(intent, bundle);
+        LOGGER.info(String.format("startActivity action=%s uri=%s",intent.getAction(),intent.getData()));
+        if(intent.getAction() == Intent.ACTION_CREATE_DOCUMENT) {
+            m_externalFileManager.storeFileContent(intent.getData());
+        }
+    }
+    */
 }

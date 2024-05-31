@@ -1,10 +1,15 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Toast;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,21 +18,26 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
-import net.heretical_camelid.transit_emv_checker.android_app.BuildConfig;
+
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainActivity extends AppCompatActivity {
+    static final Logger LOGGER = LoggerFactory.getLogger(MainActivity.class);
+
 
     // Activity wide UI elements
     private BottomNavigationView m_navView;
@@ -40,6 +50,17 @@ public class MainActivity extends AppCompatActivity {
 
     // NFC/EMV operations controller
     private EMVMediaAgent m_emvMediaAgent;
+
+    // Permission management
+    final static int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
+    static final String PERMISSION_STATE_GRANTED = "granted";
+    static final String PERMISSION_STATE_DENIED = "denied";
+    TreeMap<String,String> m_permissionStatuses;
+
+    // Saving XML capture files depends on these
+    private ExternalFileManagerBase m_externalFileManager;
+    final static int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 201;
+    final static int REQUEST_CODE_CREATE_DOCUMENT = 202;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
+        m_externalFileManager = new ModernExternalFileManager(this);
+        m_externalFileManager.requestPermissions();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -101,8 +124,6 @@ public class MainActivity extends AppCompatActivity {
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
                     ;
             }
-            // .format( DateTimeFormatter.ISO_DATE_TIME )
-
         } else {
             // In CI builds, versionCode will contain an integer
             // parsed from the 7-hex-digit prefix of the git
@@ -190,4 +211,62 @@ public class MainActivity extends AppCompatActivity {
         m_homePageLog.setValue("About to try to detect EMV media");
         m_emvMediaAgent.enableDetection();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        super.onActivityResult(requestCode, resultCode, resultData);
+        if(resultCode != RESULT_OK) {
+            Toast.makeText(this,"Request declined",Toast.LENGTH_LONG).show();
+        } else if(resultData==null) {
+            Toast.makeText(this, "Request approved but null data", Toast.LENGTH_LONG).show();
+        } else if(requestCode== REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS) {
+            LOGGER.warn("Unexpected directory access result received at MainActivity");
+        } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
+            m_externalFileManager.storeFileContent(resultData.getData());
+        } else {
+            LOGGER.warn("Unexpected result received at MainActivity for request code " + requestCode);
+        }
+    }
+
+    public void saveXmlCaptureFile(String xmlFilename, String xmlContent) {
+        //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
+        m_externalFileManager.saveFile(xmlFilename, "text/xml", xmlContent.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+        final int requestCode,
+        final String[] permissions,
+        final int[] grantResults
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for(int i=0; i<permissions.length; ++i) {
+            String permissionStatus =
+                (PackageManager.PERMISSION_GRANTED==grantResults[i]) ?
+                PERMISSION_STATE_GRANTED: PERMISSION_STATE_DENIED
+            ;
+            m_permissionStatuses.put(permissions[i], permissionStatus);
+        }
+        m_externalFileManager.configureSaveDirectory(m_permissionStatuses);
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        LOGGER.info(String.format("onNewIntent action=%s uri=%s",intent.getAction(),intent.getData()));
+        if(intent.getAction() == Intent.ACTION_CREATE_DOCUMENT) {
+            m_externalFileManager.storeFileContent(intent.getData());
+        }
+    }
+
+    /*
+    @Override
+    public void startActivity(Intent intent, Bundle bundle) {
+        super.startActivity(intent, bundle);
+        LOGGER.info(String.format("startActivity action=%s uri=%s",intent.getAction(),intent.getData()));
+        if(intent.getAction() == Intent.ACTION_CREATE_DOCUMENT) {
+            m_externalFileManager.storeFileContent(intent.getData());
+        }
+    }
+    */
 }

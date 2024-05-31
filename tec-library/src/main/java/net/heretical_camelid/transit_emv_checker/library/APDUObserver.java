@@ -4,6 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
@@ -269,7 +272,11 @@ public class APDUObserver {
             case 0x80A8: {
                 int lengthOfExtraBytes = cr.rawCommand[4];
                 byte[] extraBytes = Arrays.copyOfRange(cr.rawCommand,5,5+lengthOfExtraBytes);
-                cr.stepName = "GET_PROCESSING_OPTIONS for " + m_currentAppSelectionContext.toString();
+                if(m_currentAppSelectionContext != null) {
+                    cr.stepName = "GET_PROCESSING_OPTIONS for " + m_currentAppSelectionContext.toString();
+                } else {
+                    cr.stepName = "GET_PROCESSING_OPTIONS for unidentified application";
+                }
                 commandInterpretation.append(cr.stepName + "\n");
 
                 if(m_currentAppSelectionContext.pdol != null) {
@@ -440,7 +447,7 @@ public class APDUObserver {
     public String summary() {
         final String indentString = " ";
         if(m_pciMaskingDone != true) {
-            return "Summary not available unless PCI masking completed successfully";
+            return "Summary not available because PCI masking has not been completed successfully";
         }
         StringBuilder summarySB = new StringBuilder();
         AppAccountIdentifier mediumAccountIdentifier = primaryAccountIdentifier();
@@ -451,7 +458,12 @@ public class APDUObserver {
             accountIdLabel = "Primary account identifier";
         }
 
-        if(mediumAccountIdentifier.applicationPSN.length()==0) {
+        if(mediumAccountIdentifier==null) {
+            return "Summary not available because medium account identifier is null";
+        } else if(
+            mediumAccountIdentifier.applicationPSN==null ||
+            mediumAccountIdentifier.applicationPSN.length()==0
+        ) {
             summarySB.append(String.format(
                 "%s:\n%sPAN=%s\n%sEXP=%s\n%s(no PSN)\n",
                 accountIdLabel,
@@ -627,11 +639,11 @@ public class APDUObserver {
         AppAccountIdentifier mediumAccountIdentifier = primaryAccountIdentifier();
         if(mediumAccountIdentifier!=null) {
             return String.format(
-                "%s@atc=%04d",
+                "%satc%04d",
                 mediumAccountIdentifier,m_mediumTransactionCounterNow
             );
         } else {
-            return null;
+            return String.format("incomplete_media_" + LocalDateTime.now().toString());
         }
     }
 }

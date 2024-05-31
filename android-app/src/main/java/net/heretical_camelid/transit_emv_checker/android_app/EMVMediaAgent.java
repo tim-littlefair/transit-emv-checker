@@ -4,18 +4,22 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 
+import androidx.core.app.ActivityCompat;
 import com.github.devnied.emvnfccard.exception.CommunicationException;
 import com.github.devnied.emvnfccard.model.EmvCard;
 import com.github.devnied.emvnfccard.parser.EmvTemplate;
 
 import net.heretical_camelid.transit_emv_checker.library.*;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.File;
 
 public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     public static final int TIMEOUT_5000_MS = 5000;
     private final MainActivity m_mainActivity;
     private final NfcAdapter m_nfcAdapter;
+    private final EmvTemplate.Builder m_templateBuilder;
 
     public EMVMediaAgent(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
@@ -25,6 +29,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         } else {
             m_mainActivity.homePageLogAppend("No NFC adapter found");
         }
+        m_templateBuilder = createTemplateBuilder();
     }
 
     public void enableDetection() {
@@ -54,11 +59,12 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     @Override
     public void onTagDiscovered(Tag tag) {
         m_mainActivity.homePageLogAppend("Tag discovered: " + tag.describeContents());
+        disableDetection();
         processMedia(tag);
-        m_nfcAdapter.disableReaderMode(m_mainActivity);
     }
 
     void processMedia(Tag emvMediaTag) {
+
         IsoDep tagAsIsoDep = IsoDep.get(emvMediaTag);
         if(tagAsIsoDep == null) {
             m_mainActivity.homePageLogAppend("Media does not support IsoDep mode");
@@ -82,23 +88,8 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                 // Create an observer object for APDUs and data extracted from them
                 PCIMaskingAgent pciMaskingAgent = new PCIMaskingAgent();
                 APDUObserver apduObserver = new APDUObserver(pciMaskingAgent);
-
                 AndroidNFCProvider provider = new AndroidNFCProvider(apduObserver, tagAsIsoDep);
-                TransitTerminal terminal = new TransitTerminal();
-
-                EmvTemplate.Config config = EmvTemplate.Config()
-                    .setContactLess(true)
-                    .setReadAllAids(true)
-                    .setReadTransactions(false)
-                    .setReadCplc(false)
-                    .setRemoveDefaultParsers(true)
-                    .setReadAt(true)
-                    ;
-                EmvTemplate template = EmvTemplate.Builder() //
-                    .setProvider(provider)
-                    .setConfig(config)
-                    .setTerminal(terminal)
-                    .build();
+                EmvTemplate template = m_templateBuilder.setProvider(provider).build();
                 MyParser mParser = new MyParser(template, apduObserver);
                 template.addParsers(mParser);
 
@@ -115,6 +106,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                 }
                 pciMaskingAgent.maskAccountData(apduObserver);
                 TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
+                writeXMLToExternalStorage(apduObserver);
                 m_mainActivity.setDisplayMediaDetailsState(tcc.capabilityReport(),apduObserver.summary());
             }
             while (false);
@@ -126,6 +118,33 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                     // Handle exception silently
                 }
             }
+        }
+    }
+
+    private static EmvTemplate.Builder createTemplateBuilder() {
+        EmvTemplate.Config config = EmvTemplate.Config()
+            .setContactLess(true)
+            .setReadAllAids(true)
+            .setReadTransactions(false)
+            .setReadCplc(false)
+            .setRemoveDefaultParsers(true)
+            .setReadAt(true)
+            ;
+        EmvTemplate.Builder templateBuilder = EmvTemplate.Builder() //
+            .setConfig(config)
+            .setTerminal(new TransitTerminal());
+        return templateBuilder;
+    }
+
+    void writeXMLToExternalStorage(APDUObserver apduObserver) {
+        String fileBaseName = apduObserver.mediumStateId() ;
+        String xmlContent = apduObserver.toXmlString(false);
+        if(fileBaseName == null) {
+            m_mainActivity.homePageLogAppend("Capture file failed: medium state id is null");
+        } else if(xmlContent == null) {
+            m_mainActivity.homePageLogAppend("Capture file failed: XML content is null");
+        } else {
+            m_mainActivity.saveXmlCaptureFile(fileBaseName + ".xml", xmlContent);
         }
     }
 }

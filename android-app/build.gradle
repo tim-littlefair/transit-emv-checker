@@ -10,8 +10,8 @@ android {
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
-        minSdk 24
-        targetSdk 34
+        minSdk 26
+        targetSdk 29
         versionCode 1
         versionName "0.1.0"
 
@@ -48,7 +48,6 @@ dependencies {
     implementation "org.apache.commons:commons-collections4:4.2"
     implementation "commons-io:commons-io:2.6"
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
-    // testImplementation "org.slf4j:slf4j-log4j12:*"
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.12.0'
@@ -65,6 +64,8 @@ dependencies {
     // The following line ensures that a report is generated
     // listing dependency copyrights and licenses
     implementation 'com.jaredsburrows:gradle-license-plugin:0.9.7'
+
+    implementation "org.slf4j:slf4j-simple:2.0.13"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -136,8 +136,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         return templateBuilder;
     }
 
-    String writeXMLToExternalStorage(APDUObserver apduObserver) {
-        String xmlPath = null;
+    void writeXMLToExternalStorage(APDUObserver apduObserver) {
         String fileBaseName = apduObserver.mediumStateId() ;
         String xmlContent = apduObserver.toXmlString(false);
         if(fileBaseName == null) {
@@ -145,8 +144,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         } else if(xmlContent == null) {
             m_mainActivity.homePageLogAppend("Capture file failed: XML content is null");
         } else {
-            xmlPath = m_mainActivity.saveXmlCaptureFile(fileBaseName + ".xml", xmlContent);
+            m_mainActivity.saveXmlCaptureFile(fileBaseName + ".xml", xmlContent);
         }
-        return xmlPath;
     }
 }

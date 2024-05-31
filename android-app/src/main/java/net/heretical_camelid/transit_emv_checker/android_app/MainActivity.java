@@ -19,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -227,9 +228,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String saveXmlCaptureFile(String xmlFilename, String xmlContent) {
+    public void saveXmlCaptureFile(String xmlFilename, String xmlContent) {
         //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
-        return m_externalFileManager.saveFile(xmlFilename, xmlContent);
+        m_externalFileManager.saveFile(xmlFilename, "text/xml", xmlContent.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override

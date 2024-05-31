@@ -108,24 +108,23 @@ public class LegacyExternalFileManager extends ExternalFileManagerBase {
 
 
     @Override
-    public @NotNull String saveFile(String xmlFilename, String xmlContent) {
+    public void saveFile(String fileBaseName, String fileMimeType, byte[] fileContent) {
         Uri.Builder documentUriBuilder = m_xmlSaveDirectoryUri.buildUpon();
-        documentUriBuilder.appendPath(xmlFilename);
+        documentUriBuilder.appendPath(fileBaseName);  // TODO: Derive extension from fileMimeType
         Uri documentUri = documentUriBuilder.build();
         LOGGER.info("Attempting to save to " + documentUri.getPath());
         OutputStream outputStream;
         try {
             outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-            writer.write(xmlContent);
-            writer.flush();
-            writer.close();
+            // BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            outputStream.write(fileContent);
+            outputStream.flush();
+            outputStream.close();
             LOGGER.error("Saved to " + documentUri.getPath());
         } catch (IOException e) {
             LOGGER.error("Failed to save with message: " + e.getMessage());
             throw new RuntimeException(e);
         }
-        return documentUri.getPath();
     }
 
     public void setSaveDirectory(Uri uri) {

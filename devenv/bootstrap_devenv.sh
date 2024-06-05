@@ -54,7 +54,10 @@ mkdir -p $tec_devenv_dir
 startdir=$(pwd)
 cd $tec_devenv_dir
 if [ -r $zip_file_name ] ; then
-  echo Using preserved download
+  echo Using preserved command line tools download but deleting everything else
+  mv $zip_file_name ..
+  rm -rf *
+  mv ../$zip_file_name .
 else
   echo Downloading $zip_file_name
   curl $dl_repo/$zip_file_name -O
@@ -81,9 +84,8 @@ mv cmdline-tools/* ./latest
 mv ./latest cmdline-tools
 
 yes | ./cmdline-tools/latest/bin/sdkmanager --licenses > cmdline-tools/licenses.txt
-./cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platform-tools" "platforms;android-34"
+./cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" "emulator"
 ./cmdline-tools/latest/bin/sdkmanager --list_installed
-# ./cmdline-tools/latest/bin/sdkmanager --list | grep platform-tools
 
 cd $startdir
 

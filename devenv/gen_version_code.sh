@@ -16,5 +16,5 @@ hash7_as_decimal=$(printf "%d" 0x$hash7_as_hex)
 # apply the same change to products in other directories in the future
 for d in android-app ; do
   git checkout $d/build.gradle
-  /usr/bin/sed -e "s/versionCode 1/versionCode $hash7_as_decimal/" -i'' $d/build.gradle
+  /usr/bin/sed -e "s/versionCode 1/versionCode $hash7_as_decimal/" -i '' $d/build.gradle
 done

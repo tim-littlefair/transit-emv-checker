@@ -10,7 +10,7 @@
 
 hash7_as_hex=$(git rev-parse HEAD | cut -c1-7)
 hash7_as_decimal=$(printf "%d" 0x$hash7_as_hex)
-/usr/bin/echo git hash7 = $hash7_as_hex -\> $hash7_as_decimal
+/bin/echo git hash7 = $hash7_as_hex -\> $hash7_as_decimal
 
 # For the moment we are only marking up the Android app but we could
 # apply the same change to products in other directories in the future

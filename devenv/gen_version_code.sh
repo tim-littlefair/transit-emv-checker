@@ -12,9 +12,20 @@ hash7_as_hex=$(git rev-parse HEAD | cut -c1-7)
 hash7_as_decimal=$(printf "%d" 0x$hash7_as_hex)
 /bin/echo git hash7 = $hash7_as_hex -\> $hash7_as_decimal
 
+short_osname=$(uname -s)
+if [ "$short_osname" = "Linux" ] ; then
+  sed_inplace_arg="--in-place"
+elif [ "$short_osname" = "Darwin" ] ; then
+  sed_inplace_arg="-i ''"
+else
+  echo Unexpected OS name $short_osname
+  return 2> /dev/null
+  exit 1
+fi
+
 # For the moment we are only marking up the Android app but we could
 # apply the same change to products in other directories in the future
 for d in android-app ; do
   git checkout $d/build.gradle
-  /usr/bin/sed -e "s/versionCode 1/versionCode $hash7_as_decimal/" -i '' $d/build.gradle
+  /usr/bin/sed -e "s/versionCode 1/versionCode $hash7_as_decimal/" $sed_inplace_arg '' $d/build.gradle
 done

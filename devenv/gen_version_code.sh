@@ -27,5 +27,5 @@ fi
 # apply the same change to products in other directories in the future
 for d in android-app ; do
   git checkout $d/build.gradle
-  /usr/bin/sed -e "s/versionCode 1/versionCode $hash7_as_decimal/" $sed_inplace_arg '' $d/build.gradle
+  /usr/bin/sed -e "s/versionCode 1/versionCode $hash7_as_decimal/" $sed_inplace_arg $d/build.gradle
 done

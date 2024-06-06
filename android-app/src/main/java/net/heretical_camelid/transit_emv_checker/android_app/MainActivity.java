@@ -118,16 +118,15 @@ public class MainActivity extends AppCompatActivity {
             // In developer builds from unmodified git source,
             // versionCode will be equal to 1 and is not interesting.
             versionString += "-dev";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                versionString +=
-                    "@" + ZonedDateTime.now( ZoneOffset.UTC )
-                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
-                    ;
-            }
+            versionString +=
+                "@" + ZonedDateTime.now(ZoneOffset.UTC)
+                          .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
+            ;
         } else {
             // In CI builds, versionCode will contain an integer
             // parsed from the 7-hex-digit prefix of the git
-            // commit hash.
+            // commit hash so we can render it back to hex
+            // to match the hash prefix.
             versionString += String.format(".%07x",versionCode);
         }
         aboutText = aboutText.replace("%VERSION%",versionString);

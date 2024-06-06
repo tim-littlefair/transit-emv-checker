@@ -33,7 +33,6 @@ public class LegacyExternalFileManager extends ExternalFileManagerBase {
         String[] permissionsDesired = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
         };
         m_mainActivity.m_permissionStatuses = new TreeMap<String,String>();
         ArrayList<String> permissionsToBeRequested = new ArrayList<>();

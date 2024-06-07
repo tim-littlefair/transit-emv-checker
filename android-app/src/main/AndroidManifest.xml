@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          package="net.heretical_camelid.transit_emv_checker.android_app"
 >
 
 
@@ -22,7 +21,7 @@
             android:requestLegacyExternalStorage="true"
             tools:targetApi="31">
         <activity
-                android:name="net.heretical_camelid.transit_emv_checker.android_app.MainActivity"
+                android:name=".MainActivity"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -37,8 +36,5 @@
     <!-- declarations associated with instrumented/connected automated tests -->
     <instrumentation android:targetPackage="net.heretical_camelid.transit_emv_checker.android_app"
                      android:name="androidx.test.runner.AndroidJUnitRunner"/>
-    <queries>
-        <package android:name="net.heretical_camelid.transit_emv_checker.android_app" />
-    </queries>
 
 </manifest>

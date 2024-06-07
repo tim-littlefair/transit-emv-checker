@@ -63,12 +63,6 @@ public class TEC_UIAutomatorTests {
         Context context = getApplicationContext();
         final Intent launchIntent = context.getPackageManager()
                                   .getLaunchIntentForPackage(TEC_ANDROID_APP_PACKAGE);
-        /*
-        final Intent launchIntent = new Intent(Intent.ACTION_MAIN);
-        launchIntent.setComponent(new ComponentName(
-            TEC_ANDROID_APP_PACKAGE, "MainActivity"
-        ));
-         */
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);    // Clear out any previous instances
         context.startActivity(launchIntent);
 

@@ -37,6 +37,24 @@ android {
             merge "build/licenses"
         }
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+        managedDevices {
+            localDevices {
+                defaultGoogleATD /*(com.android.build.api.dsl.ManagedVirtualDevice)*/ {
+                    // A lower resolution device is used here for better emulator performance
+                    device = "Nexus One"
+                    apiLevel = 34
+                    // The 'google' image is required because 'aosp-atd' does not contain
+                    // the system file picker
+                    systemImageSource = "google"
+                    //abi = "x86_64"
+                }
+            }
+        }
+    }
 }
 
 dependencies {

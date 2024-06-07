@@ -44,7 +44,7 @@ public class TEC_UIAutomatorTests {
         "com.android.documentsui";
 
 
-    private static final int _LAUNCH_TIMEOUT_SECONDS = 5;
+    private static final int _LAUNCH_TIMEOUT_SECONDS = 30;
 
     // At any point where we are waiting for a UI element to
     // appear, we use this timeout
@@ -90,27 +90,43 @@ public class TEC_UIAutomatorTests {
 
         assertThat(mDevice, notNullValue());
 
-
         // First screen displayed is the system file picker, for selection under
         // user control of the folder to be opened as the app's documents directory
-        // We would prefer to identify the SELECT button by its resource ID but
-        // this does not work (presumably because the system file picker does
-        // not make its resource id's visible in the same way as my own app).
-        // We are falling back to identifying it by displayed text, but must bear
-        // in mind that this will probably fail for a device with a non-English
-        // language setting.
         UiObject2 sfpSelectButton = mDevice.wait(Until.findObject(
+
+            // Depending on whether this is the first run of the app after a
+            // clean install or not, the system file picker may present either
+            // a "USE THIS FOLDER" or "SELECT" button which needs to be clicked
+            // to progress.
+
+            // We would prefer to identify the button by its resource ID but
+            // this does not work (presumably because the system file picker does
+            // not make its resource id's visible in the same way as our own app).
+            // We are falling back to identifying it by displayed text, but must bear
+            // in mind that this will probably fail for a device with a non-English
+            // language setting.
+
             // By.res(ANDROID_DOCUMENTSUI_PACKAGE, "R.id.button1")
-            By.text("SELECT")
+            By.text(Pattern.compile("SELECT|USE THIS FOLDER"))
+
         ), _UI_APPEAR_TIMEOUT_SECONDS * 1000);
         assertThat(sfpSelectButton, is(notNullValue()));
-        // assertThat(sfpSelectButton.getText(),is(equalTo("SELECT")));
+        String sfpSelectButtonText = sfpSelectButton.getText();
         sfpSelectButton.click();
+        if(sfpSelectButtonText.equals("USE THIS FOLDER")) {
+            UiObject2 allowButton = mDevice.wait(Until.findObject(
+                By.text(Pattern.compile("ALLOW"))
+            ), _UI_APPEAR_TIMEOUT_SECONDS * 1000);
+            assertThat(allowButton, is(notNullValue()));
+            allowButton.click();
+        } else {
+            assertThat(sfpSelectButton.getText(), is(equals("SELECT")));
+        }
 
         // Second screen displayed is the home screen, where the user is required
         // to click on the 'Start Detection' button to enable NFC polling
         UiObject2 startDetectionButton = mDevice.wait(Until.findObject(
-            // By.res(TEC_ANDROID_APP_PACKAGE, "R.id.button_home")
+            //By.res(TEC_ANDROID_APP_PACKAGE, "R.id.button_home")
             By.text("START EMV MEDIA DETECTION")
         ), _UI_APPEAR_TIMEOUT_SECONDS);
         assertThat(startDetectionButton, is(notNullValue()));

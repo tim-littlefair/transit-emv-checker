@@ -6,8 +6,6 @@
 
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
             android:allowBackup="true"
@@ -19,7 +17,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.BottomNavigationTemplate"
             android:requestLegacyExternalStorage="true"
-            tools:targetApi="31">
+            tools:targetApi="34">
         <activity
                 android:name=".MainActivity"
                 android:exported="true">
@@ -29,12 +27,12 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_DOCUMENT"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
     </application>
-
-    <!-- declarations associated with instrumented/connected automated tests -->
-    <instrumentation android:targetPackage="net.heretical_camelid.transit_emv_checker.android_app"
-                     android:name="androidx.test.runner.AndroidJUnitRunner"/>
-
 </manifest>

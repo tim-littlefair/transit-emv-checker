@@ -19,8 +19,12 @@
           android:versionCode="1"
           android:versionName="1.0">
 
+    <!--suppress AndroidDomInspection-->
     <instrumentation android:targetPackage="net.heretical_camelid.transit_emv_checker.android_app"
                      android:name="androidx.test.runner.AndroidJUnitRunner"/>
 
+    <!--
     <application tools:replace="label" android:label="TEC_EspressoTest" />
+    -->
+
 </manifest>

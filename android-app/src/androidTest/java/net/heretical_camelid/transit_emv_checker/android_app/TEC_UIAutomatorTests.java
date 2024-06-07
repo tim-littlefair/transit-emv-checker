@@ -1,5 +1,13 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+// This test class is based on the AOSP provided example project:
+// https://github.com/android/testing-samples/blob/main/ui/uiautomator/BasicSample/app/src/androidTest/java/com/example/android/testing/uiautomator/BasicSample/ChangeTextBehaviorTest.java
+// and is subject to the same Apache 2.0 license as the upstream file
+
+// Documentation on the uiautomator framework is at:
+// https://developer.android.com/training/testing/other-components/ui-automator
+
+import android.content.ComponentName;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,24 +26,23 @@ import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.Until;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Basic sample for unbundled UiAutomator.
  */
 @RunWith(AndroidJUnit4.class)
 @SdkSuppress(minSdkVersion = 18)
-public class TEC_UIAutomatorTest {
+public class TEC_UIAutomatorTests {
 
-    private static final String BASIC_SAMPLE_PACKAGE
-        = "com.example.android.testing.uiautomator.BasicSample";
+    private static final String TEC_ANDROID_APP_PACKAGE =
+        "net.heretical_camelid.transit_emv_checker.android_app";
+    private static final String ANDROID_DOCUMENTSUI_PACKAGE =
+        "com.android.documentsui";
 
-    private static final int LAUNCH_TIMEOUT = 5000;
 
-    private static final String STRING_TO_BE_TYPED = "UiAutomator";
+    private static final int LAUNCH_TIMEOUT = 10000;
 
     private UiDevice mDevice;
 
@@ -52,51 +59,66 @@ public class TEC_UIAutomatorTest {
         assertThat(launcherPackage, notNullValue());
         mDevice.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
 
-        // Launch the blueprint app
+        // Launch the TEC application
         Context context = getApplicationContext();
-        final Intent intent = context.getPackageManager()
-                                  .getLaunchIntentForPackage(BASIC_SAMPLE_PACKAGE);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);    // Clear out any previous instances
-        context.startActivity(intent);
+        final Intent launchIntent = context.getPackageManager()
+                                  .getLaunchIntentForPackage(TEC_ANDROID_APP_PACKAGE);
+        /*
+        final Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+        launchIntent.setComponent(new ComponentName(
+            TEC_ANDROID_APP_PACKAGE, "MainActivity"
+        ));
+         */
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);    // Clear out any previous instances
+        context.startActivity(launchIntent);
 
         // Wait for the app to appear
-        mDevice.wait(Until.hasObject(By.pkg(BASIC_SAMPLE_PACKAGE).depth(0)), LAUNCH_TIMEOUT);
+        mDevice.wait(Until.hasObject(By.pkg(TEC_ANDROID_APP_PACKAGE).depth(0)), LAUNCH_TIMEOUT);
     }
 
     @Test
-    public void checkPreconditions() {
+    public void testSimpleRunNoCardPresented() {
+
         assertThat(mDevice, notNullValue());
-    }
 
-    @Test
-    public void testChangeText_sameActivity() {
-        // Type text and then press the button.
-        mDevice.findObject(By.res(BASIC_SAMPLE_PACKAGE, "editTextUserInput"))
+        // First screen displayed is the system file picker, for selection under
+        // user control of the folder to be opened as the app's documents directory
+        final int _SFP_TIMEOUT_MS = 1000;
+        UiObject2 sfpSelectButton = mDevice.wait(Until.findObject(
+            By.res(ANDROID_DOCUMENTSUI_PACKAGE, "R.id.button1")
+        ), _SFP_TIMEOUT_MS);
+        assertThat(sfpSelectButton, is(notNullValue()));
+        assertThat(sfpSelectButton.getText(),is(equalTo("SELECT")));
+        sfpSelectButton.click();
+
+        /*
             .setText(STRING_TO_BE_TYPED);
-        mDevice.findObject(By.res(BASIC_SAMPLE_PACKAGE, "changeTextBt"))
+        mDevice.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "changeTextBt"))
             .click();
 
         // Verify the test is displayed in the Ui
         UiObject2 changedText = mDevice
-                                    .wait(Until.findObject(By.res(BASIC_SAMPLE_PACKAGE, "textToBeChanged")),
-                                        500 /* wait 500ms */);
+                                    .wait(Until.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "textToBeChanged")),
+                                        500 );
         assertThat(changedText.getText(), is(equalTo(STRING_TO_BE_TYPED)));
+         */
     }
-
+/*
     @Test
     public void testChangeText_newActivity() {
         // Type text and then press the button.
-        mDevice.findObject(By.res(BASIC_SAMPLE_PACKAGE, "editTextUserInput"))
+        mDevice.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "editTextUserInput"))
             .setText(STRING_TO_BE_TYPED);
-        mDevice.findObject(By.res(BASIC_SAMPLE_PACKAGE, "activityChangeTextBtn"))
+        mDevice.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "activityChangeTextBtn"))
             .click();
 
         // Verify the test is displayed in the Ui
         UiObject2 changedText = mDevice
-                                    .wait(Until.findObject(By.res(BASIC_SAMPLE_PACKAGE, "show_text_view")),
-                                        500 /* wait 500ms */);
+                                    .wait(Until.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "show_text_view")),
+                                        500 );
         assertThat(changedText.getText(), is(equalTo(STRING_TO_BE_TYPED)));
     }
+*/
 
     /**
      * Uses package manager to find the package name of the device launcher. Usually this package

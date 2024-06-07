@@ -26,6 +26,8 @@ import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.Until;
 
+import java.util.regex.Pattern;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -42,12 +44,22 @@ public class TEC_UIAutomatorTests {
         "com.android.documentsui";
 
 
-    private static final int LAUNCH_TIMEOUT = 10000;
+    private static final int _LAUNCH_TIMEOUT_SECONDS = 5;
+
+    // At any point where we are waiting for a UI element to
+    // appear, we use this timeout
+    private static final int _UI_APPEAR_TIMEOUT_SECONDS = 5;
+
+    // At any point where we are waiting for a UI element to change
+    // state, we use this unconditional sleep
+    private static final int _UI_CHANGE_SLEEP_SECONDS = 2;
 
     private UiDevice mDevice;
 
     @Before
     public void startMainActivityFromHomeScreen() {
+
+
         // Initialize UiDevice instance
         mDevice = UiDevice.getInstance(getInstrumentation());
 
@@ -57,7 +69,10 @@ public class TEC_UIAutomatorTests {
         // Wait for launcher
         final String launcherPackage = getLauncherPackageName();
         assertThat(launcherPackage, notNullValue());
-        mDevice.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
+        mDevice.wait(
+            Until.hasObject(By.pkg(launcherPackage).depth(0)),
+            _LAUNCH_TIMEOUT_SECONDS*1000
+        );
 
         // Launch the TEC application
         Context context = getApplicationContext();
@@ -67,7 +82,7 @@ public class TEC_UIAutomatorTests {
         context.startActivity(launchIntent);
 
         // Wait for the app to appear
-        mDevice.wait(Until.hasObject(By.pkg(TEC_ANDROID_APP_PACKAGE).depth(0)), LAUNCH_TIMEOUT);
+        mDevice.wait(Until.hasObject(By.pkg(TEC_ANDROID_APP_PACKAGE).depth(0)), _LAUNCH_TIMEOUT_SECONDS);
     }
 
     @Test
@@ -75,15 +90,6 @@ public class TEC_UIAutomatorTests {
 
         assertThat(mDevice, notNullValue());
 
-        // At each point where we are waiting for a UI element to
-        // appear, we use this timeout (uiautomator API allows us
-        // to wait up to this time, for such a change, but will
-        // return immediately the target element is available)
-        final int _UI_APPEAR_TIMEOUT_SECONDS = 10;
-
-        // At each point where we are waiting for a UI element to change
-        // state, we use this unconditional sleep
-        final int _UI_CHANGE_SLEEP_SECONDS = 3;
 
         // First screen displayed is the system file picker, for selection under
         // user control of the folder to be opened as the app's documents directory
@@ -115,6 +121,29 @@ public class TEC_UIAutomatorTests {
         // counter-intuitive, but button is still clickable
         assertThat(startDetectionButton.isClickable(),is(equalTo(true)));
         assertThat(startDetectionButton.getText(),is(equalTo("WAITING FOR EMV MEDIA")));
+
+        // Navigate to each of the other pages in turn
+        //checkNavigationPageContent("Transit", ".*No media presented.*");
+        //checkNavigationPageContent("EMV Details", ".*No media presented.*");
+        checkNavigationPageContent("About", ".*Version.*");
+    }
+
+    private void checkNavigationPageContent(String pageNavigationText, String expectedDisplayedRegex) {
+        Pattern expectedDisplayedPattern = Pattern.compile(expectedDisplayedRegex,Pattern.MULTILINE);
+        UiObject2 pageNavigationButton = mDevice.wait(Until.findObject(
+            By.text(pageNavigationText)
+        ), _UI_APPEAR_TIMEOUT_SECONDS);
+
+        /*
+         * The logic above does not work yet
+        assertThat(pageNavigationButton, is(notNullValue()));
+        assertThat(pageNavigationButton.isClickable(),is(equalTo(true)));
+        pageNavigationButton.click();
+        UiObject2 pageDisplayObject = mDevice.wait(Until.findObject(
+            By.text(expectedDisplayedPattern)
+        ), _UI_APPEAR_TIMEOUT_SECONDS);
+        assertThat(pageDisplayObject, is(notNullValue()));
+         */
     }
 
     @After

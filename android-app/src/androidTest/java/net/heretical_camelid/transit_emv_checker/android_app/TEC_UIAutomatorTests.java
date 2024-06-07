@@ -7,7 +7,7 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 // Documentation on the uiautomator framework is at:
 // https://developer.android.com/training/testing/other-components/ui-automator
 
-import android.content.ComponentName;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,44 +75,53 @@ public class TEC_UIAutomatorTests {
 
         assertThat(mDevice, notNullValue());
 
+        // At each point where we are waiting for a UI element to
+        // appear, we use this timeout (uiautomator API allows us
+        // to wait up to this time, for such a change, but will
+        // return immediately the target element is available)
+        final int _UI_APPEAR_TIMEOUT_SECONDS = 10;
+
+        // At each point where we are waiting for a UI element to change
+        // state, we use this unconditional sleep
+        final int _UI_CHANGE_SLEEP_SECONDS = 3;
+
         // First screen displayed is the system file picker, for selection under
         // user control of the folder to be opened as the app's documents directory
-        final int _SFP_TIMEOUT_MS = 1000;
+        // We would prefer to identify the SELECT button by its resource ID but
+        // this does not work (presumably because the system file picker does
+        // not make its resource id's visible in the same way as my own app).
+        // We are falling back to identifying it by displayed text, but must bear
+        // in mind that this will probably fail for a device with a non-English
+        // language setting.
         UiObject2 sfpSelectButton = mDevice.wait(Until.findObject(
-            By.res(ANDROID_DOCUMENTSUI_PACKAGE, "R.id.button1")
-        ), _SFP_TIMEOUT_MS);
+            // By.res(ANDROID_DOCUMENTSUI_PACKAGE, "R.id.button1")
+            By.text("SELECT")
+        ), _UI_APPEAR_TIMEOUT_SECONDS * 1000);
         assertThat(sfpSelectButton, is(notNullValue()));
-        assertThat(sfpSelectButton.getText(),is(equalTo("SELECT")));
+        // assertThat(sfpSelectButton.getText(),is(equalTo("SELECT")));
         sfpSelectButton.click();
 
-        /*
-            .setText(STRING_TO_BE_TYPED);
-        mDevice.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "changeTextBt"))
-            .click();
-
-        // Verify the test is displayed in the Ui
-        UiObject2 changedText = mDevice
-                                    .wait(Until.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "textToBeChanged")),
-                                        500 );
-        assertThat(changedText.getText(), is(equalTo(STRING_TO_BE_TYPED)));
-         */
+        // Second screen displayed is the home screen, where the user is required
+        // to click on the 'Start Detection' button to enable NFC polling
+        UiObject2 startDetectionButton = mDevice.wait(Until.findObject(
+            // By.res(TEC_ANDROID_APP_PACKAGE, "R.id.button_home")
+            By.text("START EMV MEDIA DETECTION")
+        ), _UI_APPEAR_TIMEOUT_SECONDS);
+        assertThat(startDetectionButton, is(notNullValue()));
+        assertThat(startDetectionButton.isClickable(),is(equalTo(true)));
+        assertThat(startDetectionButton.getText(),is(equalTo("START EMV MEDIA DETECTION")));
+        startDetectionButton.click();
+        sleep(_UI_CHANGE_SLEEP_SECONDS);
+        // counter-intuitive, but button is still clickable
+        assertThat(startDetectionButton.isClickable(),is(equalTo(true)));
+        assertThat(startDetectionButton.getText(),is(equalTo("WAITING FOR EMV MEDIA")));
     }
-/*
-    @Test
-    public void testChangeText_newActivity() {
-        // Type text and then press the button.
-        mDevice.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "editTextUserInput"))
-            .setText(STRING_TO_BE_TYPED);
-        mDevice.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "activityChangeTextBtn"))
-            .click();
 
-        // Verify the test is displayed in the Ui
-        UiObject2 changedText = mDevice
-                                    .wait(Until.findObject(By.res(TEC_ANDROID_APP_PACKAGE, "show_text_view")),
-                                        500 );
-        assertThat(changedText.getText(), is(equalTo(STRING_TO_BE_TYPED)));
+    @After
+    public void waitOnFinalScreenForVisualInspection() {
+        final int _END_OF_RUN_SLEEP_SECONDS = 5;
+        sleep(_END_OF_RUN_SLEEP_SECONDS);
     }
-*/
 
     /**
      * Uses package manager to find the package name of the device launcher. Usually this package
@@ -128,6 +137,14 @@ public class TEC_UIAutomatorTests {
         PackageManager pm = getApplicationContext().getPackageManager();
         ResolveInfo resolveInfo = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
         return resolveInfo.activityInfo.packageName;
+    }
+
+    private void sleep(int numSeconds) {
+        try {
+            Thread.sleep(numSeconds * 1000 );
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 

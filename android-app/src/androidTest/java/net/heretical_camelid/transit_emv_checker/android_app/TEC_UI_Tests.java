@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.PatternMatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -30,7 +29,6 @@ import android.view.ViewParent;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -57,9 +55,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @RunWith(AndroidJUnit4.class)
 @SdkSuppress(minSdkVersion = 18)
-public class TEC_UIAutomatorTests {
+public class TEC_UI_Tests {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(TEC_UIAutomatorTests.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(TEC_UI_Tests.class);
 
     private static final String TEC_ANDROID_APP_PACKAGE =
         "net.heretical_camelid.transit_emv_checker.android_app";
@@ -135,33 +133,24 @@ public class TEC_UIAutomatorTests {
         assertThat(visibleButton.isClickable(),is(equalTo(true)));
 
         // Navigate to each of the other pages in turn
-        // checkNavigationPageContent("Transit", "No media presented");
-        // checkNavigationPageContent("EMV", "No media presented");
-        checkNavigationPageContent("About", "Version");
+        checkNavigationPageContent(1, R.id.navigation_transit, "Transit", "Card");
+        checkNavigationPageContent(2, R.id.navigation_emv_details, "EMV", "Card");
+        checkNavigationPageContent(3, R.id.navigation_about, "About", "Version");
     }
 
-    private void checkNavigationPageContent(String pageNavigationText, String expectedDisplayedSubstring) {
-        /*
-        UiObject2 pageNavigationButton = mDevice.wait(Until.findObject(
-            By.text(pageNavigationText)
-        ), _UI_APPEAR_TIMEOUT_SECONDS);
-
-         * The logic above does not work yet
-        assertThat(pageNavigationButton, is(notNullValue()));
-        assertThat(pageNavigationButton.isClickable(),is(equalTo(true)));
-        pageNavigationButton.click();
-        UiObject2 pageDisplayObject = mDevice.wait(Until.findObject(
-            By.text(expectedDisplayedPattern)
-        ), _UI_APPEAR_TIMEOUT_SECONDS);
-        assertThat(pageDisplayObject, is(notNullValue()));
-         */
+    private void checkNavigationPageContent(
+            int navigationPosition,
+            int navigationResourceId,
+            String pageNavigationText,
+            String expectedDisplayedSubstring
+    ) {
         ViewInteraction bottomNavigationItemView3 = onView(
-                allOf(withId(R.id.navigation_about), withContentDescription("About"),
+                allOf(withId(navigationResourceId), withContentDescription(pageNavigationText),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.nav_view),
                                         0),
-                                3),
+                                navigationPosition),
                         isDisplayed()));
         bottomNavigationItemView3.perform(click());
 

@@ -9,4 +9,6 @@
     <string name="title_emv_details">EMV Application Details</string>
     <string name="title_about">About</string>
     <string name="button_home">Button</string>
+    <string name="start_emv_media_detection">Start EMV Media Detection</string>
+    <string name="waiting_for_emv_media">Waiting for EMV media</string>
 </resources>

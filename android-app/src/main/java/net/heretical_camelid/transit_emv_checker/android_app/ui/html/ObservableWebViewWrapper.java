@@ -1,11 +1,12 @@
 package net.heretical_camelid.transit_emv_checker.android_app.ui.html;
 
+import android.annotation.SuppressLint;
 import android.util.Base64;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 public class ObservableWebViewWrapper {
     private final WebView m_webView;
+    @SuppressLint("SetJavaScriptEnabled")
     public ObservableWebViewWrapper(WebView webView) {
         m_webView = webView;
         // I have no reason to want Javascript enabled,

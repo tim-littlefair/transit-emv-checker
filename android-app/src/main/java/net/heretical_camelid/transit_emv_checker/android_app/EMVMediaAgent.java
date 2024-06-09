@@ -4,16 +4,12 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 
-import androidx.core.app.ActivityCompat;
 import com.github.devnied.emvnfccard.exception.CommunicationException;
-import com.github.devnied.emvnfccard.model.EmvCard;
 import com.github.devnied.emvnfccard.parser.EmvTemplate;
 
 import net.heretical_camelid.transit_emv_checker.library.*;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.File;
 
 public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     public static final int TIMEOUT_5000_MS = 5000;
@@ -64,25 +60,17 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     }
 
     void processMedia(Tag emvMediaTag) {
-
         IsoDep tagAsIsoDep = IsoDep.get(emvMediaTag);
         if(tagAsIsoDep == null) {
-            m_mainActivity.homePageLogAppend("Media does not support IsoDep mode");
+            m_mainActivity.homePageLogAppend("Detected media is not compatible with EMV");
+            m_mainActivity.setInitialState();
         } else {
-            do {
-                m_mainActivity.homePageLogAppend("Attempting to connect to tag in IsoDep mode");
-                try {
-                    tagAsIsoDep.setTimeout(TIMEOUT_5000_MS);
-                    tagAsIsoDep.connect();
-                    if (tagAsIsoDep.isConnected()) {
-                        m_mainActivity.homePageLogAppend("Successfully connected to tag in IsoDep mode");
-                    }
-                } catch (IOException e) {
-                    m_mainActivity.homePageLogAppend(
-                        "Attempt to connect to tag in IsoDep mode failed with exception:\n" +
-                            e.getMessage()
-                    );
-                    continue;
+            m_mainActivity.homePageLogAppend("Attempting to connect to EMV media");
+            try {
+                tagAsIsoDep.setTimeout(TIMEOUT_5000_MS);
+                tagAsIsoDep.connect(); /* Can throw IOException */
+                if (tagAsIsoDep.isConnected()) {
+                    m_mainActivity.homePageLogAppend("Successfully connected to EMV media");
                 }
 
                 // Create an observer object for APDUs and data extracted from them
@@ -93,30 +81,31 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                 MyParser mParser = new MyParser(template, apduObserver);
                 template.addParsers(mParser);
 
-                try {
-                    m_mainActivity.homePageLogAppend("About to read and parse media EMV content");
-                    EmvCard card = template.readEmvCard();
-                    m_mainActivity.homePageLogAppend("Media EMV content read and parsed successfully");
-                } catch (CommunicationException e) {
-                    m_mainActivity.homePageLogAppend(
-                        "Reading or parsing of EMV media content failed with error:\n" +
-                        e.getMessage()
-                    );
-                    continue;
-                }
+                m_mainActivity.homePageLogAppend("About to read and parse media EMV content");
+                template.readEmvCard();
+                m_mainActivity.homePageLogAppend("Media EMV content read and parsed successfully");
                 pciMaskingAgent.maskAccountData(apduObserver);
                 TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
                 writeXMLToExternalStorage(apduObserver);
                 m_mainActivity.setDisplayMediaDetailsState(tcc.capabilityReport(),apduObserver.summary());
+            } catch (CommunicationException e) {
+                m_mainActivity.homePageLogAppend(
+                    "Reading or parsing of EMV media content failed with error:\n" +
+                        e.getMessage()
+                );
+                m_mainActivity.setInitialState();
+            } catch (IOException e) {
+                m_mainActivity.homePageLogAppend(
+                    "Attempt to connect to EMV media failed with exception:\n" +
+                        e.getMessage()
+                );
+                m_mainActivity.setInitialState();
             }
-            while (false);
 
-            if (tagAsIsoDep != null) {
-                try {
-                    tagAsIsoDep.close();
-                } catch (java.io.IOException e) {
-                    // Handle exception silently
-                }
+            try {
+                tagAsIsoDep.close();
+            } catch (java.io.IOException e) {
+                // Handle exception silently
             }
         }
     }
@@ -130,10 +119,9 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
             .setRemoveDefaultParsers(true)
             .setReadAt(true)
             ;
-        EmvTemplate.Builder templateBuilder = EmvTemplate.Builder() //
+        return EmvTemplate.Builder()
             .setConfig(config)
             .setTerminal(new TransitTerminal());
-        return templateBuilder;
     }
 
     void writeXMLToExternalStorage(APDUObserver apduObserver) {
@@ -144,6 +132,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         } else if(xmlContent == null) {
             m_mainActivity.homePageLogAppend("Capture file failed: XML content is null");
         } else {
+            m_mainActivity.homePageLogAppend("Saving capture file. suggested name is " + fileBaseName + ".xml");
             m_mainActivity.saveXmlCaptureFile(fileBaseName + ".xml", xmlContent);
         }
     }

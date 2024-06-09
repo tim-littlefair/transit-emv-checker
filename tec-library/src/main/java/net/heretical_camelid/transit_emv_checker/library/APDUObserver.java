@@ -593,7 +593,9 @@ public class APDUObserver {
                 }
 
             }
-        }
+        }        boolean canContinue = true;
+
+
 
         xmlBuffer.append("</emv_medium>\n");
 
@@ -639,11 +641,11 @@ public class APDUObserver {
         AppAccountIdentifier mediumAccountIdentifier = primaryAccountIdentifier();
         if(mediumAccountIdentifier!=null) {
             return String.format(
-                "%satc%04d",
+                "%s-%04d",
                 mediumAccountIdentifier,m_mediumTransactionCounterNow
             );
         } else {
-            return String.format("incomplete_media_" + LocalDateTime.now().toString());
+            return String.format("incomplete_media-" + LocalDateTime.now().toString());
         }
     }
 }

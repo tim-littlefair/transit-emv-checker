@@ -1,15 +1,12 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
-import android.view.View;
 import android.widget.Toast;
-import androidx.core.content.ContextCompat;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,8 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
@@ -45,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     // Model attributes driving fragment UI elements
     private final HashMap<Integer, MutableLiveData<String> > m_htmlPageRegistry = new HashMap<>();
-    private MutableLiveData<String> m_homePageStatus;
     private MutableLiveData<String> m_homePageLog = null;
 
     // NFC/EMV operations controller
@@ -112,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
             openSourceLicensesText = "";
         }
 
+        String versionString = getVersionString();
+        aboutText = aboutText.replace("%VERSION%",versionString);
+        aboutText = aboutText.replace(
+            "%OPEN_SOURCE_LICENSES_HTML_BASE64%",
+            Base64.encodeToString(openSourceLicensesText.getBytes(),Base64.NO_PADDING)
+        );
+        setPageHtmlText(R.id.navigation_about,aboutText);
+    }
+
+    @NonNull
+    private static String getVersionString() {
         String versionString = BuildConfig.VERSION_NAME;
         int versionCode = BuildConfig.VERSION_CODE;
         if(versionCode==1) {
@@ -123,34 +130,40 @@ public class MainActivity extends AppCompatActivity {
                           .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
             ;
         } else {
-            // In CI builds, versionCode will contain an integer
-            // parsed from the 7-hex-digit prefix of the git
-            // commit hash so we can render it back to hex
-            // to match the hash prefix.
+            // In CI builds, the build script devenv/gen_version_code.sh will
+            // run before the app is built and will modify build.gradle so that
+            // versionCode will contain an integer parsed from the 7-hex-digit
+            // prefix of the git commit hash.
+            // This integer is rendered back into hex to match the hash prefix
+            // as shown in the git commit log.
             versionString += String.format(".%07x",versionCode);
         }
-        aboutText = aboutText.replace("%VERSION%",versionString);
-        aboutText = aboutText.replace(
-            "%OPEN_SOURCE_LICENSES_HTML_BASE64%",
-            Base64.encodeToString(openSourceLicensesText.getBytes(),Base64.NO_PADDING)
-        );
-        setPageHtmlText(R.id.navigation_about,aboutText);
+        return versionString;
     }
 
     private @NotNull String getTextFromAsset(String assetFilename) throws IOException {
+        int _BLOCK_SIZE = 10240;
+        byte[] nextBlock = new byte[_BLOCK_SIZE];
         InputStream assetStream = getAssets().open(assetFilename);
-        int lengthInBytes = assetStream.available();
-        byte[] buffer = new byte[lengthInBytes];
-        assetStream.read(buffer);
+        byte[] assetBytes = new byte[0];
+        int bytesRead;
+        while(true) {
+            bytesRead = assetStream.read(nextBlock);
+            if(bytesRead<=0) {
+                break;
+            }
+            byte[] newAssetBytes = new byte[assetBytes.length + bytesRead];
+            System.arraycopy(assetBytes,0, newAssetBytes, 0, assetBytes.length);
+            System.arraycopy(nextBlock, 0, newAssetBytes, assetBytes.length, bytesRead);
+            assetBytes = newAssetBytes;
+        }
         assetStream.close();
-        return new String(buffer, "UTF-8");
+        return new String(assetBytes, StandardCharsets.UTF_8);
     }
 
     public void setInitialState() {
         setPageHtmlText(R.id.navigation_transit,"<html><body><p>Card not read yet</p></body></html>");
         setPageHtmlText(R.id.navigation_emv_details,"<html><body><p>Card not read yet</p></body></html>");
-        //setItemState(R.id.navigation_transit,false);
-        //setItemState(R.id.navigation_emv_details,false);
     }
 
     public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails) {
@@ -164,9 +177,6 @@ public class MainActivity extends AppCompatActivity {
                 emvApplicationDetails +
                 "</pre></body></html>"
         );
-        //setItemState(R.id.navigation_transit,true);
-        //setItemState(R.id.navigation_emv_details,true);
-        // m_navController.navigate(R.id.navigation_transit);
     }
 
     public void registerHomeViewModel(HomeViewModel theModel) {
@@ -176,27 +186,6 @@ public class MainActivity extends AppCompatActivity {
     public void registerHtmlViewModel(int whichModel, HtmlViewModel theModel) {
         theModel.setData(m_htmlPageRegistry.get(whichModel));
     }
-
-    private void setItemState(int itemId, boolean isEnabled) {
-        View itemView = m_navView.findViewById(itemId);
-        assert itemView != null;
-        if(isEnabled == false) {
-            itemView.setEnabled(false);
-            itemView.setOnClickListener(v -> {
-                m_navController.navigate(R.id.navigation_home);
-                Toast.makeText(
-                        MainActivity.this,
-                        "No current EMV media",
-                        Toast.LENGTH_SHORT
-                ).show();
-            });
-            // itemView.setClickable(true);
-        } else {
-            itemView.setOnClickListener(null);
-            itemView.setEnabled(true);
-        }
-    }
-
 
     public void homePageLogAppend(String s) {
         if(m_homePageLog != null) {
@@ -235,8 +224,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(
         final int requestCode,
-        final String[] permissions,
-        final int[] grantResults
+        @NonNull final String[] permissions,
+        @NonNull final int[] grantResults
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         for(int i=0; i<permissions.length; ++i) {
@@ -253,19 +242,8 @@ public class MainActivity extends AppCompatActivity {
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         LOGGER.info(String.format("onNewIntent action=%s uri=%s",intent.getAction(),intent.getData()));
-        if(intent.getAction() == Intent.ACTION_CREATE_DOCUMENT) {
+        if(Objects.equals(intent.getAction(), Intent.ACTION_CREATE_DOCUMENT)) {
             m_externalFileManager.storeFileContent(intent.getData());
         }
     }
-
-    /*
-    @Override
-    public void startActivity(Intent intent, Bundle bundle) {
-        super.startActivity(intent, bundle);
-        LOGGER.info(String.format("startActivity action=%s uri=%s",intent.getAction(),intent.getData()));
-        if(intent.getAction() == Intent.ACTION_CREATE_DOCUMENT) {
-            m_externalFileManager.storeFileContent(intent.getData());
-        }
-    }
-    */
 }

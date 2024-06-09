@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.UriPermission;
 import android.net.Uri;
 import android.provider.DocumentsContract;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
@@ -28,19 +26,17 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
     final private MainActivity m_mainActivity;
     Uri m_saveDirectoryUri = null;
     private byte[] m_bytesToSave = null;
-    ActivityResultLauncher<Intent> m_createFileLauncher = null;
+    ActivityResultLauncher<Intent> m_createFileLauncher;
 
     public ModernExternalFileManager(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
         m_createFileLauncher = m_mainActivity.registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Uri userSelectedUri = result.getData().getData();
-                        storeFileContent(userSelectedUri);
-                    }
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    assert result.getData() != null;
+                    Uri userSelectedUri = result.getData().getData();
+                    storeFileContent(userSelectedUri);
                 }
             }
         );
@@ -53,9 +49,8 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
             m_mainActivity.getContentResolver().getPersistedUriPermissions()
         ;
 
-        if(persistedPermissions==null || persistedPermissions.size()==0) {
+        if(persistedPermissions==null || persistedPermissions.isEmpty()) {
             promptUserForSaveDir();
-            return;
         } else if(persistedPermissions.size()==1) {
             UriPermission currentSaveDirPermission = persistedPermissions.get(0);
             if (currentSaveDirPermission.isWritePermission()) {
@@ -69,7 +64,7 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
             }
         } else {
             // More than one permission => something weird has happened
-            // Delete all the peristable permissions found and start again
+            // Delete all the persistable permissions found and start again
             for(UriPermission uriPermission: persistedPermissions) {
                 m_mainActivity.getContentResolver().releasePersistableUriPermission(
                     uriPermission.getUri(),
@@ -97,16 +92,14 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
         ActivityResultLauncher<Intent> directoryAccessRequestLauncher =
             m_mainActivity.registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode()== Activity.RESULT_OK ) {
-                            m_saveDirectoryUri = result.getData().getData();
-                            m_mainActivity.getContentResolver().takePersistableUriPermission(
-                                m_saveDirectoryUri,
-                                SAVEDIR_FLAGS_READ_WRITE
-                            );
-                        }
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        assert result.getData() != null;
+                        m_saveDirectoryUri = result.getData().getData();
+                        m_mainActivity.getContentResolver().takePersistableUriPermission(
+                            m_saveDirectoryUri,
+                            SAVEDIR_FLAGS_READ_WRITE
+                        );
                     }
                 }
             )
@@ -124,8 +117,6 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
         intent.setType(fileMimeType);
         intent.putExtra(Intent.EXTRA_TITLE, fileBaseName);
         m_bytesToSave = fileContent;
-        //m_mainActivity.startActivityForResult(intent,MainActivity.REQUEST_CODE_CREATE_DOCUMENT);
-
         m_createFileLauncher.launch(intent);
     }
 
@@ -134,6 +125,7 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
         try {
             LOGGER.info("Before call to openOutputStream for URI " + documentUri);
             outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri,"wt");
+            assert outputStream != null;
             LOGGER.info("Before write");
             outputStream.write(m_bytesToSave);
             LOGGER.info("Before flush");

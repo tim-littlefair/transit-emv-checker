@@ -32,6 +32,9 @@ android {
         viewBinding true
         buildConfig true
     }
+    lint {
+        disable += [ 'DefaultLocale' , 'PointlessBooleanExpression']
+    }
     packaging {
         resources {
             merge "build/licenses"

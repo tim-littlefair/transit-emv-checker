@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import androidx.core.content.ContextCompat;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+/** @noinspection unused*/
 public class LegacyExternalFileManager extends ExternalFileManagerBase {
     static final Logger LOGGER = LoggerFactory.getLogger(LegacyExternalFileManager.class);
 
@@ -34,7 +34,7 @@ public class LegacyExternalFileManager extends ExternalFileManagerBase {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
         };
-        m_mainActivity.m_permissionStatuses = new TreeMap<String,String>();
+        m_mainActivity.m_permissionStatuses = new TreeMap<>();
         ArrayList<String> permissionsToBeRequested = new ArrayList<>();
         for(String permissionName: permissionsDesired) {
             boolean permissionOutcome =
@@ -52,9 +52,9 @@ public class LegacyExternalFileManager extends ExternalFileManagerBase {
             m_mainActivity.m_permissionStatuses.put(permissionName,permissionStatus);
             LOGGER.info("Permission " + permissionName + " initial_status=" + permissionStatus);
         }
-        if(permissionsToBeRequested.size()>0) {
+        if(permissionsToBeRequested.isEmpty() == false) {
             m_mainActivity.requestPermissions(
-                permissionsToBeRequested.toArray(new String[permissionsToBeRequested.size()]),
+                permissionsToBeRequested.toArray(new String[0]),
                 MainActivity.REQUEST_CODE_REQUEST_PERMISSIONS
             );
             // We need to wait until we see the permission request result before
@@ -91,11 +91,10 @@ public class LegacyExternalFileManager extends ExternalFileManagerBase {
                 if (appCacheDirExists == false) {
                     appCacheDirExists = appCacheDir.mkdirs();
                 }
+
                 if (appCacheDirExists == false) {
                     LOGGER.warn("Can't save files: cache directory did not exist and could not be created");
-                    appCacheDirExists = appCacheDir.mkdirs();
-                }
-                if (appCacheDir.canWrite() == false) {
+                } else if (appCacheDir.canWrite() == false) {
                     LOGGER.warn("Can't save files: cache directory not writeable");
                 } else {
                     m_xmlSaveDirectoryUri = Uri.fromFile(appCacheDir);
@@ -115,7 +114,7 @@ public class LegacyExternalFileManager extends ExternalFileManagerBase {
         OutputStream outputStream;
         try {
             outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri);
-            // BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+            assert outputStream != null;
             outputStream.write(fileContent);
             outputStream.flush();
             outputStream.close();

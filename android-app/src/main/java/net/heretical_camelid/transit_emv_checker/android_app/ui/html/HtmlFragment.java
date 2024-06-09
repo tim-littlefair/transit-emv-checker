@@ -17,15 +17,12 @@ import net.heretical_camelid.transit_emv_checker.android_app.databinding.Fragmen
 public class HtmlFragment extends Fragment {
 
     private FragmentHtmlBinding binding;
-    private HtmlViewModel m_htmlViewModel;
-    private ObservableWebViewWrapper m_observableWebViewWrapper;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentHtmlBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-        return root;
+        return binding.getRoot();
     }
 
     @Override
@@ -46,9 +43,9 @@ public class HtmlFragment extends Fragment {
 
         assert currentDestination != null;
 
-        m_observableWebViewWrapper = new ObservableWebViewWrapper(binding.wvHtml);
-        m_htmlViewModel = new ViewModelProvider(this).get(HtmlViewModel.class);
-        activity.registerHtmlViewModel(currentDestination.getId(),m_htmlViewModel);
+        ObservableWebViewWrapper m_observableWebViewWrapper = new ObservableWebViewWrapper(binding.wvHtml);
+        HtmlViewModel m_htmlViewModel = new ViewModelProvider(this).get(HtmlViewModel.class);
+        activity.registerHtmlViewModel(currentDestination.getId(), m_htmlViewModel);
         m_htmlViewModel.getText().observe(
             getViewLifecycleOwner(),
             m_observableWebViewWrapper::loadHtmlText

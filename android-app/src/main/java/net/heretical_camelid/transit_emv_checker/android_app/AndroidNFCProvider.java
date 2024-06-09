@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 class AndroidNFCProvider extends MyProviderBase implements IProvider {
-    private IsoDep m_tagAsIsoDep;
+    private final IsoDep m_tagAsIsoDep;
 
     public AndroidNFCProvider(APDUObserver apduStore, IsoDep tagAsIsoDep) {
         super(apduStore);
@@ -40,25 +40,13 @@ class AndroidNFCProvider extends MyProviderBase implements IProvider {
         byte[] retval;
 
         // Try the NFC-A way
-        try {
-            retval = m_tagAsIsoDep.getHistoricalBytes();
-        } catch (Exception e) {
-            retval = null;
-        }
+        retval = m_tagAsIsoDep.getHistoricalBytes();
 
         // If that didn't work, try the NFC-B way
         if (retval == null) {
-            try {
-                retval = m_tagAsIsoDep.getHiLayerResponse();
-            } catch (Exception e) {
-            }
+            retval = m_tagAsIsoDep.getHiLayerResponse();
         }
 
         return retval;
     }
-
-    public void setmTagCom(final IsoDep mTagCom) {
-        this.m_tagAsIsoDep = mTagCom;
-    }
-
 }

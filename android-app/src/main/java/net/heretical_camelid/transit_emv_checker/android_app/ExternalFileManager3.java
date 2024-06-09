@@ -2,12 +2,9 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.DocumentsContract;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
@@ -17,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.TreeMap;
 
+/** @noinspection unused*/
 public class ExternalFileManager3 extends ExternalFileManagerBase {
     static final Logger LOGGER = LoggerFactory.getLogger(ModernExternalFileManager.class);
 
@@ -33,19 +30,17 @@ public class ExternalFileManager3 extends ExternalFileManagerBase {
     Uri m_saveDirectoryUri = null;
 
     private byte[] m_bytesToSave = null;
-    ActivityResultLauncher<Intent> m_createFileLauncher = null;
+    ActivityResultLauncher<Intent> m_createFileLauncher;
 
     public ExternalFileManager3(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
         m_createFileLauncher = m_mainActivity.registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Uri userSelectedUri = result.getData().getData();
-                        storeFileContent(userSelectedUri);
-                    }
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    assert result.getData() != null;
+                    Uri userSelectedUri = result.getData().getData();
+                    storeFileContent(userSelectedUri);
                 }
             }
         );
@@ -99,46 +94,6 @@ public class ExternalFileManager3 extends ExternalFileManagerBase {
         if(m_saveDirectoryFile != null) {
             m_saveDirectoryUri = Uri.fromFile(m_saveDirectoryFile);
         }
-        return;
-/*
-
-
-            String dailySubdirName = String.format("%s_%s", ,currentDate);
-
-            if(m_saveDirectoryFile.exists())
-        }
-        m_saveDirectoryUri = null;
-        List<UriPermission> persistedPermissions =
-            m_mainActivity.getContentResolver().getPersistedUriPermissions()
-        ;
-
-        if(persistedPermissions==null || persistedPermissions.size()==0) {
-            promptUserForSaveDir();
-            return;
-        } else if(persistedPermissions.size()==1) {
-            UriPermission currentSaveDirPermission = persistedPermissions.get(0);
-            if (currentSaveDirPermission.isWritePermission()) {
-                m_saveDirectoryUri = currentSaveDirPermission.getUri();
-            } else {
-                m_mainActivity.getContentResolver().releasePersistableUriPermission(
-                    currentSaveDirPermission.getUri(),
-                    SAVEDIR_FLAGS_READ_WRITE
-                );
-                promptUserForSaveDir();
-            }
-        } else {
-            // More than one permission => something weird has happened
-            // Delete all the peristable permissions found and start again
-            for(UriPermission uriPermission: persistedPermissions) {
-                m_mainActivity.getContentResolver().releasePersistableUriPermission(
-                    uriPermission.getUri(),
-                    SAVEDIR_FLAGS_READ_WRITE
-                );
-            }
-            promptUserForSaveDir();
-        }
-
- */
     }
 
     private void promptUserForSaveDir() {
@@ -166,16 +121,14 @@ public class ExternalFileManager3 extends ExternalFileManagerBase {
         ActivityResultLauncher<Intent> directoryAccessRequestLauncher =
             m_mainActivity.registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode()== Activity.RESULT_OK ) {
-                            m_saveDirectoryUri = result.getData().getData();
-                            m_mainActivity.getContentResolver().takePersistableUriPermission(
-                                m_saveDirectoryUri,
-                                SAVEDIR_FLAGS_READ_WRITE
-                            );
-                        }
+                result -> {
+                    if(result.getResultCode()== Activity.RESULT_OK ) {
+                        assert result.getData() != null;
+                        m_saveDirectoryUri = result.getData().getData();
+                        m_mainActivity.getContentResolver().takePersistableUriPermission(
+                            m_saveDirectoryUri,
+                            SAVEDIR_FLAGS_READ_WRITE
+                        );
                     }
                 }
             )
@@ -194,14 +147,6 @@ public class ExternalFileManager3 extends ExternalFileManagerBase {
         }
         Uri documentUri = Uri.withAppendedPath(m_saveDirectoryUri,fileBaseName + ".xml");
         storeFileContent(documentUri);
-        /*
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(fileMimeType);
-        intent.putExtra(Intent.EXTRA_TITLE, fileBaseName);
-
-        m_createFileLauncher.launch(intent);
-         */
     }
 
     public void storeFileContent(Uri documentUri) {
@@ -209,6 +154,7 @@ public class ExternalFileManager3 extends ExternalFileManagerBase {
         try {
             LOGGER.info("Before call to openOutputStream for URI " + documentUri);
             outputStream = m_mainActivity.getContentResolver().openOutputStream(documentUri,"wt");
+            assert outputStream != null;
             LOGGER.info("Before write");
             outputStream.write(m_bytesToSave);
             LOGGER.info("Before flush");

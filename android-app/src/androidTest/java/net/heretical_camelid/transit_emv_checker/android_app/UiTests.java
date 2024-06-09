@@ -155,7 +155,10 @@ public class UiTests {
                         withParent(withParent(IsInstanceOf.<View>instanceOf(android.webkit.WebView.class))),
                         isDisplayed()));
         assertThat(textView3,is(notNullValue()));
-        // textView3.check(matches(withText(expectedDisplayedSubstring)));
+
+        // Allow the screen to be displayed briefly to the human test observer
+        // if there is one
+        sleep(3);
     }
 
     @After

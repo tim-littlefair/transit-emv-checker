@@ -6,16 +6,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.devnied.emvnfccard.enums.SwEnum;
 import com.github.devnied.emvnfccard.exception.CommunicationException;
 import com.github.devnied.emvnfccard.iso7816emv.EmvTags;
-import com.github.devnied.emvnfccard.model.Application;
-import com.github.devnied.emvnfccard.model.EmvCard;
-import com.github.devnied.emvnfccard.model.enums.ApplicationStepEnum;
-import com.github.devnied.emvnfccard.model.enums.CardStateEnum;
 import com.github.devnied.emvnfccard.parser.EmvTemplate;
 import com.github.devnied.emvnfccard.parser.impl.EmvParser;
-import com.github.devnied.emvnfccard.utils.ResponseUtils;
 import com.github.devnied.emvnfccard.utils.TlvUtil;
 import com.github.devnied.emvnfccard.model.Afl;
 import com.github.devnied.emvnfccard.utils.CommandApdu;
@@ -24,16 +18,23 @@ import com.github.devnied.emvnfccard.enums.CommandEnum;
 
 import fr.devnied.bitlib.BytesUtils;
 
+/**
+ * See comment on MyParser.extractCommonsCardData for why it
+ * was necessary to override the definition of that method
+ * provided in the base class
+ * com.github.devnied.emvnfccard.parser.impl.EmvParser
+ */
 public class MyParser extends EmvParser {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MyParser.class);
 
-    private APDUObserver m_apduObserver = null;
+    private final APDUObserver m_apduObserver;
 
     /**
      * Default constructor
      *
      * @param pTemplate parser template
-     * @param apduObserver
+     * @param apduObserver datastore which preserves and reports on the APDUs exchanged
+     * during the tap and the EMV tags in those APDUs.
      */
     public MyParser(EmvTemplate pTemplate, APDUObserver apduObserver) {
         super(pTemplate);
@@ -41,9 +42,9 @@ public class MyParser extends EmvParser {
     }
 
 	/**
-	 * This method overrides devnied's implementation in the superclass
+	 * This method overrides the implementation in the base class
      * to re-discover the application file locator bytes, and to read 
-     * all of the records associated with the application (devnied's 
+     * all of the records associated with the application (the base class
      * implementation only reads records until the track data is found,
      * and usually leaves the records containing CAPK index and other
      * transit-relevant tags unread).
@@ -54,7 +55,7 @@ public class MyParser extends EmvParser {
 	 */
     @Override
 	protected boolean extractCommonsCardData(final byte[] pGpo) throws CommunicationException {
-        // Invoke devnied's implementation first to fill all of the fields required by 
+        // Invoke the base class implementation first to fill all of the fields required by
         // his EmvCard class
         boolean retval =  super.extractCommonsCardData(pGpo);
         final byte[] aflBytes;
@@ -64,7 +65,7 @@ public class MyParser extends EmvParser {
             if(pGpo[0] == (byte) 0x80) {
                 // Format 1, 0x80 should be followed by a single byte length indicator, 
                 // then two bytes of AIP, then AFL list.
-                // The length indicator covers AIP and AFL list and does not incude status word.
+                // The length indicator covers AIP and AFL list and does not include status word.
                 if(pGpo[1] == pGpo.length - 4) {
                     aflBytes = ArrayUtils.subarray(pGpo, 4, pGpo.length - 2);
                     LOGGER.debug("AFL bytes from RMT format 1: " + BytesUtils.bytesToString(aflBytes));

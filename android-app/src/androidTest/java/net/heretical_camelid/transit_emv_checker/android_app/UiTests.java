@@ -34,7 +34,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withSubstring;
-import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
 import androidx.test.espresso.ViewInteraction;
@@ -55,15 +54,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 @RunWith(AndroidJUnit4.class)
 @SdkSuppress(minSdkVersion = 18)
-public class TEC_UI_Tests {
+public class UiTests {
 
-    static final Logger LOGGER = LoggerFactory.getLogger(TEC_UI_Tests.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(UiTests.class);
 
     private static final String TEC_ANDROID_APP_PACKAGE =
         "net.heretical_camelid.transit_emv_checker.android_app";
-    private static final String ANDROID_DOCUMENTSUI_PACKAGE =
-        "com.android.documentsui";
-
 
     private static final int _LAUNCH_TIMEOUT_SECONDS = 30;
 

@@ -8,6 +8,11 @@ public class ObservableWebViewWrapper {
     private final WebView m_webView;
     public ObservableWebViewWrapper(WebView webView) {
         m_webView = webView;
+        // I have no reason to want Javascript enabled,
+        // but running with it disabled triggers large
+        // stack traces in logcat.
+        // ref: https://stackoverflow.com/q/74198645
+        m_webView.getSettings().setJavaScriptEnabled(true);
     }
 
     public void loadHtmlText(String htmlText) {

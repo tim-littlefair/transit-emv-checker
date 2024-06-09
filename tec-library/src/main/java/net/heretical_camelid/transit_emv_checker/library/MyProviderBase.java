@@ -51,6 +51,12 @@ public abstract class MyProviderBase implements IProvider {
                 commsEndMillis - startMillis,
                 analysisEndMillis - startMillis
             ));
+            if(newCommandAndResponse.rawResponse==null) {
+                throw new CommunicationException(
+                    "Null response to command sent in step " +
+                    newCommandAndResponse.stepName
+                );
+            }
         }
 
 		return ret;

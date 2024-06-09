@@ -86,14 +86,20 @@ public class MyParser extends EmvParser {
                 for (Afl afl : listAfl) {
                     // check all records
                     for (int index = afl.getFirstRecord(); index <= afl.getLastRecord(); index++) {
-                        LOGGER.debug(String.format("Attempting to read AFL[%d.%d]",afl.getSfi(),index,afl));
-                        template.get().getProvider()
-                            .transceive(
-                                new CommandApdu(
-                                    CommandEnum.READ_RECORD, 
-                                    index, afl.getSfi() << 3 | 4, 0
-                                ).toBytes()
-                            );
+                        LOGGER.debug(String.format("Attempting to read AFL[%d.%d]",afl.getSfi(),index));
+                        byte[] response = template.get().getProvider().transceive(
+                            new CommandApdu(
+                                CommandEnum.READ_RECORD,
+                                index, afl.getSfi() << 3 | 4, 0
+                            ).toBytes()
+                        );
+                        if(response==null) {
+                            LOGGER.warn(String.format(
+                                "Null response to READ_RECORD for AFL[%d.%d]",afl.getSfi(),index
+                            ));
+                            retval = false;
+                            break;
+                        }
                     }
                 }
             } else {

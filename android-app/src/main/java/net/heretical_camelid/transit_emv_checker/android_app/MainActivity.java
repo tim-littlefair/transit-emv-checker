@@ -86,8 +86,14 @@ public class MainActivity extends AppCompatActivity {
     final static int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 201;
     final static int REQUEST_CODE_CREATE_DOCUMENT = 202;
 
-    boolean m_userHasAgreed = false;
-    private AlertDialog m_startupAlert;
+    static boolean m_userHasAgreed = false;
+    private static AlertDialog s_startupAlert;
+
+    public static void showStartupAlert() {
+        if(m_userHasAgreed==false) {
+            s_startupAlert.show();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,15 +123,13 @@ public class MainActivity extends AppCompatActivity {
         setInitialState();
 
         buildStartupAlert();
-        if(m_userHasAgreed==false) {
-            m_startupAlert.show();
-        }
+        showStartupAlert();
     }
 
     @Override public void onResume() {
         super.onResume();
         if(m_userHasAgreed==false) {
-            m_startupAlert.show();
+            s_startupAlert.show();
         }
     }
 
@@ -153,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         );
         startupAlertBuilder.setNeutralButton("more information", m_startupAlertListener);
         startupAlertBuilder.setNegativeButton("decline and close", m_startupAlertListener);
-        m_startupAlert = startupAlertBuilder.create();
+        s_startupAlert = startupAlertBuilder.create();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -175,9 +179,13 @@ public class MainActivity extends AppCompatActivity {
         if(m_userHasAgreed == false) {
             // Display only the long disclaimer and a button to trigger return
             // to the startup dialog
-            String returnButtonText = "<button id='return_to_startup_alert' style='align:center;'>";
+            String returnButtonText = (
+                "<a href='data:return_to_startup_alert'><button " +
+                "style='align: center; position: absolute; left: 50%; transform: translateX: 50%;' " +
+                ">"
+            );
             returnButtonText += "AGREE OR DECLINE";
-            returnButtonText += "</button>";
+            returnButtonText += "</button><br/><br/><br/></a>";
             setPageHtmlText(R.id.navigation_about,
                 longDisclaimerText + returnButtonText
             );

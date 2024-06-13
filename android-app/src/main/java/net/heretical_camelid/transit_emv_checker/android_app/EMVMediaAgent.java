@@ -83,11 +83,22 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
 
                 m_mainActivity.homePageLogAppend("About to read and parse media EMV content");
                 template.readEmvCard();
-                m_mainActivity.homePageLogAppend("Media EMV content read and parsed successfully");
                 pciMaskingAgent.maskAccountData(apduObserver);
-                TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
                 writeXMLToExternalStorage(apduObserver);
-                m_mainActivity.setDisplayMediaDetailsState(tcc.capabilityReport(),apduObserver.summary());
+                TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
+                String transitCapabilityReport = tcc.capabilityReport();
+                String emvDetailsSummary = apduObserver.summary();
+                if(transitCapabilityReport==null) {
+                    m_mainActivity.homePageLogAppend("Failed to retrieve transit capabilities");
+                    m_mainActivity.setInitialState();
+                } else if (emvDetailsSummary==null) {
+                    m_mainActivity.homePageLogAppend("Failed to retrieve transit capabilities");
+                    m_mainActivity.setInitialState();
+                } else {
+                    m_mainActivity.homePageLogAppend("Media EMV content read and parsed successfully");
+                    m_mainActivity.setDisplayMediaDetailsState(transitCapabilityReport,emvDetailsSummary);
+                    m_mainActivity.navigateToPage(R.id.navigation_transit);
+                }
             } catch (CommunicationException e) {
                 m_mainActivity.homePageLogAppend(
                     "Reading or parsing of EMV media content failed with error:\n" +

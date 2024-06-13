@@ -1,6 +1,7 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
 import static android.text.Html.FROM_HTML_MODE_COMPACT;
+import static android.text.Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -129,14 +130,17 @@ public class MainActivity extends AppCompatActivity {
             disclaimerHtml = "Please be aware of implications of using this app related to PCI and card issuer fraud detection";
         }
         Spanned disclaimerRichText = Html.fromHtml(
-            disclaimerHtml,
-            0
+            disclaimerHtml, (
+                Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH |
+                Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM |
+                Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
+            )
         );
         startupAlertBuilder.setMessage(disclaimerRichText);
         startupAlertBuilder.setPositiveButton(
             R.string.i_understand_and_agree,m_startupAlertOnClickListener
         );
-        startupAlertBuilder.setNeutralButton("more info",m_startupAlertOnClickListener);
+        startupAlertBuilder.setNeutralButton("more information",m_startupAlertOnClickListener);
         startupAlertBuilder.setNegativeButton("decline and close", m_startupAlertOnClickListener);
         AlertDialog startupAlert = startupAlertBuilder.create();
         startupAlert.show();

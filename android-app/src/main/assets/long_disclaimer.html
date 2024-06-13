@@ -1,32 +1,42 @@
+<h3>Responsible use of this application</h3>
 This application is intended to enable customer service and technical employees working
-in the mass transit/public transport industry to advise customers whose contactless EMV
-cards are not accepted at transport validators.
-<br/>
+in the mass transit/public transport industry to identify impediments preventing acceptance
+for customers whose contactless EMV cards are declined or trigger errors at fare payment
+validators.
+<br/><br/>
 This application provides no features useful to a criminal intending to 'skim' a customer's
 cEMV card in order to trigger an illicit payment.
-<br/>
+<br/><br/>
 There is no legal impediment the developers are aware of to using this application on live cards,
 but potential users should be aware of the following concerns:
-<br/>
+<br/><br/>
 <ul>
     <li>
 If a transport authority, operator or agent is accepting cEMV payments, it will be
 bound by the regulations issued by the Payment Cards Industry Security Standards Council.
-Organizations in this category should consult their internal specialists to determine
-whether they are permitted to use this application.  Whether they are permitted may
-depend on whether the PCI-DSS approval covering their system comes under PCI-DSS v4.0 or
+Organizations in this category should consult their internal subject matter experts to
+determine whether they are permitted to use this application.  Whether they are permitted
+may depend on whether the PCI-DSS approval covering their system comes under PCI-DSS v4.0 or
 PCI-DSS v3.2.1 (the earlier specification contains much stricter language in relation to
-applications processing live PANs).
+use of applications processing live PANs other than live payment terminals connected to
+the payment network).
     </li>
     <li>
 All cEMV cards contain counters of numbers of taps processed on the card, and the banks
 issuing these cards will receive the current counter as part of transaction information
-for every payment on the card.  Banks can and do check the sequence of counter values
-received and may regard gaps in the sequence as evidence of risk of fraudulent use of
-the card and apply an action like blocking the card which could be inconvenient to the
-cardholder.  Tapping a card once on this application will result in a gap of one in the
-transaction counter sequence at the bank, which is very unlikely to trigger action.
-<em>It is strongly recommended that no card should be tapped on this application more
-than once or at the most twice on any given day</em>.
+for every payment on the card.  The banks which issue cards and do check the sequence of
+counter values received and may flag frequent or lengthy gaps in the sequence as evidence of
+risk of fraudulent use of the card and may apply an action like blocking the card which could be
+inconvenient to the cardholder.  Tapping a card once on this application will result
+in a gap of 1 missing counter value in the sequence at the bank, which is very unlikely
+to trigger action.
+<br/>
+<strong>It is strongly recommended that no live card should be tapped on this application more
+than once or at the most twice on any given day</strong>.
+There is no limit on the number of times test cards or cards emulated using proprietary cEMV
+testing tools can be tapped.
     </li>
 </ul>
+<br/>&nbsp;<br/>
+<br/>&nbsp;<br/>
+<br/>&nbsp;<br/>

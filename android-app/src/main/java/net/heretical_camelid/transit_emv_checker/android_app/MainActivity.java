@@ -1,12 +1,15 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -83,7 +86,20 @@ public class MainActivity extends AppCompatActivity {
         populateAboutPage();
         setInitialState();
         m_externalFileManager = new ModernExternalFileManager(this);
-        m_externalFileManager.requestPermissions();
+        AlertDialog.Builder startupAlertBuilder = new AlertDialog.Builder(MainActivity.this);
+        startupAlertBuilder.setTitle("Transit EMV Checker");
+        startupAlertBuilder.setMessage("I am warning you");
+        startupAlertBuilder.setPositiveButton(
+            R.string.i_understand_and_agree,
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // m_externalFileManager.requestPermissions();
+                }
+            }
+        );
+        AlertDialog startupAlert = startupAlertBuilder.create();
+        startupAlert.show();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {

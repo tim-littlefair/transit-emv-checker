@@ -50,7 +50,7 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
         ;
 
         if(persistedPermissions==null || persistedPermissions.isEmpty()) {
-            promptUserForSaveDir();
+            // promptUserForSaveDir();
         } else if(persistedPermissions.size()==1) {
             UriPermission currentSaveDirPermission = persistedPermissions.get(0);
             if (currentSaveDirPermission.isWritePermission()) {
@@ -60,7 +60,7 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
                     currentSaveDirPermission.getUri(),
                     SAVEDIR_FLAGS_READ_WRITE
                 );
-                promptUserForSaveDir();
+                // promptUserForSaveDir();
             }
         } else {
             // More than one permission => something weird has happened
@@ -71,7 +71,7 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
                     SAVEDIR_FLAGS_READ_WRITE
                 );
             }
-            promptUserForSaveDir();
+            // promptUserForSaveDir();
         }
     }
 

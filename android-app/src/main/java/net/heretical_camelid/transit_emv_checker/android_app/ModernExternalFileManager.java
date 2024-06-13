@@ -42,39 +42,6 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
         );
     }
 
-    @Override
-    public void requestPermissions() {
-        m_saveDirectoryUri = null;
-        List<UriPermission> persistedPermissions =
-            m_mainActivity.getContentResolver().getPersistedUriPermissions()
-        ;
-
-        if(persistedPermissions==null || persistedPermissions.isEmpty()) {
-            // promptUserForSaveDir();
-        } else if(persistedPermissions.size()==1) {
-            UriPermission currentSaveDirPermission = persistedPermissions.get(0);
-            if (currentSaveDirPermission.isWritePermission()) {
-                m_saveDirectoryUri = currentSaveDirPermission.getUri();
-            } else {
-                m_mainActivity.getContentResolver().releasePersistableUriPermission(
-                    currentSaveDirPermission.getUri(),
-                    SAVEDIR_FLAGS_READ_WRITE
-                );
-                // promptUserForSaveDir();
-            }
-        } else {
-            // More than one permission => something weird has happened
-            // Delete all the persistable permissions found and start again
-            for(UriPermission uriPermission: persistedPermissions) {
-                m_mainActivity.getContentResolver().releasePersistableUriPermission(
-                    uriPermission.getUri(),
-                    SAVEDIR_FLAGS_READ_WRITE
-                );
-            }
-            // promptUserForSaveDir();
-        }
-    }
-
     private void promptUserForSaveDir() {
         // ref https://stackoverflow.com/a/72404595
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
@@ -105,6 +72,11 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
             )
         ;
         directoryAccessRequestLauncher.launch(intent);
+    }
+
+    @Override
+    void requestPermissions() {
+        // No longer used - can we remove from interface?
     }
 
     public void configureSaveDirectory(TreeMap<String, String> permissionStatuses) {

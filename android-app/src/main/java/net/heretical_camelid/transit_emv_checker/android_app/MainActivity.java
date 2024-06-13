@@ -1,11 +1,14 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+import static android.text.Html.FROM_HTML_MODE_COMPACT;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Base64;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,6 +38,30 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+class StartupAlertOnClickListener implements DialogInterface.OnClickListener {
+    final MainActivity m_mainActivity;
+
+    StartupAlertOnClickListener(MainActivity mainActivity) {
+        m_mainActivity = mainActivity;
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        switch (which) {
+            case DialogInterface.BUTTON_POSITIVE:
+                m_mainActivity.m_userHasAgreed = true;
+                m_mainActivity.populateAboutPage();
+                break;
+            case DialogInterface.BUTTON_NEUTRAL:
+                m_mainActivity.navigateToPage(R.id.navigation_about);
+                break;
+            case DialogInterface.BUTTON_NEGATIVE:
+                m_mainActivity.closeApplication();
+                break;
+        }
+    }
+}
+
 public class MainActivity extends AppCompatActivity {
     static final Logger LOGGER = LoggerFactory.getLogger(MainActivity.class);
 
@@ -42,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     // Activity wide UI elements
     private BottomNavigationView m_navView;
     private NavController m_navController;
+
+    private StartupAlertOnClickListener m_startupAlertOnClickListener;
 
     // Model attributes driving fragment UI elements
     private final HashMap<Integer, MutableLiveData<String> > m_htmlPageRegistry = new HashMap<>();
@@ -61,9 +90,12 @@ public class MainActivity extends AppCompatActivity {
     final static int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 201;
     final static int REQUEST_CODE_CREATE_DOCUMENT = 202;
 
+    boolean m_userHasAgreed = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        m_userHasAgreed = false;
         m_emvMediaAgent = new EMVMediaAgent(this);
 
         m_htmlPageRegistry.put(R.id.navigation_transit,new MutableLiveData<>());
@@ -85,19 +117,27 @@ public class MainActivity extends AppCompatActivity {
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
+
+        m_startupAlertOnClickListener = new StartupAlertOnClickListener(this);
         m_externalFileManager = new ModernExternalFileManager(this);
         AlertDialog.Builder startupAlertBuilder = new AlertDialog.Builder(MainActivity.this);
         startupAlertBuilder.setTitle("Transit EMV Checker");
-        startupAlertBuilder.setMessage("I am warning you");
-        startupAlertBuilder.setPositiveButton(
-            R.string.i_understand_and_agree,
-            new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // m_externalFileManager.requestPermissions();
-                }
-            }
+        String disclaimerHtml;
+        try {
+            disclaimerHtml = MainActivity.this.getTextFromAsset("short_disclaimer.html");
+        } catch (IOException e) {
+            disclaimerHtml = "Please be aware of implications of using this app related to PCI and card issuer fraud detection";
+        }
+        Spanned disclaimerRichText = Html.fromHtml(
+            disclaimerHtml,
+            0
         );
+        startupAlertBuilder.setMessage(disclaimerRichText);
+        startupAlertBuilder.setPositiveButton(
+            R.string.i_understand_and_agree,m_startupAlertOnClickListener
+        );
+        startupAlertBuilder.setNeutralButton("more info",m_startupAlertOnClickListener);
+        startupAlertBuilder.setNegativeButton("decline and close", m_startupAlertOnClickListener);
         AlertDialog startupAlert = startupAlertBuilder.create();
         startupAlert.show();
     }
@@ -109,7 +149,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void populateAboutPage() {
+    void populateAboutPage() {
+        if(m_userHasAgreed == false) {
+            String longDisclaimerText;
+            try {
+                longDisclaimerText = getTextFromAsset("long_disclaimer.html");
+            }
+            catch(IOException e) {
+                longDisclaimerText = "<html><body><p>ERROR: Long disclaimer text not found</p></body></html>";
+            }
+            setPageHtmlText(R.id.navigation_about, longDisclaimerText);
+            return;
+        }
         String aboutText = null;
         String openSourceLicensesText;
         try {
@@ -261,5 +312,14 @@ public class MainActivity extends AppCompatActivity {
         if(Objects.equals(intent.getAction(), Intent.ACTION_CREATE_DOCUMENT)) {
             m_externalFileManager.storeFileContent(intent.getData());
         }
+    }
+
+    public void navigateToPage(int pageId) {
+        m_navController.navigate(pageId);
+    }
+
+    public void closeApplication() {
+        MainActivity.this.finish();
+        System.exit(0);
     }
 }

@@ -1,8 +1,5 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
-import static android.text.Html.FROM_HTML_MODE_COMPACT;
-import static android.text.Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -39,10 +36,10 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class StartupAlertOnClickListener implements DialogInterface.OnClickListener {
+class StartupAlertListener implements DialogInterface.OnClickListener {
     final MainActivity m_mainActivity;
 
-    StartupAlertOnClickListener(MainActivity mainActivity) {
+    StartupAlertListener(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
     }
 
@@ -71,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView m_navView;
     private NavController m_navController;
 
-    private StartupAlertOnClickListener m_startupAlertOnClickListener;
+    private StartupAlertListener m_startupAlertListener;
 
     // Model attributes driving fragment UI elements
     private final HashMap<Integer, MutableLiveData<String> > m_htmlPageRegistry = new HashMap<>();
@@ -92,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     final static int REQUEST_CODE_CREATE_DOCUMENT = 202;
 
     boolean m_userHasAgreed = false;
+    private AlertDialog m_startupAlert;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +117,21 @@ public class MainActivity extends AppCompatActivity {
         populateAboutPage();
         setInitialState();
 
-        m_startupAlertOnClickListener = new StartupAlertOnClickListener(this);
+        buildStartupAlert();
+        if(m_userHasAgreed==false) {
+            m_startupAlert.show();
+        }
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        if(m_userHasAgreed==false) {
+            m_startupAlert.show();
+        }
+    }
+
+    private void buildStartupAlert() {
+        m_startupAlertListener = new StartupAlertListener(this);
         m_externalFileManager = new ModernExternalFileManager(this);
         AlertDialog.Builder startupAlertBuilder = new AlertDialog.Builder(MainActivity.this);
         startupAlertBuilder.setTitle("Transit EMV Checker");
@@ -138,12 +150,11 @@ public class MainActivity extends AppCompatActivity {
         );
         startupAlertBuilder.setMessage(disclaimerRichText);
         startupAlertBuilder.setPositiveButton(
-            R.string.i_understand_and_agree,m_startupAlertOnClickListener
+            R.string.i_understand_and_agree, m_startupAlertListener
         );
-        startupAlertBuilder.setNeutralButton("more information",m_startupAlertOnClickListener);
-        startupAlertBuilder.setNegativeButton("decline and close", m_startupAlertOnClickListener);
-        AlertDialog startupAlert = startupAlertBuilder.create();
-        startupAlert.show();
+        startupAlertBuilder.setNeutralButton("more information", m_startupAlertListener);
+        startupAlertBuilder.setNegativeButton("decline and close", m_startupAlertListener);
+        m_startupAlert = startupAlertBuilder.create();
     }
 
     private void setPageHtmlText(int pageNavigationId, String htmlText) {
@@ -290,23 +301,6 @@ public class MainActivity extends AppCompatActivity {
     public void saveXmlCaptureFile(String xmlFilename, String xmlContent) {
         //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
         m_externalFileManager.saveFile(xmlFilename, "text/xml", xmlContent.getBytes(StandardCharsets.UTF_8));
-    }
-
-    @Override
-    public void onRequestPermissionsResult(
-        final int requestCode,
-        @NonNull final String[] permissions,
-        @NonNull final int[] grantResults
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for(int i=0; i<permissions.length; ++i) {
-            String permissionStatus =
-                (PackageManager.PERMISSION_GRANTED==grantResults[i]) ?
-                PERMISSION_STATE_GRANTED: PERMISSION_STATE_DENIED
-            ;
-            m_permissionStatuses.put(permissions[i], permissionStatus);
-        }
-        m_externalFileManager.configureSaveDirectory(m_permissionStatuses);
     }
 
     @Override

@@ -42,47 +42,6 @@ public class ModernExternalFileManager extends ExternalFileManagerBase {
         );
     }
 
-    private void promptUserForSaveDir() {
-        // ref https://stackoverflow.com/a/72404595
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        intent.setFlags(
-            // Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED |
-            SAVEDIR_FLAGS_READ_WRITE |
-                Intent.FLAG_GRANT_PREFIX_URI_PERMISSION |
-                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-
-        );
-        String URI_PREFIX = "content://com.android.externalstorage.documents/tree/primary";
-        Uri initialUri = Uri.parse(URI_PREFIX );
-        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
-
-        ActivityResultLauncher<Intent> directoryAccessRequestLauncher =
-            m_mainActivity.registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        assert result.getData() != null;
-                        m_saveDirectoryUri = result.getData().getData();
-                        m_mainActivity.getContentResolver().takePersistableUriPermission(
-                            m_saveDirectoryUri,
-                            SAVEDIR_FLAGS_READ_WRITE
-                        );
-                    }
-                }
-            )
-        ;
-        directoryAccessRequestLauncher.launch(intent);
-    }
-
-    @Override
-    void requestPermissions() {
-        // No longer used - can we remove from interface?
-    }
-
-    public void configureSaveDirectory(TreeMap<String, String> permissionStatuses) {
-        // no longer required
-    }
-
     public void saveFile(String fileBaseName, String fileMimeType, byte[] fileContent) {
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);

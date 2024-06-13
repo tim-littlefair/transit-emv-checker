@@ -9,11 +9,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -91,7 +93,11 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navigation_emv_details,
                 R.id.navigation_about
         ).build();
-        m_navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        NavHostFragment navHostFragment = (NavHostFragment) (
+            getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main)
+        );
+        assert navHostFragment != null;
+        m_navController = navHostFragment.getNavController();
         NavigationUI.setupActionBarWithNavController(this, m_navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, m_navController);
         m_navView = findViewById(R.id.nav_view);

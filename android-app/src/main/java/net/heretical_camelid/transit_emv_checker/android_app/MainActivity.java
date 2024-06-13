@@ -2,11 +2,9 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Base64;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -101,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
         m_htmlPageRegistry.put(R.id.navigation_emv_details,new MutableLiveData<>());
         m_htmlPageRegistry.put(R.id.navigation_about,new MutableLiveData<>());
 
-        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        ActivityMainBinding binding;
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -165,38 +164,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void populateAboutPage() {
-        if(m_userHasAgreed == false) {
-            String longDisclaimerText;
-            try {
-                longDisclaimerText = getTextFromAsset("long_disclaimer.html");
-            }
-            catch(IOException e) {
-                longDisclaimerText = "<html><body><p>ERROR: Long disclaimer text not found</p></body></html>";
-            }
-            setPageHtmlText(R.id.navigation_about, longDisclaimerText);
-            return;
-        }
-        String aboutText = null;
-        String openSourceLicensesText;
+        String longDisclaimerText;
         try {
-            aboutText = getTextFromAsset("about.html");
-            openSourceLicensesText = getTextFromAsset("open_source_licenses.html");
+            longDisclaimerText = getTextFromAsset("long_disclaimer.html");
         }
         catch(IOException e) {
-            // Placeholders
-            if(aboutText == null) {
-                aboutText = "<html><body><p>TEC by TJL</p></body></html>";
-            }
-            openSourceLicensesText = "";
+            longDisclaimerText = "<html><body><p>ERROR: Long disclaimer text not found</p></body></html>";
         }
 
-        String versionString = getVersionString();
-        aboutText = aboutText.replace("%VERSION%",versionString);
-        aboutText = aboutText.replace(
-            "%OPEN_SOURCE_LICENSES_HTML_BASE64%",
-            Base64.encodeToString(openSourceLicensesText.getBytes(),Base64.NO_PADDING)
-        );
-        setPageHtmlText(R.id.navigation_about,aboutText);
+        if(m_userHasAgreed == false) {
+            // Display only the long disclaimer and a button to trigger return
+            // to the startup dialog
+            String returnButtonText = "<button id='return_to_startup_alert' style='align:center;'>";
+            returnButtonText += "AGREE OR DECLINE";
+            returnButtonText += "</button>";
+            setPageHtmlText(R.id.navigation_about,
+                longDisclaimerText + returnButtonText
+            );
+        } else {
+            // Display the full about text (which includes the long disclaimer as
+            // a section.
+            String aboutText = null;
+            try {
+                aboutText = getTextFromAsset("about.html");
+            } catch (IOException e) {
+                // Placeholders
+                if (aboutText == null) {
+                    aboutText = "<html><body><p>TEC by TJL</p></body></html>";
+                }
+            }
+
+            String versionString = getVersionString();
+            aboutText = aboutText.replace("%VERSION%", versionString);
+            aboutText = aboutText.replace("%RESPONSIBLE_USE%", longDisclaimerText);
+            setPageHtmlText(R.id.navigation_about, aboutText);
+        }
     }
 
     @NonNull

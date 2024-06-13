@@ -144,7 +144,7 @@ public class UiTests {
                 allOf(withId(navigationResourceId), withContentDescription(pageNavigationText),
                         childAtPosition(
                                 childAtPosition(
-                                        withId(R.id.nav_view),
+                                        withId(R.id.bottom_nav_view),
                                         0),
                                 navigationPosition),
                         isDisplayed()));

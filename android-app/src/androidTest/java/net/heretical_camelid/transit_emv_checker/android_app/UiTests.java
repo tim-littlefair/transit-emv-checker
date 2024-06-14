@@ -118,8 +118,8 @@ public class UiTests {
                 By.text(buttonPattern)
             ), _UI_APPEAR_TIMEOUT_SECONDS * 1000);
             assertThat(visibleButton, is(notNullValue()));
-            visibleButtonText = visibleButton.getText();
-            LOGGER.info("Button text: " + visibleButtonText);
+            //visibleButtonText = visibleButton.getText();
+            //LOGGER.info("Button text: " + visibleButtonText);
             visibleButton.click();
         } while(visibleButtonText.equals("START EMV MEDIA DETECTION") == false);
 

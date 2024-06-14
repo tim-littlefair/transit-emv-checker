@@ -1,6 +1,5 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -14,7 +13,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -29,6 +27,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
+import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeFragment;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
 
@@ -66,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
 
     static boolean m_userHasAgreed = false;
     private static AlertDialog s_startupAlert;
+    private net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding m_binding;
+    private HomeFragment m_homeFragment;
 
     public static void showStartupAlert() {
         if(m_userHasAgreed==false) {
@@ -83,9 +84,8 @@ public class MainActivity extends AppCompatActivity {
         m_htmlPageRegistry.put(R.id.navigation_emv_details,new MutableLiveData<>());
         m_htmlPageRegistry.put(R.id.navigation_about,new MutableLiveData<>());
 
-        ActivityMainBinding binding;
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        m_binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(m_binding.getRoot());
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home,
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         assert navHostFragment != null;
         m_navController = navHostFragment.getNavController();
         NavigationUI.setupActionBarWithNavController(this, m_navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, m_navController);
+        NavigationUI.setupWithNavController(m_binding.navView, m_navController);
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
         setInitialState();
@@ -238,6 +238,9 @@ public class MainActivity extends AppCompatActivity {
     public void setInitialState() {
         setPageHtmlText(R.id.navigation_transit,"<html><body><p>Card not read yet</p></body></html>");
         setPageHtmlText(R.id.navigation_emv_details,"<html><body><p>Card not read yet</p></body></html>");
+        if(m_homeFragment != null) {
+            m_homeFragment.resetButtonToPromptForDetection();
+        }
     }
 
     public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails) {
@@ -312,5 +315,9 @@ public class MainActivity extends AppCompatActivity {
     public void closeApplication() {
         MainActivity.this.finish();
         System.exit(0);
+    }
+
+    public void registerHomeFragment(HomeFragment homeFragment) {
+        m_homeFragment = homeFragment;
     }
 }

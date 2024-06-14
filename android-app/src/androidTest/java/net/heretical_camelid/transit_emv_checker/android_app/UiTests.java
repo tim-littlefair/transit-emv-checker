@@ -114,12 +114,18 @@ public class UiTests {
         UiObject2 visibleButton;
         String visibleButtonText;
         do {
+            sleep(_UI_CHANGE_SLEEP_SECONDS);
+            sleep(_UI_CHANGE_SLEEP_SECONDS);
+            sleep(_UI_CHANGE_SLEEP_SECONDS);
             visibleButton = mDevice.wait(Until.findObject(
                 By.text(buttonPattern)
             ), _UI_APPEAR_TIMEOUT_SECONDS * 1000);
             assertThat(visibleButton, is(notNullValue()));
-            //visibleButtonText = visibleButton.getText();
-            //LOGGER.info("Button text: " + visibleButtonText);
+            sleep(_UI_CHANGE_SLEEP_SECONDS);
+            sleep(_UI_CHANGE_SLEEP_SECONDS);
+            sleep(_UI_CHANGE_SLEEP_SECONDS);
+            visibleButtonText = visibleButton.getText();
+            LOGGER.info("Button text: " + visibleButtonText);
             visibleButton.click();
         } while(visibleButtonText.equals("START EMV MEDIA DETECTION") == false);
 

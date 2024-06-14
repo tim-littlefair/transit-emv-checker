@@ -14,7 +14,7 @@ android {
         targetSdk 34
         versionCode 1
         versionName "0.1.0"
-        setProperty("archiveBaseName","TransitEMVChecker-$versionName")
+        setProperty("archivesBaseName","TransitEMVChecker-$versionName")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

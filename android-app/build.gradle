@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
+    id 'base'
     id 'com.jaredsburrows.license' version '0.9.7'
 }
-
 
 android {
     namespace 'net.heretical_camelid.transit_emv_checker.android_app'
@@ -14,7 +14,6 @@ android {
         targetSdk 34
         versionCode 1
         versionName "0.1.0"
-        setProperty("archivesBaseName","TransitEMVChecker-$versionName")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -33,12 +32,7 @@ android {
         buildConfig true
     }
     lint {
-        disable += [ 'DefaultLocale' , 'PointlessBooleanExpression']
-    }
-    packaging {
-        resources {
-            merge "build/licenses"
-        }
+        disable += [ 'DefaultLocale' ]
     }
     testOptions {
         unitTests {
@@ -60,6 +54,10 @@ android {
     }
 }
 
+base {
+    archivesName = "TransitEMVChecker-$android.defaultConfig.versionName"
+}
+
 dependencies {
     implementation project(':tec-library')
 
@@ -67,7 +65,7 @@ dependencies {
     implementation "com.github.devnied:bit-lib4j:1.5.2"
     implementation "org.apache.commons:commons-lang3:3.8.1"
     implementation "org.apache.commons:commons-collections4:4.3"
-    implementation "commons-io:commons-io:2.7"
+    implementation "commons-io:commons-io:2.13.0"
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
 
     implementation 'androidx.appcompat:appcompat:1.7.0'
@@ -90,8 +88,8 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation('androidx.test.uiautomator:uiautomator:2.3.0')
 }

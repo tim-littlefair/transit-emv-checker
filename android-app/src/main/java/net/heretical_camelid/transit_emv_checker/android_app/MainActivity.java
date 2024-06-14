@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +23,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.TreeMap;
 
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeFragment;
@@ -52,24 +50,18 @@ public class MainActivity extends AppCompatActivity {
     // NFC/EMV operations controller
     private EMVMediaAgent m_emvMediaAgent;
 
-    // Permission management
-    final static int REQUEST_CODE_REQUEST_PERMISSIONS = 101;
-    static final String PERMISSION_STATE_GRANTED = "granted";
-    static final String PERMISSION_STATE_DENIED = "denied";
-    TreeMap<String,String> m_permissionStatuses;
-
     // Saving XML capture files depends on these
     private ExternalFileManagerBase m_externalFileManager;
     final static int REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS = 201;
     final static int REQUEST_CODE_CREATE_DOCUMENT = 202;
 
-    static boolean m_userHasAgreed = false;
+    static boolean s_userHasAgreed = false;
     private static AlertDialog s_startupAlert;
-    private net.heretical_camelid.transit_emv_checker.android_app.databinding.ActivityMainBinding m_binding;
+    private ActivityMainBinding m_binding;
     private HomeFragment m_homeFragment;
 
     public static void showStartupAlert() {
-        if(m_userHasAgreed==false) {
+        if(s_userHasAgreed ==false) {
             s_startupAlert.show();
         }
     }
@@ -77,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        m_userHasAgreed = false;
+        s_userHasAgreed = false;
         m_emvMediaAgent = new EMVMediaAgent(this);
 
         m_htmlPageRegistry.put(R.id.navigation_transit,new MutableLiveData<>());
@@ -110,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override public void onResume() {
         super.onResume();
-        if(m_userHasAgreed==false) {
+        if(s_userHasAgreed ==false) {
             s_startupAlert.show();
         }
     }
@@ -129,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         Spanned disclaimerRichText = Html.fromHtml(
             disclaimerHtml, (
                 Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH |
-                Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM |
+                Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST |
                 Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
             )
         );
@@ -158,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             longDisclaimerText = "<html><body><p>ERROR: Long disclaimer text not found</p></body></html>";
         }
 
-        if(m_userHasAgreed == false) {
+        if(s_userHasAgreed == false) {
             // Display only the long disclaimer and a button to trigger return
             // to the startup dialog
             String returnButtonText = (
@@ -195,22 +187,24 @@ public class MainActivity extends AppCompatActivity {
     private static String getVersionString() {
         String versionString = BuildConfig.VERSION_NAME;
         int versionCode = BuildConfig.VERSION_CODE;
+
+        // In CI builds, the build script devenv/gen_version_code.sh will
+        // run before the app is built and will modify build.gradle so that
+        // versionCode will contain an integer parsed from the 7-hex-digit
+        // prefix of the git commit hash.
+        // This integer is rendered back into hex to match the hash prefix
+        // as shown in the git commit log.
+        versionString += String.format("-%07x",versionCode);
+
         if(versionCode==1) {
             // In developer builds from unmodified git source,
-            // versionCode will be equal to 1 and is not interesting.
-            versionString += "-dev";
-            versionString +=
+            // the hexified versionCode will always be equal to 000001
+            // so replace it with a timestamp.
+            versionString = versionString.replace(
+                "-0000001",
                 "@" + ZonedDateTime.now(ZoneOffset.UTC)
                           .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
-            ;
-        } else {
-            // In CI builds, the build script devenv/gen_version_code.sh will
-            // run before the app is built and will modify build.gradle so that
-            // versionCode will contain an integer parsed from the 7-hex-digit
-            // prefix of the git commit hash.
-            // This integer is rendered back into hex to match the hash prefix
-            // as shown in the git commit log.
-            versionString += String.format(".%07x",versionCode);
+            );
         }
         return versionString;
     }

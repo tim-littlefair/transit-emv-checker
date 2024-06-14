@@ -13,7 +13,7 @@ class StartupAlertListener implements DialogInterface.OnClickListener {
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case DialogInterface.BUTTON_POSITIVE:
-                m_mainActivity.m_userHasAgreed = true;
+                MainActivity.s_userHasAgreed = true;
                 m_mainActivity.populateAboutPage();
                 break;
             case DialogInterface.BUTTON_NEUTRAL:

@@ -65,7 +65,7 @@ public class UiTests {
 
     // At any point where we are waiting for a UI element to
     // appear, we use this timeout
-    private static final int _UI_APPEAR_TIMEOUT_SECONDS = 5;
+    private static final int _UI_APPEAR_TIMEOUT_SECONDS = 10;
 
     // At any point where we are waiting for a UI element to change
     // state, we use this unconditional sleep
@@ -108,7 +108,7 @@ public class UiTests {
         assertThat(mDevice, notNullValue());
 
         Pattern buttonPattern = Pattern.compile(
-                "USE THIS FOLDER|ALLOW|SELECT|START EMV MEDIA DETECTION"
+                "ALLOW|I UNDERSTAND AND AGREE|START EMV MEDIA DETECTION"
         );
 
         UiObject2 visibleButton;

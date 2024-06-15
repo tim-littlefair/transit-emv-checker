@@ -31,3 +31,5 @@ for d in android-app ; do
   /usr/bin/sed -e "s#versionCode 1#versionCode $hash7_as_decimal#" $sed_inplace_arg $d/build.gradle
   /usr/bin/sed -e "s#replace_with_keystore_properties_path#/tmp/hc_keys/hc-playstore-upload-2024_keystore.properties#" $sed_inplace_arg $d/build.gradle
 done
+
+git diff | grep -e versionCode -e keystorePropertiesFile

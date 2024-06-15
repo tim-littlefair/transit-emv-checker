@@ -9,7 +9,7 @@ plugins {
 // https://developer.android.com/studio/publish/app-signing#secure-shared-keystore
 // The filename in the next line will be rewritten for signed builds
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file("/tmp/hc_keys/hc-playstore-upload-2024_keystore.properties")
+def keystorePropertiesFile = rootProject.file("replace_with_keystore_properties_path")
 if(keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }

@@ -27,3 +27,6 @@ local.properties
 
 */target/
 _work/
+android-app/release
+*.hprof
+

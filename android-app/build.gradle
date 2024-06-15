@@ -2,13 +2,14 @@ plugins {
     id 'com.android.application'
     id 'base'
     id 'com.jaredsburrows.license' version '0.9.7'
+    id 'com.google.gms.google-services'
 }
 
 // Following recipe for keeping key secrets out of git
 // https://developer.android.com/studio/publish/app-signing#secure-shared-keystore
 // The filename in the next line will be rewritten for signed builds
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file("replace_with_keystore_properties_path")
+def keystorePropertiesFile = rootProject.file("/tmp/hc_keys/hc-playstore-upload-2024_keystore.properties")
 if(keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -106,6 +107,7 @@ dependencies {
     implementation 'com.jaredsburrows:gradle-license-plugin:0.9.7'
 
     implementation "org.slf4j:slf4j-simple:2.0.13"
+    implementation 'androidx.test.espresso:espresso-accessibility:3.5.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -113,6 +115,9 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.5.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation('androidx.test.uiautomator:uiautomator:2.3.0')
+
+    implementation platform('com.google.firebase:firebase-bom:33.1.0')
+    implementation 'com.google.firebase:firebase-analytics'
 }
 
 licenseReport {

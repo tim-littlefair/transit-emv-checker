@@ -28,6 +28,6 @@ fi
 for d in android-app ; do
   git restore $d/build.gradle
   # Using '#' as sed delimiter to avoid a lot of escaping in file path in second command
-  /usr/bin/sed -e "s#versionCode 1#versionCode $hash7_as_decimal#" $sed_inplace_arg $d/build.gradle
+  /usr/bin/sed -e "s#versionCode \d+#versionCode $hash7_as_decimal#" $sed_inplace_arg $d/build.gradle
   /usr/bin/sed -e "s#replace_with_keystore_properties_path#/tmp/hc_keys/hc-playstore-upload-2024_keystore.properties#" $sed_inplace_arg $d/build.gradle
 done

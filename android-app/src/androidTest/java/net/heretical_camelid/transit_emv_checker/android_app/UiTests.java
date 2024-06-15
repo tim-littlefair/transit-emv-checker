@@ -35,6 +35,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withSubstring;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import androidx.test.espresso.accessibility.AccessibilityChecks;
 
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.SdkSuppress;
@@ -100,6 +101,9 @@ public class UiTests {
 
         // Wait for the app to appear
         mDevice.wait(Until.hasObject(By.pkg(TEC_ANDROID_APP_PACKAGE).depth(0)), _LAUNCH_TIMEOUT_SECONDS);
+
+        // Enable Espresso accessibility checks
+        AccessibilityChecks.enable();
     }
 
     @Test

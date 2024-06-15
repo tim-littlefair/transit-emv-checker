@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "225799598458",
+    "project_id": "transit-emv-checker",
+    "storage_bucket": "transit-emv-checker.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225799598458:android:db0722eed0a15f3409e6c3",
+        "android_client_info": {
+          "package_name": "net.heretical_camelid.transit_emv_checker.android_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlyD8ZQCy0UAFnOEcElPBy90J5kyvO7e0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

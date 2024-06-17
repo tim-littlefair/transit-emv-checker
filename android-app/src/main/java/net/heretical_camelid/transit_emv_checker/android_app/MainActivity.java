@@ -1,6 +1,7 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -188,12 +189,18 @@ public class MainActivity extends AppCompatActivity {
         if(versionString.contains("-dirty")) {
             // In developer builds from unmodified git source,
             // the version name contains the suffix '-dirty'
-            // replace this with a timestamp.
+            // replace this with a string indicating that this is a
+            // developer build
             versionString = versionString.replace(
                 "-dirty",
-                "-devbuild-" + ZonedDateTime.now(ZoneOffset.UTC)
-                          .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
+                "-devbuild"
             );
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Add a timestamp if the API makes it easy to do so
+                versionString += "-" +
+                    ZonedDateTime.now(ZoneOffset.UTC)
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"));
+            }
         }
         return versionString;
     }

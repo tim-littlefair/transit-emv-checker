@@ -20,6 +20,7 @@ public class HomeFragment extends Fragment {
     private Button m_button;
     private HomeViewModel m_homeViewModel;
     private TextView m_log;
+    private int m_previousStarts = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -31,7 +32,6 @@ public class HomeFragment extends Fragment {
         m_button = binding.buttonHome;
 
         m_homeViewModel.getLog().observe(getViewLifecycleOwner(), m_log::setText);
-        m_homeViewModel.getLog().setValue("Starting up...");
 
         MainActivity mainActivity = getMainActivity();
         mainActivity.registerHomeViewModel(m_homeViewModel);
@@ -44,8 +44,12 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        m_homeViewModel.getLog().setValue("Clearing details of previous card ...");
-        m_homeViewModel.getLog().setValue("Restarting ...");
+        if(m_previousStarts==0) {
+            m_homeViewModel.getLog().setValue("Starting up...");
+        } else {
+            m_homeViewModel.getLog().setValue("Clearing details of previous card ...\nRestarting ...");
+        }
+        m_previousStarts += 1;
         getMainActivity().setInitialState();
         resetButtonToPromptForDetection();
     }

@@ -142,6 +142,7 @@ public class UiTests {
         checkNavigationPageContent(1, R.id.navigation_transit, "Transit", "Card");
         checkNavigationPageContent(2, R.id.navigation_emv_details, "EMV", "Card");
         checkNavigationPageContent(3, R.id.navigation_about, "About", "Version");
+        checkNavigationPageContent(0, R.id.navigation_home, "Home", null);
     }
 
     private void checkNavigationPageContent(
@@ -160,12 +161,17 @@ public class UiTests {
                         isDisplayed()));
         bottomNavigationItemView3.perform(click());
 
-        ViewInteraction textView3 = onView(
+        if(expectedDisplayedSubstring==null) {
+            // Home screen is not based on WebView so the logic
+            // below is not applicable
+        } else {
+            ViewInteraction textView3 = onView(
                 allOf(withSubstring(expectedDisplayedSubstring),
-                        withParent(withParent(IsInstanceOf.<View>instanceOf(android.webkit.WebView.class))),
-                        isDisplayed()));
-        assertThat(textView3,is(notNullValue()));
+                    withParent(withParent(IsInstanceOf.<View>instanceOf(android.webkit.WebView.class))),
+                    isDisplayed()));
+            assertThat(textView3, is(notNullValue()));
 
+        }
         // Allow the screen to be displayed briefly to the human test observer
         // if there is one
         sleep(3);

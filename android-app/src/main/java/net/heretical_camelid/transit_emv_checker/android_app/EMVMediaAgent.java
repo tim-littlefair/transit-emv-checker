@@ -97,7 +97,7 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                 } else {
                     m_mainActivity.homePageLogAppend("Media EMV content read and parsed successfully");
                     m_mainActivity.setDisplayMediaDetailsState(transitCapabilityReport,emvDetailsSummary);
-                    m_mainActivity.navigateToPage(R.id.navigation_transit);
+                    m_mainActivity.homePageLogAppend("Switch to Transit tab to see Transit Capabilities of this card");
                 }
             } catch (CommunicationException e) {
                 m_mainActivity.homePageLogAppend(

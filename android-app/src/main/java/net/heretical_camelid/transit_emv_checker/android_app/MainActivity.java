@@ -94,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(m_binding.navView, m_navController);
         m_navView = findViewById(R.id.nav_view);
         populateAboutPage();
-        setInitialState();
-
         buildStartupAlert();
         showStartupAlert();
     }
@@ -302,7 +300,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void navigateToPage(int pageId) {
-
         m_navController.navigate(pageId);
     }
 

@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
-        minSdk 26
+        minSdk 25
         targetSdk 34
         // Google Play store requires versionCode for releases to be
         // monotonically increasing
@@ -28,13 +28,16 @@ android {
         // this out, the pattern is now
         // prefix 30
         // 2 digits each for for major, minor, patch version number
-        // trailing digit starts at zero can be updated for successive
+        // 1 trailing digit starts at zero can be updated for successive
         // attempts within the same release number
-        versionCode 300001020
+        versionCode 300001030
         // CI script update_build.sh will substitute the 7 hex digit
         // prefix of the current git hash in place of -dirty in the
         // line below.
-        versionName "0.1.2-dirty"
+        // For non-CI builds, the -dirty suffix will be replaced by
+        // -devbuild-{timestamp} where the version name appears
+        // in the about page.
+        versionName "0.1.3-dirty"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

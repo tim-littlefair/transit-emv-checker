@@ -184,23 +184,14 @@ public class MainActivity extends AppCompatActivity {
     @NonNull
     private static String getVersionString() {
         String versionString = BuildConfig.VERSION_NAME;
-        int versionCode = BuildConfig.VERSION_CODE;
 
-        // In CI builds, the build script devenv/gen_version_code.sh will
-        // run before the app is built and will modify build.gradle so that
-        // versionCode will contain an integer parsed from the 7-hex-digit
-        // prefix of the git commit hash.
-        // This integer is rendered back into hex to match the hash prefix
-        // as shown in the git commit log.
-        versionString += String.format("-%07x",versionCode);
-
-        if(versionCode==1) {
+        if(versionString.contains("-dirty")) {
             // In developer builds from unmodified git source,
-            // the hexified versionCode will always be equal to 000001
-            // so replace it with a timestamp.
+            // the version name contains the suffix '-dirty'
+            // replace this with a timestamp.
             versionString = versionString.replace(
-                "-0000001",
-                "@" + ZonedDateTime.now(ZoneOffset.UTC)
+                "-dirty",
+                "-devbuild-" + ZonedDateTime.now(ZoneOffset.UTC)
                           .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'"))
             );
         }

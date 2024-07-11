@@ -18,8 +18,45 @@ public class PCIMaskingAgent {
         // https://medium.com/@androidcrypto/talk-to-your-credit-card-part-7-find-and-print-out-the-application-primary-account-number-52b24b396082
         int tagAsInt = BytesUtils.byteArrayToInt(possiblySensitiveTLV.getTagBytes());
         switch(tagAsInt) {
-            case 0x9F46: // ICC Public certificate - encrypted with known key, contains PAN
-            case 0x56:   // Track 1 - contains PAN encoded as ASCII
+            // Tags which may contain PCI-DSS 4.0 account data 
+            // Subdivided into CHD (cardholder data) or SAD (sensitive authentication data)
+            case 0x56:   // Track 1 - contains PAN encoded as ASCII (=> both CHD and SAD)
+            case 0x9F20: // Track 2 discretionary data (includes Service Code)
+            case 0x9F46: // ICC Public certificate - encrypted with known key, cleartext contains PAN
+            case 0x9F5A: // Application PAN
+            case 0x9F5E: // Data Storage identifier (contains PAN)
+            case 0x5F30: // Service code (classified as SAD)
+            case 0x5F20: // Cardholder name (classified as CHD)
+            case 0x5F21: // copy of Track 1
+            case 0x5F22: // copy of Track 2
+
+            // Tag 0x57 track 2 is not masked out at this point because the value
+            // retrieved this tag from by the upstream package com.github.devnied.emvnfccard:library
+            // will be used later to ensure that any unexpected occurrence of the PAN (even one caused 
+            // by random fate, e.g. in encrypted data) is masked before reporting is started.
+            // NB I am not yet sure whether other tags 0x5A, 0x9F5A may also need to be 
+            // preserved so that emvnfccard:library can access them for cards where 0x5A is not 
+            // present
+            // case 0x57:   // Track 2 equivalent data - also contains PAN (=> both CHD and SAD)
+            case 0x5A:   // Application PAN (CHD)
+
+            // Tag 0x5F24, (application) expiration date is listed as CHD, but is permitted 
+            // to be stored under PCI-DSS v4.0 providing the PAN is not stored or is only 
+            // stored in irreversibly truncated form.
+            // We choose to retain the value of this tag as it potentially forms part of the unique 
+            // key of the card/media (in the event that the card issuer issues a replacement card with 
+            // the same PAN and PSN but a different expiry date, e.g. at the end of the original 
+            // card's validity period).  
+            // In transit systems where a deny list based on hashes of the PAN and 
+            // other card/media tags is in used, the expiration date may form part 
+            // of the hash so that a specific physical media item can be blocked without 
+            // blocking other media with the same PAN and a different expiry date.
+
+            // PCI would also permit us to store tag 0x5F20, cardholder name, despite its
+            // classification as CHD, but the content of this tag does not contribute to 
+            // evaluation of the media's transit capabilities, so it is included in the supression 
+            // list above.
+
             // Others below this point probably do not contain sensitive data - but we mask them
             // for safety's sake because they are not easy to inspect
             case 0x9081: // Issuer public key certificate
@@ -50,14 +87,19 @@ public class PCIMaskingAgent {
         // carItem.intepretedResponse needs to be masked in 16 bytes per chunk
         // as the prettyPrintAPDU function breaks the data into 16 bytes per line
         while(bytesToMask.length>0) {
-            byte[] chunkBytes = Arrays.copyOfRange(bytesToMask,0,16);
+            byte[] chunkBytes;
+            if(bytesToMask.length>16) {
+                chunkBytes = Arrays.copyOfRange(bytesToMask,0,16);
+            } else {
+                chunkBytes = Arrays.copyOfRange(bytesToMask,0,bytesToMask.length);
+            }
             byte[] maskedChunkBytes = new byte[chunkBytes.length];
             Arrays.fill(maskedChunkBytes,(byte) 0xFF);
             if(chunkBytes.length==16) {
                 carItem.interpretedResponseBody = carItem.interpretedResponseBody.replace(
                     BytesUtils.bytesToString(chunkBytes),
                     BytesUtils.bytesToString(maskedChunkBytes)
-                );
+                );            
             } else {
                 // The last line is usually shorter - we reduce but do not 
                 // eliminate the danger that we will replace the same hex
@@ -68,9 +110,8 @@ public class PCIMaskingAgent {
                     BytesUtils.bytesToString(maskedChunkBytes) + " ("
                 );
                 break;
-            }
-    
-            bytesToMask = Arrays.copyOfRange(bytesToMask, 16, bytesToMask.length);
+            }            
+            bytesToMask = Arrays.copyOfRange(bytesToMask, chunkBytes.length, bytesToMask.length);
         }
     
         possiblySensitiveTLV.setValueBytes(bytesAfterMasking);

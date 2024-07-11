@@ -34,7 +34,13 @@ public abstract class MyProviderBase implements IProvider {
         newCommandAndResponse.rawCommand = pCommand;
 		try {
             ret = implementationTransceive(pCommand, buffer);
-            newCommandAndResponse.rawResponse = ret;
+            // The raw response stored in m_apduStore will be 
+            // updated to mask out PCI CHD and SAD, so we clone
+            // the original response array so that we are able
+            // to return the unmasked value to the upstream 
+            // code in package com.github.devnied.emvnfccard:library
+            // allowing the library to capture the PAN.
+            newCommandAndResponse.rawResponse = Arrays.copyOfRange(ret, 0, ret.length);
 		} catch (CommunicationException e) {
             newCommandAndResponse.interpretedResponseStatus = "Exception: " + e.getMessage();
 		}
@@ -42,8 +48,8 @@ public abstract class MyProviderBase implements IProvider {
         if(m_apduStore != null) {
             m_apduStore.interpretCommand(newCommandAndResponse);
             m_apduStore.interpretResponse(newCommandAndResponse);
-            m_apduStore.add(newCommandAndResponse);
             m_apduStore.extractTags(newCommandAndResponse);
+            m_apduStore.add(newCommandAndResponse);
             long analysisEndMillis = System.currentTimeMillis();
             LOGGER.debug(String.format(
                 "Command: %s: comms time: %d msec, analysis time: %d msec",

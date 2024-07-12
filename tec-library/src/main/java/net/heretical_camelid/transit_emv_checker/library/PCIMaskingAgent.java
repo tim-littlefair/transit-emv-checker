@@ -1,5 +1,6 @@
 package net.heretical_camelid.transit_emv_checker.library;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
@@ -21,24 +22,24 @@ public class PCIMaskingAgent {
             // Tags which may contain PCI-DSS 4.0 account data 
             // Subdivided into CHD (cardholder data) or SAD (sensitive authentication data)
             case 0x56:   // Track 1 - contains PAN encoded as ASCII (=> both CHD and SAD)
+            case 0x5F30: // Service code (classified as SAD)
+            case 0x5F21: // copy of Track 1
+            case 0x5F22: // copy of Track 2
             case 0x9F20: // Track 2 discretionary data (includes Service Code)
             case 0x9F46: // ICC Public certificate - encrypted with known key, cleartext contains PAN
             case 0x9F5A: // Application PAN
             case 0x9F5E: // Data Storage identifier (contains PAN)
-            case 0x5F30: // Service code (classified as SAD)
-            case 0x5F20: // Cardholder name (classified as CHD)
-            case 0x5F21: // copy of Track 1
-            case 0x5F22: // copy of Track 2
 
             // Tag 0x57 track 2 is not masked out at this point because the value
             // retrieved this tag from by the upstream package com.github.devnied.emvnfccard:library
             // will be used later to ensure that any unexpected occurrence of the PAN (even one caused 
             // by random fate, e.g. in encrypted data) is masked before reporting is started.
-            // NB I am not yet sure whether other tags 0x5A, 0x9F5A may also need to be 
+            // NB I am not yet sure whether other tags 0x57, 0x9F5A may also need to be
             // preserved so that emvnfccard:library can access them for cards where 0x5A is not 
             // present
-            // case 0x57:   // Track 2 equivalent data - also contains PAN (=> both CHD and SAD)
-            case 0x5A:   // Application PAN (CHD)
+            // case 0x57: // Track 2 equivalent data - also contains PAN (=> both CHD and SAD)
+            case 0x5A: // Application PAN (CHD)
+            // case 0x9F5A: // Application PAN (CHD)
 
             // Tag 0x5F24, (application) expiration date is listed as CHD, but is permitted 
             // to be stored under PCI-DSS v4.0 providing the PAN is not stored or is only 
@@ -55,7 +56,24 @@ public class PCIMaskingAgent {
             // PCI would also permit us to store tag 0x5F20, cardholder name, despite its
             // classification as CHD, but the content of this tag does not contribute to 
             // evaluation of the media's transit capabilities, so it is included in the supression 
-            // list above.
+            // list.
+            case 0x5F20: // Cardholder name (classified as CHD)
+
+            // Tag 0x42, known as the Issuer Identification Number (IIN), also sometimes
+            // referred to as BIN (B standing for Bank), is not explicitly listed as 
+            // CHD, but may be either 6 or 8 digits long.
+            // The PAN of any given card/media will start with the IIN.
+            // If the IIN is 6 digits long, it is OK for all of the digits in the IIN 
+            // to be stored or displayed as they correspond with digits which are visible
+            // in a PAN truncated in the standard way (first 6 + last 4 digits visible,
+            // other digits replaced by a placeholder such as '*' or 'F').
+            // If the IIN is 8 digits long, the last two digits of the IIN contain digits 
+            // from the PAN which should not be visible in this format.
+            // For the sake of certainty, in the present version, the whole IIN will
+            // masked out whatever length it is - but at a later date it might be
+            // worth returning to this and only masking out the 7th and 8th digits
+            // when those are present.
+            case 0x42: // Issuer Identification Number (IIN)
 
             // Others below this point probably do not contain sensitive data - but we mask them
             // for safety's sake because they are not easy to inspect
@@ -83,7 +101,30 @@ public class PCIMaskingAgent {
                 BytesUtils.bytesToString(bytesAfterMasking)
             )
         );
-    
+
+        // If the type of any of the tags in the current TLV response is ASCII,
+        // carItem.interpretedResponseBody will contain the tag with a suffix
+        // of the form "(=...)" where '...' is the ASCII rendering of the tag.
+        String asciiRendering = new String(bytesToMask, StandardCharsets.US_ASCII);
+        // For now we assume that if any of the bytes data didn't render as ASCII,
+        // the tag can't be typed as ASCII, and we don't need any special attention.
+
+        // TODO:
+        // Check what happens where cards are issued to cardholders
+        // with non-ASCII accented characters in their names including
+        // both characters in iso-latin-1 and characters in scripts like
+        // Greek/Cyrillic/Arabic/Hindi/CJK/etc.
+
+        char[] maskedAsciiRendering = new char[asciiRendering.length()];
+        Arrays.fill(maskedAsciiRendering,'?');
+        carItem.interpretedResponseBody = carItem.interpretedResponseBody.replace(
+            "(=" + asciiRendering + ")",
+            "(=" + new String(maskedAsciiRendering)+ ")"
+        );
+
+
+
+
         // carItem.intepretedResponse needs to be masked in 16 bytes per chunk
         // as the prettyPrintAPDU function breaks the data into 16 bytes per line
         while(bytesToMask.length>0) {
@@ -113,7 +154,8 @@ public class PCIMaskingAgent {
             }            
             bytesToMask = Arrays.copyOfRange(bytesToMask, chunkBytes.length, bytesToMask.length);
         }
-    
+
+
         possiblySensitiveTLV.setValueBytes(bytesAfterMasking);
     }
 

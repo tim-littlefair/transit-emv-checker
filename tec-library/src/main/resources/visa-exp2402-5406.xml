@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    This XML file was originally captured using the command line 
+    version of TEC from an expired live Visa card with PAN
+    4065 8900 1641 5406
+
+    The original captured XML has been manually edited to reinstate the 
+    masked digits of the PAN, so that automated test assertions can be 
+    implemented to confirm that the masking has been successful.
+
+    Manual edits may also be added in future to enable verification
+    of correct masking of the following EMV tags:
+    0x42: Issuer identification number
+    0x5F20: Cardholder name (need to mask ASCII render as well as hex bytes)
+-->
 <emv_medium>
     <command_and_response step_number="1" step_name="SELECT CONTACTLESS PPSE">
         <raw_command>
@@ -85,7 +99,7 @@ tag: 9C length: 01 value: 00
 tag: 9F37 length: 04 value: 26 D9 D9 C6
         </interpreted_command>
         <raw_response>
-77 56 82 02 20 20 94 08 18 01 01 01 10 02 05 00 57 13 40 65 89 FF FF FF 54 06 D2 40 22 01 97 66 68 66 23 50 1F 5F 20 02 20 2F 5F 34 01 01 9F 10 07 06 01 12 03 A0 00 00 9F 6C 02 00 00 9F 6E 04 20 70 00 00 9F 26 08 4F BC E7 B6 D1 F3 49 0A 9F 27 01 80 9F 36 02 00 4F 90 00
+77 56 82 02 20 20 94 08 18 01 01 01 10 02 05 00 57 13 40 65 89 00 16 41 54 06 D2 40 22 01 97 66 68 66 23 50 1F 5F 20 02 20 2F 5F 34 01 01 9F 10 07 06 01 12 03 A0 00 00 9F 6C 02 00 00 9F 6E 04 20 70 00 00 9F 26 08 4F BC E7 B6 D1 F3 49 0A 9F 27 01 80 9F 36 02 00 4F 90 00
         </raw_response>
         <interpreted_response_status>SW_9000</interpreted_response_status>
         <interpreted_response_body>
@@ -95,7 +109,7 @@ tag: 9F37 length: 04 value: 26 D9 D9 C6
       94 08 -- Application File Locator (AFL)
             18 01 01 01 10 02 05 00 (BINARY)
       57 13 -- Track 2 Equivalent Data
-            40 65 89 FF FF FF 54 06 D2 40 22 01 97 66 68 66
+            40 65 89 00 16 41 54 06 D2 40 22 01 97 66 68 66
             23 50 1F (BINARY)
       5F 20 02 -- Cardholder Name
                20 2F (= /)
@@ -123,13 +137,13 @@ tag: 9F37 length: 04 value: 26 D9 D9 C6
 READ_RECORD 03.01
         </interpreted_command>
         <raw_response>
-70 14 5A 08 40 65 89 FF FF FF 54 06 5F 24 03 24 02 29 9F 4A 01 82 90 00
+70 14 5A 08 40 65 89 00 16 41 54 06 5F 24 03 24 02 29 9F 4A 01 82 90 00
         </raw_response>
         <interpreted_response_status>SW_9000</interpreted_response_status>
         <interpreted_response_body>
 70 14 -- Record Template (EMV Proprietary)
       5A 08 -- Application Primary Account Number (PAN)
-            40 65 89 FF FF FF 54 06 (NUMERIC)
+            40 65 89 00 16 41 54 06 (NUMERIC)
       5F 24 03 -- Application Expiration Date
                24 02 29 (NUMERIC)
       9F 4A 01 -- Static Data Authentication Tag List
@@ -297,12 +311,12 @@ GET_DATA for tag 9F36
     </emv_tag>
     <emv_tag tag="57" name="Track 2 Equivalent Data">
         <value source="medium" scope="A0000000031010p01">
-            40 65 89 FF FF FF 54 06 D2 40 22 01 97 66 68 66 23 50 1F
+            40 65 89 00 16 41 54 06 D2 40 22 01 97 66 68 66 23 50 1F
         </value>
     </emv_tag>
     <emv_tag tag="5A" name="Application Primary Account Number (PAN)">
         <value source="medium" scope="A0000000031010p01">
-            40 65 89 FF FF FF 54 06
+            40 65 89 00 16 41 54 06
         </value>
     </emv_tag>
     <emv_tag tag="5F20" name="Cardholder Name">

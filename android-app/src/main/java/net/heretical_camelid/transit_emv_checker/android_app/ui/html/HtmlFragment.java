@@ -43,7 +43,7 @@ public class HtmlFragment extends Fragment {
 
         assert currentDestination != null;
 
-        ObservableWebViewWrapper m_observableWebViewWrapper = new ObservableWebViewWrapper(binding.wvHtml);
+        ObservableWebViewWrapper m_observableWebViewWrapper = new ObservableWebViewWrapper(binding.wvHtml, activity);
         HtmlViewModel m_htmlViewModel = new ViewModelProvider(this).get(HtmlViewModel.class);
         activity.registerHtmlViewModel(currentDestination.getId(), m_htmlViewModel);
         m_htmlViewModel.getText().observe(

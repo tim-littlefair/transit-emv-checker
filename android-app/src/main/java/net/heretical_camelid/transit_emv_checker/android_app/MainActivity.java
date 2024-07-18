@@ -29,6 +29,7 @@ import net.heretical_camelid.transit_emv_checker.android_app.databinding.Activit
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeFragment;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
+import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
     private static AlertDialog s_startupAlert;
     private ActivityMainBinding m_binding;
     private HomeFragment m_homeFragment;
+
+    private String m_xmlContent = null;
+    private String m_xmlFileBaseName = null;
 
     public static void showStartupAlert() {
         if(s_userHasAgreed ==false) {
@@ -233,17 +237,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails) {
+    public void setDisplayMediaDetailsState(String transitCapabilities, String emvApplicationDetails, String diagnosticXml, String xmlFileBaseName) {
         setPageHtmlText(R.id.navigation_transit,
             "<html><body><pre style='white-space: pre-wrap;'>" +
             transitCapabilities +
             "</pre></body></html>"
         );
-        setPageHtmlText(R.id.navigation_emv_details,
-            "<html><body><pre style='white-space: pre-wrap;'>" +
-                emvApplicationDetails +
-                "</pre></body></html>"
+        String xmlButtonHtml;
+        if(diagnosticXml != null && xmlFileBaseName != null) {
+            xmlButtonHtml = (
+                "<div width='100%'><button name='save_xml' width='100%' enabled='true' onclick='observer.buttonClicked(this.name)'>" +
+                "Save Diagnostic XML" +
+                "</button></div>"
+            );
+            m_xmlContent = diagnosticXml;
+            m_xmlFileBaseName = xmlFileBaseName;
+        } else {
+            xmlButtonHtml = (
+                "<div width='100%'><button width='100%' enabled='false'>" +
+                    "Diagnostic XML not available to Save" +
+                    "</button></div>"
+            );
+            m_xmlContent = null;
+            m_xmlFileBaseName = null;
+        }
+        String emvDetailsHtml = (
+            "<html><body>" +
+            "<div><pre style='white-space: pre-wrap;'>" +
+            emvApplicationDetails +
+            "</pre><div>" +
+            xmlButtonHtml +
+            "</body></html>"
         );
+        setPageHtmlText(R.id.navigation_emv_details, emvDetailsHtml);
     }
 
     public void registerHomeViewModel(HomeViewModel theModel) {
@@ -283,11 +309,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void saveXmlCaptureFile(String xmlFilename, String xmlContent) {
-        //return m_fileSaver.saveViaIntent(xmlFilename, xmlContent, REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS);
-        m_externalFileManager.saveFile(xmlFilename, "text/xml", xmlContent.getBytes(StandardCharsets.UTF_8));
-    }
-
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -308,5 +329,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void registerHomeFragment(HomeFragment homeFragment) {
         m_homeFragment = homeFragment;
+    }
+
+    public void writeXmlCaptureFile() {
+        m_externalFileManager.saveFile(m_xmlFileBaseName, "text/xml", m_xmlContent.getBytes(StandardCharsets.UTF_8));
     }
 }

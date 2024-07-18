@@ -12,7 +12,7 @@ import fr.devnied.bitlib.BytesUtils;
 
 public class PCIMaskingAgent {
 
-    void maskWholeValueIfSensitive(APDUObserver apduObserver, CommandAndResponse carItem, TLV possiblySensitiveTLV) {
+    void maskWholeValueIfSensitive(CommandAndResponse carItem, TLV possiblySensitiveTLV) {
         // There are a small number of tags which may contain sensitive data
         // in an obfuscated state, or encrypted with publicly available keys.
         // ref:
@@ -55,7 +55,7 @@ public class PCIMaskingAgent {
 
             // PCI would also permit us to store tag 0x5F20, cardholder name, despite its
             // classification as CHD, but the content of this tag does not contribute to 
-            // evaluation of the media's transit capabilities, so it is included in the supression 
+            // evaluation of the media's transit capabilities, so it is included in the suppression
             // list.
             case 0x5F20: // Cardholder name (classified as CHD)
 
@@ -125,7 +125,7 @@ public class PCIMaskingAgent {
 
 
 
-        // carItem.intepretedResponse needs to be masked in 16 bytes per chunk
+        // carItem.interpretedResponse needs to be masked in 16 bytes per chunk
         // as the prettyPrintAPDU function breaks the data into 16 bytes per line
         while(bytesToMask.length>0) {
             byte[] chunkBytes;

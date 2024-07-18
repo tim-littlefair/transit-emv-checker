@@ -161,7 +161,7 @@ public class APDUObserver {
                     TLVInputStream stream2 = new TLVInputStream(new ByteArrayInputStream(tlv.getValueBytes()));
                     extractTagsRecursively(stream2,newTagList,carItem);
                 } else {
-                    m_PCIMaskingAgent.maskWholeValueIfSensitive(this, carItem, tlv);
+                    m_PCIMaskingAgent.maskWholeValueIfSensitive(carItem, tlv);
                     EMVTagEntry newEmvTagEntry = new EMVTagEntry();
                     newEmvTagEntry.tagHex = BytesUtils.bytesToStringNoSpace(tlv.getTagBytes());
                     newEmvTagEntry.valueHex = BytesUtils.bytesToString(tlv.getValueBytes());

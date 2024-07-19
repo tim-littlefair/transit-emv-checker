@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.MutableLiveData;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -29,7 +28,6 @@ import net.heretical_camelid.transit_emv_checker.android_app.databinding.Activit
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeFragment;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
-import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -39,11 +37,7 @@ public class MainActivity extends AppCompatActivity {
     static final Logger LOGGER = LoggerFactory.getLogger(MainActivity.class);
 
 
-    // Activity wide UI elements
-    private BottomNavigationView m_navView;
     private NavController m_navController;
-
-    private StartupAlertListener m_startupAlertListener;
 
     // Model attributes driving fragment UI elements
     private final HashMap<Integer, MutableLiveData<String> > m_htmlPageRegistry = new HashMap<>();
@@ -59,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     static boolean s_userHasAgreed = false;
     private static AlertDialog s_startupAlert;
-    private ActivityMainBinding m_binding;
     private HomeFragment m_homeFragment;
 
     private String m_xmlContent = null;
@@ -81,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         m_htmlPageRegistry.put(R.id.navigation_emv_details,new MutableLiveData<>());
         m_htmlPageRegistry.put(R.id.navigation_about,new MutableLiveData<>());
 
-        m_binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(m_binding.getRoot());
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home,
@@ -96,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
         assert navHostFragment != null;
         m_navController = navHostFragment.getNavController();
         NavigationUI.setupActionBarWithNavController(this, m_navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(m_binding.navView, m_navController);
-        m_navView = findViewById(R.id.nav_view);
+        NavigationUI.setupWithNavController(binding.navView, m_navController);
+
         populateAboutPage();
         buildStartupAlert();
         showStartupAlert();
@@ -111,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void buildStartupAlert() {
-        m_startupAlertListener = new StartupAlertListener(this);
+        StartupAlertListener startupAlertListener = new StartupAlertListener(this);
         m_externalFileManager = new ModernExternalFileManager(this);
         AlertDialog.Builder startupAlertBuilder = new AlertDialog.Builder(MainActivity.this);
         startupAlertBuilder.setTitle("Transit EMV Checker");
@@ -130,10 +123,10 @@ public class MainActivity extends AppCompatActivity {
         );
         startupAlertBuilder.setMessage(disclaimerRichText);
         startupAlertBuilder.setPositiveButton(
-            R.string.i_understand_and_agree, m_startupAlertListener
+            R.string.i_understand_and_agree, startupAlertListener
         );
-        startupAlertBuilder.setNeutralButton("more information", m_startupAlertListener);
-        startupAlertBuilder.setNegativeButton("decline and close", m_startupAlertListener);
+        startupAlertBuilder.setNeutralButton("more information", startupAlertListener);
+        startupAlertBuilder.setNegativeButton("decline and close", startupAlertListener);
         s_startupAlert = startupAlertBuilder.create();
     }
 
@@ -299,13 +292,20 @@ public class MainActivity extends AppCompatActivity {
         if(resultCode != RESULT_OK) {
             Toast.makeText(this,"Request declined",Toast.LENGTH_LONG).show();
         } else if(resultData==null) {
-            Toast.makeText(this, "Request approved but null data", Toast.LENGTH_LONG).show();
+            Toast.makeText(
+                this,
+                "Request approved but null data",
+                Toast.LENGTH_LONG
+            ).show();
         } else if(requestCode== REQUEST_CODE_DOCUMENT_DIRECTORY_ACCESS) {
             LOGGER.warn("Unexpected directory access result received at MainActivity");
         } else if(requestCode == REQUEST_CODE_CREATE_DOCUMENT) {
             m_externalFileManager.storeFileContent(resultData.getData());
         } else {
-            LOGGER.warn("Unexpected result received at MainActivity for request code " + requestCode);
+            LOGGER.warn(
+                "Unexpected result received at MainActivity for request code {}",
+                requestCode
+            );
         }
     }
 

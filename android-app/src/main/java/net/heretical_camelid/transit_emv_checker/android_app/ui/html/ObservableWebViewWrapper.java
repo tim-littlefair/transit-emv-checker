@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Base64;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -13,10 +12,12 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 
 import net.heretical_camelid.transit_emv_checker.android_app.MainActivity;
-import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ObservableWebViewWrapper extends WebViewClient implements Handler.Callback {
-    private static final String TAG = ObservableWebViewWrapper.class.getName();
+    static final Logger LOGGER = LoggerFactory.getLogger(ObservableWebViewWrapper.class);
     private final WebView m_webView;
     private final MainActivity m_mainActivity;
 
@@ -44,12 +45,15 @@ public class ObservableWebViewWrapper extends WebViewClient implements Handler.C
     @JavascriptInterface
     public void buttonClicked(String buttonCommand) {
         if(buttonCommand==null) {
-            Log.w(TAG, "buttonClicked - null command");
+            LOGGER.warn("buttonClicked - null command");
             // do nothing
         } else if(buttonCommand.equals("save_xml")) {
             m_mainActivity.writeXmlCaptureFile();
         } else {
-            Log.w(TAG, "buttonClicked - unexpected command " + buttonCommand);
+            LOGGER.warn(
+                "buttonClicked - unexpected command {}",
+                buttonCommand
+            );
         }
     }
 

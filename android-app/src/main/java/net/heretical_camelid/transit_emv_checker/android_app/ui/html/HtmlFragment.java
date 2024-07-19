@@ -15,12 +15,19 @@ import net.heretical_camelid.transit_emv_checker.android_app.R;
 import net.heretical_camelid.transit_emv_checker.android_app.databinding.FragmentHtmlBinding;
 
 public class HtmlFragment extends Fragment {
-
     private FragmentHtmlBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
+        // There is an exception thrown and recovered from
+        // within FragmentHtmlBinding.inflate which generates a long
+        // stack trace at logging level INFO.
+        // I haven't yet found a way to suppress the logging of this
+        // exception.
+        // Could probably do it by switching the log4j implementation
+        // away from sl4j-simple, and doing a pair of run-time set-level's
+        // on the  implementation bracketing this call, but not going to
+        // do that right now.
         binding = FragmentHtmlBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }

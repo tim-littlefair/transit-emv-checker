@@ -3,7 +3,6 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
-import android.util.Log;
 
 import com.github.devnied.emvnfccard.exception.CommunicationException;
 import com.github.devnied.emvnfccard.parser.EmvTemplate;
@@ -13,14 +12,10 @@ import net.heretical_camelid.transit_emv_checker.library.*;
 import java.io.IOException;
 
 public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
-    private static final String TAG =  EMVMediaAgent.class.getName();
-
     public static final int TIMEOUT_5000_MS = 5000;
     private final MainActivity m_mainActivity;
     private final NfcAdapter m_nfcAdapter;
     private final EmvTemplate.Builder m_templateBuilder;
-    private String m_fileBaseName;
-    private String m_xmlContent;
 
     public EMVMediaAgent(MainActivity mainActivity) {
         m_mainActivity = mainActivity;
@@ -89,7 +84,6 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                 m_mainActivity.homePageLogAppend("About to read and parse media EMV content");
                 template.readEmvCard();
                 pciMaskingAgent.maskAccountData(apduObserver);
-                saveXmlContentAndFilename(apduObserver);
                 TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
                 String transitCapabilityReport = tcc.capabilityReport();
                 String emvDetailsSummary = apduObserver.summary();
@@ -140,22 +134,5 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
         return EmvTemplate.Builder()
             .setConfig(config)
             .setTerminal(new TransitTerminal());
-    }
-
-    void saveXmlContentAndFilename(APDUObserver apduObserver) {
-        m_fileBaseName = apduObserver.mediumStateId();
-        m_xmlContent = apduObserver.toXmlString(false);
-        Log.i(TAG, "Diagnostic XML Content:\n\n" + m_xmlContent + "\n");
-    }
-
-    void writeXmlToFile() {
-        if(m_fileBaseName == null) {
-            m_mainActivity.homePageLogAppend("Capture file failed: medium state id is null");
-        } else if(m_xmlContent == null) {
-            m_mainActivity.homePageLogAppend("Capture file failed: XML content is null");
-        } else {
-            m_mainActivity.homePageLogAppend("Saving capture file. suggested name is " + m_fileBaseName + ".xml");
-            m_mainActivity.writeXmlCaptureFile();
-        }
     }
 }

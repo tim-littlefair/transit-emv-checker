@@ -16,7 +16,7 @@ public class BasicReplayTest  {
         TapReplayConductor trc;
         try {
             trc = new TapReplayConductor(
-                new FileInputStream("src/main/resources/visa-exp2402-5406.xml"),
+                new FileInputStream("src/main/assets/visa-exp2402-5406.xml"),
                 null
             );
         } catch (FileNotFoundException e) {

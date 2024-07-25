@@ -88,6 +88,13 @@ android {
             }
         }
     }
+    sourceSets {
+        main {
+            // Bring in the XML capture files used for automated tests
+            // TODO: Work out how to include these in debug builds only
+            assets.srcDirs += [ '../tec-library/src/main/assets' ]
+        }
+    }
 }
 
 base {
@@ -142,7 +149,3 @@ licenseReport {
     copyHtmlReportToAssets = true
     useVariantSpecificAssetDirs = false
 }
-
-
-
-

@@ -14,10 +14,10 @@ public class TapReplayProvider extends MyProviderBase implements IProvider {
     int m_stepIndex;
 
     public TapReplayProvider(TapReplayConductor trc) {
-        super(trc.getAPDUObserver());
         m_trc = trc;
         m_commandsAndResponses = m_trc.getCommandsAndResponses();
         m_stepIndex = 0;
+        setApduStore(trc.getAPDUObserver());
     }
 
     @Override

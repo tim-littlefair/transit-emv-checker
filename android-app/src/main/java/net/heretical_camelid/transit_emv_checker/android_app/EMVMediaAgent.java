@@ -56,10 +56,10 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
     public void onTagDiscovered(Tag tag) {
         m_mainActivity.homePageLogAppend("Tag discovered: " + tag.describeContents());
         disableDetection();
-        processMedia(tag);
+        processNfcMedia(tag);
     }
 
-    void processMedia(Tag emvMediaTag) {
+    public void processNfcMedia(Tag emvMediaTag) {
         IsoDep tagAsIsoDep = IsoDep.get(emvMediaTag);
         if(tagAsIsoDep == null) {
             m_mainActivity.homePageLogAppend("Detected media is not compatible with EMV");
@@ -73,33 +73,10 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
                     m_mainActivity.homePageLogAppend("Successfully connected to EMV media");
                 }
 
-                // Create an observer object for APDUs and data extracted from them
-                PCIMaskingAgent pciMaskingAgent = new PCIMaskingAgent();
-                APDUObserver apduObserver = new APDUObserver(pciMaskingAgent);
-                AndroidNFCProvider provider = new AndroidNFCProvider(apduObserver, tagAsIsoDep);
-                EmvTemplate template = m_templateBuilder.setProvider(provider).build();
-                MyParser mParser = new MyParser(template, apduObserver);
-                template.addParsers(mParser);
+                // Create a provider to read the media
+                AndroidNFCProvider provider = new AndroidNFCProvider(tagAsIsoDep);
 
-                m_mainActivity.homePageLogAppend("About to read and parse media EMV content");
-                template.readEmvCard();
-                pciMaskingAgent.maskAccountData(apduObserver);
-                TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
-                String transitCapabilityReport = tcc.capabilityReport();
-                String emvDetailsSummary = apduObserver.summary();
-                if(transitCapabilityReport==null) {
-                    m_mainActivity.homePageLogAppend("Failed to retrieve transit capabilities");
-                    m_mainActivity.setInitialState();
-                } else if (emvDetailsSummary==null) {
-                    m_mainActivity.homePageLogAppend("Failed to retrieve EMV details");
-                    m_mainActivity.setInitialState();
-                } else {
-                    m_mainActivity.homePageLogAppend("Media EMV content read and parsed successfully");
-                    String diagnosticXml = apduObserver.toXmlString(false);
-                    String xmlFileBaseName = apduObserver.mediumStateId();
-                    m_mainActivity.setDisplayMediaDetailsState(transitCapabilityReport,emvDetailsSummary, diagnosticXml, xmlFileBaseName);
-                    m_mainActivity.homePageLogAppend("Switch to Transit tab to see Transit Capabilities of this card");
-                }
+                processMedia(provider);
             } catch (CommunicationException e) {
                 m_mainActivity.homePageLogAppend(
                     "Reading or parsing of EMV media content failed with error:\n" +
@@ -119,6 +96,40 @@ public class EMVMediaAgent implements NfcAdapter.ReaderCallback {
             } catch (java.io.IOException e) {
                 // Handle exception silently
             }
+        }
+    }
+
+    private void processMedia(MyProviderBase provider) throws CommunicationException {
+
+        // Create an observer object for APDUs and data extracted from them
+        PCIMaskingAgent pciMaskingAgent = new PCIMaskingAgent();
+        APDUObserver apduObserver = new APDUObserver(pciMaskingAgent);
+
+        // Connect the provider to the observer
+        provider.setApduStore(apduObserver);
+
+        EmvTemplate template = m_templateBuilder.setProvider(provider).build();
+        MyParser mParser = new MyParser(template, apduObserver);
+        template.addParsers(mParser);
+
+        m_mainActivity.homePageLogAppend("About to read and parse media EMV content");
+        template.readEmvCard();
+        pciMaskingAgent.maskAccountData(apduObserver);
+        TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
+        String transitCapabilityReport = tcc.capabilityReport();
+        String emvDetailsSummary = apduObserver.summary();
+        if(transitCapabilityReport==null) {
+            m_mainActivity.homePageLogAppend("Failed to retrieve transit capabilities");
+            m_mainActivity.setInitialState();
+        } else if (emvDetailsSummary==null) {
+            m_mainActivity.homePageLogAppend("Failed to retrieve EMV details");
+            m_mainActivity.setInitialState();
+        } else {
+            m_mainActivity.homePageLogAppend("Media EMV content read and parsed successfully");
+            String diagnosticXml = apduObserver.toXmlString(false);
+            String xmlFileBaseName = apduObserver.mediumStateId();
+            m_mainActivity.setDisplayMediaDetailsState(transitCapabilityReport,emvDetailsSummary, diagnosticXml, xmlFileBaseName);
+            m_mainActivity.homePageLogAppend("Switch to Transit tab to see Transit Capabilities of this card");
         }
     }
 

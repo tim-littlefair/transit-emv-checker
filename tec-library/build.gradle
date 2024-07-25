@@ -15,9 +15,9 @@ dependencies {
     implementation 'commons-io:commons-io:2.7'
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
     implementation "org.slf4j:slf4j-api:2.0.13"
-    testImplementation "org.slf4j:slf4j-reload4j:2.0.13"
+    implementation "org.slf4j:slf4j-reload4j:2.0.13"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // The following line ensures that a report is generated
@@ -26,7 +26,12 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        includeTags "run_with_gradle"
+    }
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
     finalizedBy jacocoTestReport
 }
 
@@ -38,7 +43,7 @@ jacocoTestReport {
 // https://docs.gradle.org/current/userguide/building_java_projects.html#sec:java_packaging
 tasks.register('uberJar', Jar) {
     archiveClassifier = 'uber'
-    duplicatesStrategy = 'warn'
+    duplicatesStrategy = 'include'
     from sourceSets.main.output
     dependsOn configurations.runtimeClasspath
     from {

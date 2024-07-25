@@ -4,6 +4,7 @@ import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
 import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
 import net.heretical_camelid.transit_emv_checker.library.TransitCapabilityChecker;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BasicReplayTest  {
     @Test
+    @Tag("run_with_gradle")
     public void testTapReplay() {
         TapReplayConductor trc;
         try {

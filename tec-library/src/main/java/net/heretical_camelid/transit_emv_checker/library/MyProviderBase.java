@@ -17,10 +17,9 @@ import fr.devnied.bitlib.BytesUtils;
 public abstract class MyProviderBase implements IProvider {
 	static final Logger LOGGER = LoggerFactory.getLogger(MyProviderBase.class);
 
-    final APDUObserver m_apduStore;
-    protected MyProviderBase(APDUObserver apduStore) {
-        m_apduStore = apduStore;
-    }
+    protected APDUObserver m_apduStore;
+    protected MyProviderBase() { m_apduStore = null; }
+    public void setApduStore(APDUObserver apduStore) {  m_apduStore = apduStore; }
 
     protected abstract byte[] implementationTransceive(final byte[] pCommand, ByteBuffer receiveBuffer) throws CommunicationException;
 

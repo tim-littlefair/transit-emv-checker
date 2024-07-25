@@ -3,7 +3,7 @@ package net.heretical_camelid.transit_emv_checker.android_app;
 import android.nfc.tech.IsoDep;
 import com.github.devnied.emvnfccard.exception.CommunicationException;
 import com.github.devnied.emvnfccard.parser.IProvider;
-import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
+
 import net.heretical_camelid.transit_emv_checker.library.MyProviderBase;
 
 import java.io.IOException;
@@ -12,8 +12,7 @@ import java.nio.ByteBuffer;
 class AndroidNFCProvider extends MyProviderBase implements IProvider {
     private final IsoDep m_tagAsIsoDep;
 
-    public AndroidNFCProvider(APDUObserver apduStore, IsoDep tagAsIsoDep) {
-        super(apduStore);
+    public AndroidNFCProvider(IsoDep tagAsIsoDep) {
         m_tagAsIsoDep = tagAsIsoDep;
     }
 

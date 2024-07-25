@@ -1,7 +1,15 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withParent;
+import static androidx.test.espresso.matcher.ViewMatchers.withSubstring;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -11,19 +19,34 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 
+import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.accessibility.AccessibilityChecks;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.Until;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.regex.Pattern;
+
+// Some logic in this test suite base class is based on the AOSP provided example project:
+// https://github.com/android/testing-samples/blob/main/ui/uiautomator/BasicSample/app/src/androidTest/java/com/example/android/testing/uiautomator/BasicSample/ChangeTextBehaviorTest.java
+// and is subject to the same Apache 2.0 license as the upstream file
+
+// Documentation on the uiautomator framework is at:
+// https://developer.android.com/training/testing/other-components/ui-automator
 
 public class TECTestSuiteBase {
     static final Logger LOGGER = LoggerFactory.getLogger(TEC_UiTestSuite.class);
@@ -37,6 +60,25 @@ public class TECTestSuiteBase {
     // state, we use this unconditional sleep
     protected static final int _UI_CHANGE_SLEEP_SECONDS = 2;
     protected UiDevice mDevice;
+
+    static Matcher<View> childAtPosition(
+        final Matcher<View> parentMatcher, final int position) {
+
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
+    }
 
     @Before
     public void startMainActivityFromHomeScreen() {
@@ -130,5 +172,37 @@ public class TECTestSuiteBase {
 
         // counter-intuitive, but button is still clickable
         assertThat(visibleButton.isClickable(),is(equalTo(true)));
+    }
+
+    protected void checkNavigationPageContent(
+        int navigationPosition,
+        int navigationResourceId,
+        String pageNavigationText,
+        String expectedDisplayedSubstring
+    ) {
+        ViewInteraction bottomNavigationItemView3 = onView(
+                allOf(withId(navigationResourceId), withContentDescription(pageNavigationText),
+                        TECTestSuiteBase.childAtPosition(
+                                TECTestSuiteBase.childAtPosition(
+                                        withId(R.id.nav_view),
+                                        0),
+                                navigationPosition),
+                        isDisplayed()));
+        bottomNavigationItemView3.perform(click());
+
+        if(expectedDisplayedSubstring==null) {
+            // Home screen is not based on WebView so the logic
+            // below is not applicable
+        } else {
+            ViewInteraction textView3 = onView(
+                allOf(withSubstring(expectedDisplayedSubstring),
+                    withParent(withParent(IsInstanceOf.<View>instanceOf(android.webkit.WebView.class))),
+                    isDisplayed()));
+            assertThat(textView3, is(notNullValue()));
+
+        }
+        // Allow the screen to be displayed briefly to the human test observer
+        // if there is one
+        sleep(3);
     }
 }

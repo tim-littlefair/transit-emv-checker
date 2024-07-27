@@ -32,9 +32,10 @@ public class TapReplayConductor {
     private String m_captureOnlyXml = null;
 
     public TapReplayConductor(
+        XMLInputFactory xmlInputFactory,
         InputStream captureXml,
         ITerminal terminal) {
-        m_commandsAndResponses = parseXml(captureXml);
+        m_commandsAndResponses = parseXml(captureXml, xmlInputFactory);
         m_pciMaskingAgent = new PCIMaskingAgent();
         m_apduObserver = new APDUObserver(m_pciMaskingAgent);
         m_arbiter = new TapReplayArbiter();
@@ -46,8 +47,11 @@ public class TapReplayConductor {
         }
     }
 
-    public static TapReplayConductor createTapReplayConductor(InputStream is, ITerminal terminal) {
-        TapReplayConductor trc = new TapReplayConductor(is, terminal);
+    public static TapReplayConductor createTapReplayConductor(
+        XMLInputFactory xmlInputFactory,
+        InputStream is, ITerminal terminal
+    ) {
+        TapReplayConductor trc = new TapReplayConductor(xmlInputFactory, is, terminal);
         EmvTemplate template = trc.build();
         try {
             trc.play(template);
@@ -109,11 +113,12 @@ public class TapReplayConductor {
         return m_pciMaskingAgent.maskAccountData(m_apduObserver);
     }
 
-    private ArrayList<CommandAndResponse> parseXml(InputStream captureXml) {
+    private ArrayList<CommandAndResponse> parseXml(
+        InputStream captureXml, XMLInputFactory xmlInFact
+    ) {
         ArrayList<CommandAndResponse> commandsAndResponses = new ArrayList<>();
         CommandAndResponse carItem = null;
         try {
-            XMLInputFactory xmlInFact = XMLInputFactory.newInstance();
             XMLStreamReader reader = xmlInFact.createXMLStreamReader(captureXml);
             while (reader.hasNext()) {
                 int nextToken = reader.next();
@@ -152,8 +157,10 @@ public class TapReplayConductor {
 
     public static void main(String[] args) {
         TapReplayConductor trc;
+
         try {
             trc = new TapReplayConductor(
+                XMLInputFactory.newFactory(),
                 new FileInputStream(args[0]),
                 null
             );

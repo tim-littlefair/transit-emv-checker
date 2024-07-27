@@ -5,17 +5,22 @@ import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import android.content.Context;
+
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SdkSuppress;
 
 import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
-import net.heretical_camelid.transit_emv_checker.library.TransitCapabilityChecker;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.xml.stream.XMLInputFactory;
 
 /**
  * Basic sample for unbundled UiAutomator.
@@ -29,15 +34,18 @@ public class TEC_MediaTestSuite extends TECTestSuiteBase {
 
         assertThat(mDevice, notNullValue());
 
-        FileInputStream captureXmlStream;
+        InputStream captureXmlStream;
         try {
-            captureXmlStream = new FileInputStream(
-                "assets/media_captures/visa-exp2402-5406.xml"
-            );
+            String assetFilename = "media_captures/visa-exp2402-5406.xml";
+            Context context = ApplicationProvider.getApplicationContext();
+            captureXmlStream = context.getAssets().open(assetFilename);
         } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         TapReplayConductor trc = TapReplayConductor.createTapReplayConductor(
+            XMLInputFactory.newInstance(),
             captureXmlStream,
             null
         );

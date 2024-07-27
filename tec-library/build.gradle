@@ -4,6 +4,10 @@ plugins {
     id 'com.jaredsburrows.license' version '0.9.7'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 group = 'net.heretical_camelid.transit_emv_checker.library'
 version = '0.1.0'
 
@@ -12,7 +16,7 @@ dependencies {
     implementation "com.github.devnied:bit-lib4j:1.5.2"
     implementation "org.apache.commons:commons-lang3:3.8.1"
     implementation 'org.apache.commons:commons-collections4:4.3'
-    implementation 'commons-io:commons-io:2.7'
+    implementation 'commons-io:commons-io:2.13.0'
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
     implementation "org.slf4j:slf4j-api:2.0.13"
     implementation "org.slf4j:slf4j-reload4j:2.0.13"
@@ -59,3 +63,4 @@ licenseReport {
     copyHtmlReportToAssets = true
     useVariantSpecificAssetDirs = false
 }
+

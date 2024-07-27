@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import javax.xml.stream.XMLInputFactory;
+
 public class BasicReplayTest  {
     @Test
     @Tag("run_with_gradle")
@@ -23,7 +25,11 @@ public class BasicReplayTest  {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        TapReplayConductor trc = TapReplayConductor.createTapReplayConductor(captureXmlStream, null);
+        XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
+
+        TapReplayConductor trc = TapReplayConductor.createTapReplayConductor(
+            xmlInFact, captureXmlStream, null
+        );
 
         assertTrue(trc.doPCIMasking());
 

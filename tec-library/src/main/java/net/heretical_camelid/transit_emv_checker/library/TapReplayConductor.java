@@ -26,11 +26,14 @@ public class TapReplayConductor {
     private final TapReplayArbiter m_arbiter;
     private final TapReplayProvider m_provider;
     private final ITerminal m_terminal;
+    private String m_summary = null;
+    private String m_transitCapabilities = null;
+    private String m_diagnosticXml = null;
+    private String m_captureOnlyXml = null;
 
     public TapReplayConductor(
         InputStream captureXml,
-        ITerminal terminal
-    ) {
+        ITerminal terminal) {
         m_commandsAndResponses = parseXml(captureXml);
         m_pciMaskingAgent = new PCIMaskingAgent();
         m_apduObserver = new APDUObserver(m_pciMaskingAgent);
@@ -41,6 +44,19 @@ public class TapReplayConductor {
         } else {
             m_terminal = new TransitTerminal();
         }
+    }
+
+    public static TapReplayConductor createTapReplayConductor(InputStream is, ITerminal terminal) {
+        TapReplayConductor trc = new TapReplayConductor(is, terminal);
+        EmvTemplate template = trc.build();
+        try {
+            trc.play(template);
+        }
+        catch(IllegalArgumentException e) {
+            System.err.println(String.format("", e.getMessage()));
+            e.printStackTrace(System.err);
+        }
+        return trc;
     }
 
     public APDUObserver getAPDUObserver() {
@@ -76,6 +92,17 @@ public class TapReplayConductor {
         } catch (CommunicationException e) {
             throw new RuntimeException(e);
         }
+
+        boolean maskingSucceeded = m_pciMaskingAgent.maskAccountData(m_apduObserver);
+        assert maskingSucceeded = true;
+
+        m_summary = m_apduObserver.summary();
+        TransitCapabilityChecker tcc = new TransitCapabilityChecker(m_apduObserver);
+        m_transitCapabilities = tcc.capabilityReport();
+        final boolean _CAPTURE_ONLY_FALSE = false;
+        m_diagnosticXml = m_apduObserver.toXmlString(_CAPTURE_ONLY_FALSE);
+        final boolean _CAPTURE_ONLY_TRUE = true;
+        m_captureOnlyXml = m_apduObserver.toXmlString(_CAPTURE_ONLY_TRUE);
     }
 
     public boolean doPCIMasking() {
@@ -140,4 +167,9 @@ public class TapReplayConductor {
     public ArrayList<CommandAndResponse> getCommandsAndResponses() {
         return m_commandsAndResponses;
     }
+
+    public String summary() { return m_summary; }
+    public String transitCapabilities() { return m_transitCapabilities; }
+    public String diagnosticXml() { return m_diagnosticXml; }
+    public String captureOnlyXml() { return m_captureOnlyXml; }
 }

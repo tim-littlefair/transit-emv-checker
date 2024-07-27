@@ -100,6 +100,7 @@ public class Main {
 		// transaction - before we can dump this in a PCI-compliant
 		// environment we need to mask all occurrences of the PAN
 		// and the cardholder name.
+		APDUObserver[] apduObserverRef = new APDUObserver[] { apduObserver };
 		boolean pciMaskingOk = thePCIMaskingAgent.maskAccountData(apduObserver);
 
 		if (pciMaskingOk == false) {

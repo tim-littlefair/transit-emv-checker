@@ -262,5 +262,4 @@ public class PCIMaskingAgent {
         }
         return apduObserver.m_pciMaskingDone;
     }
-
 }

@@ -1,5 +1,4 @@
 package net.heretical_camelid.transit_emv_checker.tests;
-import com.github.devnied.emvnfccard.parser.EmvTemplate;
 import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
 import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
 import net.heretical_camelid.transit_emv_checker.library.TransitCapabilityChecker;
@@ -9,43 +8,33 @@ import org.junit.jupiter.api.Tag;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BasicReplayTest  {
     @Test
     @Tag("run_with_gradle")
     public void testTapReplay() {
-        TapReplayConductor trc;
+        FileInputStream captureXmlStream;
         try {
-            trc = new TapReplayConductor(
-                new FileInputStream("src/main/assets/visa-exp2402-5406.xml"),
-                null
+            captureXmlStream = new FileInputStream(
+                "src/main/assets/media_captures/visa-exp2402-5406.xml"
             );
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        EmvTemplate template = trc.build();
-        try {
-            trc.play(template);
-        }
-        catch(IllegalArgumentException e) {
-            System.err.println(String.format("", e.getMessage()));
-            e.printStackTrace(System.err);
-        }
+        TapReplayConductor trc = TapReplayConductor.createTapReplayConductor(captureXmlStream, null);
 
         assertTrue(trc.doPCIMasking());
 
         System.out.println("");
-        APDUObserver apduObserver = trc.getAPDUObserver();
-        String summary = apduObserver.summary();
+        String summary = trc.summary();
         System.out.println("Summary:\n" + summary);
 
-        TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
-        String transitCapabilities = tcc.capabilityReport();
+        String transitCapabilities = trc.transitCapabilities();
         System.out.println("Transit capabilities:\n" + transitCapabilities);
 
-        final boolean _NOT_CAPTURE_ONLY = false;
-        String diagnosticXml = apduObserver.toXmlString(_NOT_CAPTURE_ONLY);
+        String diagnosticXml = trc.diagnosticXml();
         System.out.println("Diagnostic XML:\n" + diagnosticXml);
 
         /* 
@@ -54,7 +43,7 @@ public class BasicReplayTest  {
          */
 
         // Assertion related to summary
-        assertTrue(!summary.contains("4065890016415406")); // Actual PAN simulated in visa-exp2402-5406.xml
+        assertFalse(summary.contains("4065890016415406")); // Actual PAN simulated in visa-exp2402-5406.xml
         assertTrue(summary.contains("406589FFFFFF5406"));  // Truncated PAN 
 
         // Assertions related to transitCapabilities
@@ -84,4 +73,5 @@ public class BasicReplayTest  {
         assertTrue(!diagnosticXml.contains("20 2F (= /)"));
         assertTrue(diagnosticXml.contains("FF FF (=??)"));
     }
+
 }

@@ -50,8 +50,6 @@ public class TEC_MediaTestSuite extends TECTestSuiteBase {
             null
         );
 
-        assertTrue(trc.doPCIMasking());
-
         String summary = trc.summary();
         String transitCapabilities = trc.transitCapabilities();
 

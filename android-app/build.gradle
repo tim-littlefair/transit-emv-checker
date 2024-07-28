@@ -58,6 +58,9 @@ android {
                 signingConfig signingConfigs.release
             }
         }
+        debug {
+            testCoverageEnabled true
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -128,20 +131,22 @@ dependencies {
     implementation 'com.jaredsburrows:gradle-license-plugin:0.9.7'
 
     implementation "org.slf4j:slf4j-simple:2.0.13"
-    implementation 'androidx.test.espresso:espresso-accessibility:3.5.1'
+    implementation 'androidx.test.espresso:espresso-accessibility:3.6.1'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation "androidx.test:core:1.6.1"
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test:runner:1.6.1'
+    androidTestImplementation 'androidx.test:rules:1.6.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation('androidx.test.uiautomator:uiautomator:2.3.0')
 
-    implementation platform('com.google.firebase:firebase-bom:33.1.0')
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
     implementation 'com.google.firebase:firebase-analytics'
 
-    // ref:
+    // refs:
     // https://github.com/FasterXML/jackson-dataformat-xml/issues/533
+    // https://stackoverflow.com/questions/30968735/using-com-bea-xml-stream-package-on-android
     // Android does not have javax.xml by default, but can
     // bring in a suitable substitute like this:
     implementation 'javax.xml.stream:stax-api:1.0-2'
@@ -156,3 +161,19 @@ licenseReport {
     copyHtmlReportToAssets = true
     useVariantSpecificAssetDirs = false
 }
+
+/*
+connectedAndroidTest {
+    useJUnitPlatform {
+        includeTags "run_with_gradle"
+    }
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn  connectedAndroidTest
+}
+*/

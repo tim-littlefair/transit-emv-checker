@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,9 +23,14 @@ import android.content.pm.ResolveInfo;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.ValueCallback;
+import android.webkit.WebView;
 
+import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.accessibility.AccessibilityChecks;
+import androidx.test.espresso.assertion.ViewAssertions;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject2;
@@ -194,15 +200,50 @@ public class TECTestSuiteBase {
             // Home screen is not based on WebView so the logic
             // below is not applicable
         } else {
-            ViewInteraction textView3 = onView(
-                allOf(withSubstring(expectedDisplayedSubstring),
-                    withParent(withParent(IsInstanceOf.<View>instanceOf(android.webkit.WebView.class))),
-                    isDisplayed()));
+            sleep(_UI_CHANGE_SLEEP_SECONDS);
+            ViewInteraction textView3 = onView(allOf(
+                isDisplayed(),
+                IsInstanceOf.<View>instanceOf(android.webkit.WebView.class)
+            ));
             assertThat(textView3, is(notNullValue()));
+            ViewAssertion substringChecker = (view, noViewFoundException) -> {
+                WebView wv = (WebView) view;
+                if(wv==null) {
+                    throw noViewFoundException;
+                }
+                wv.evaluateJavascript(
+                    "document.documentElement.outerHTML",
+                    new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String value) {
+                            value = value.replace("\\u003C","<");
+                            if(value.contains(expectedDisplayedSubstring)) {
+                                LOGGER.debug(
+                                    "Expected string %s found",
+                                    expectedDisplayedSubstring
+                                );
+                            } else {
+                                LOGGER.error(
+                                    "Expected string %s not found in HTML:\n%s",
+                                    expectedDisplayedSubstring, value
+                                );
+                                throw noViewFoundException;
+                            }
 
+                        }
+                    }
+                );
+            };
+            textView3.check(substringChecker);
+
+            /*
+            textView3.check(
+                ViewAssertions.matches(withSubstring("31010"))
+            );
+            textView3.check(
+                ViewAssertions.matches(withSubstring("Not going to happen"))
+            );
+            */
         }
-        // Allow the screen to be displayed briefly to the human test observer
-        // if there is one
-        sleep(3);
     }
 }

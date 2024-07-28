@@ -1,6 +1,7 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+import static androidx.test.core.graphics.BitmapStorage.writeToTestStorage;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -20,12 +21,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
+import androidx.test.core.app.DeviceCapture;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.ViewInteraction;
@@ -35,6 +38,7 @@ import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.Until;
+import androidx.test.core.graphics.BitmapStorage;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -45,7 +49,9 @@ import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
+import junit.framework.AssertionFailedError;
 
 // Some logic in this test suite base class is based on the AOSP provided example project:
 // https://github.com/android/testing-samples/blob/main/ui/uiautomator/BasicSample/app/src/androidTest/java/com/example/android/testing/uiautomator/BasicSample/ChangeTextBehaviorTest.java
@@ -223,11 +229,12 @@ public class TECTestSuiteBase {
                                     expectedDisplayedSubstring
                                 );
                             } else {
-                                LOGGER.error(
+                                String assertionMessage = String.format(
                                     "Expected string %s not found in HTML:\n%s",
                                     expectedDisplayedSubstring, value
                                 );
-                                throw noViewFoundException;
+                                LOGGER.error(assertionMessage);
+                                throw new AssertionFailedError(assertionMessage);
                             }
 
                         }
@@ -235,15 +242,15 @@ public class TECTestSuiteBase {
                 );
             };
             textView3.check(substringChecker);
+        }
+    }
 
-            /*
-            textView3.check(
-                ViewAssertions.matches(withSubstring("31010"))
-            );
-            textView3.check(
-                ViewAssertions.matches(withSubstring("Not going to happen"))
-            );
-            */
+    public void saveScreenshot(String ssName) {
+        Bitmap bm = DeviceCapture.takeScreenshot();
+        try {
+            BitmapStorage.writeToTestStorage(bm,ssName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -7,9 +7,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SdkSuppress;
+
+import com.github.devnied.emvnfccard.iso7816emv.ITerminal;
 
 import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
 
@@ -34,29 +37,17 @@ public class TEC_MediaTestSuite extends TECTestSuiteBase {
 
         assertThat(mDevice, notNullValue());
 
-        InputStream captureXmlStream;
-        try {
-            String assetFilename = "media_captures/visa-exp2402-5406.xml";
-            Context context = ApplicationProvider.getApplicationContext();
-            captureXmlStream = context.getAssets().open(assetFilename);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        TapReplayConductor trc = TapReplayConductor.createTapReplayConductor(
-            XMLInputFactory.newInstance(),
-            captureXmlStream,
-            null
-        );
+        String mediaAssetName = "visa-exp2402-5406";
+        ITerminal terminal = null;
+        TapReplayConductor trc = replayTap(mediaAssetName, terminal);
 
+        // Providing we reach this point the tap replay conductor has not only been constructed
+        // but has also replayed the tap, masked all of the PCI data, and can be used
+        // to generate the four output reports from the replay event.
         String summary = trc.summary();
         String transitCapabilities = trc.transitCapabilities();
-
-        /*
-         * Assertions related to the summary, transitCapabilities
-         * and diagnosticXml content
-         */
+        String diagnosticXml = trc.diagnosticXml();
+        String captureOnlyXml = trc.captureOnlyXml();
 
         // Assertions related to transitCapabilities
         assertTrue(transitCapabilities.contains(
@@ -93,6 +84,25 @@ public class TEC_MediaTestSuite extends TECTestSuiteBase {
         assertTrue(!diagnosticXml.contains("20 2F (= /)"));
         assertTrue(diagnosticXml.contains("FF FF (=??)"));
         */
+    }
+
+    private static @NonNull TapReplayConductor replayTap(String mediaAssetName, ITerminal terminal) {
+        TapReplayConductor trc;
+        String assetFilename = String.format("media_captures/%s.xml", mediaAssetName);
+        try {
+            Context context = ApplicationProvider.getApplicationContext();
+            InputStream captureXmlStream = context.getAssets().open(assetFilename);
+            trc = TapReplayConductor.createTapReplayConductor(
+                XMLInputFactory.newInstance(),
+                captureXmlStream,
+                terminal
+            );
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return trc;
     }
 
 }

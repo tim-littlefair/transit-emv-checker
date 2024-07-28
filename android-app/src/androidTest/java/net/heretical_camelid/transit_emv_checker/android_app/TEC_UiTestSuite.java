@@ -39,14 +39,34 @@ public class TEC_UiTestSuite extends TECTestSuiteBase {
         assertThat(mDevice, notNullValue());
 
         // Navigate to each of the other pages in turn
-        checkNavigationPageContent(1, R.id.navigation_transit, "Transit", "Card");
-        saveScreenshot("simple_run-transit");
-        checkNavigationPageContent(2, R.id.navigation_emv_details, "EMV", "Card");
-        saveScreenshot("simple_run-emv_details");
-        checkNavigationPageContent(3, R.id.navigation_about, "About", "Version");
-        saveScreenshot("simple_run-about");
-        checkNavigationPageContent(0, R.id.navigation_home, "Home", null);
-        saveScreenshot("simple_run-home");
+        checkNavigationPageContent(
+            1,
+            R.id.navigation_transit,
+            "Transit",
+            "Card",
+            "no_media"
+        );
+        checkNavigationPageContent(
+            2,
+            R.id.navigation_emv_details,
+            "EMV",
+            "Card",
+            "no_media"
+        );
+        checkNavigationPageContent(
+            3,
+            R.id.navigation_about,
+            "About",
+            "Version",
+            "no_media"
+        );
+        checkNavigationPageContent(
+            0,
+            R.id.navigation_home,
+            "Home",
+            null,
+            null
+        );
     }
 }
 

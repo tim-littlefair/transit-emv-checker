@@ -1,5 +1,6 @@
 package net.heretical_camelid.transit_emv_checker.android_app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +16,9 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.test.core.app.ApplicationProvider;
+
+import com.github.devnied.emvnfccard.iso7816emv.ITerminal;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -28,10 +32,13 @@ import net.heretical_camelid.transit_emv_checker.android_app.databinding.Activit
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeFragment;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
+import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.stream.XMLInputFactory;
 
 public class MainActivity extends AppCompatActivity {
     static final Logger LOGGER = LoggerFactory.getLogger(MainActivity.class);
@@ -64,9 +71,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Ugly, will have to do until we have a better way
+    static public MainActivity s_activeInstance = null;
+
+    @NonNull TapReplayConductor replayCapturedTap(String mediaAssetName, ITerminal terminal) {
+        TapReplayConductor trc;
+        String assetFilename = String.format("media_captures/%s.xml", mediaAssetName);
+        try {
+            Context context = ApplicationProvider.getApplicationContext();
+            InputStream captureXmlStream = context.getAssets().open(assetFilename);
+            trc = TapReplayConductor.createTapReplayConductor(
+                XMLInputFactory.newInstance(),
+                captureXmlStream,
+                terminal
+            );
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        setDisplayMediaDetailsState(
+            trc.transitCapabilities(),
+            trc.summary(),
+            trc.diagnosticXml(),
+            "replaying-" + mediaAssetName
+        );
+        return trc;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         s_userHasAgreed = false;
         m_emvMediaAgent = new EMVMediaAgent(this);
 
@@ -96,11 +133,22 @@ public class MainActivity extends AppCompatActivity {
         showStartupAlert();
     }
 
-    @Override public void onResume() {
+    @Override
+    public void onResume() {
         super.onResume();
         if(s_userHasAgreed ==false) {
             s_startupAlert.show();
         }
+
+        assert s_activeInstance == null;
+        s_activeInstance = this;
+    }
+
+    @Override
+    public void onPause() {
+        assert s_activeInstance != null;
+        s_activeInstance = null;
+        super.onPause();
     }
 
     private void buildStartupAlert() {

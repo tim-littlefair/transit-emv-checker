@@ -190,7 +190,8 @@ public class TECTestSuiteBase {
         int navigationPosition,
         int navigationResourceId,
         String pageNavigationText,
-        String expectedDisplayedSubstring
+        String expectedDisplayedSubstring,
+        String screenshotContextPrefix
     ) {
         ViewInteraction bottomNavigationItemView3 = onView(
                 allOf(withId(navigationResourceId), withContentDescription(pageNavigationText),
@@ -222,7 +223,9 @@ public class TECTestSuiteBase {
                     new ValueCallback<String>() {
                         @Override
                         public void onReceiveValue(String value) {
-                            value = value.replace("\\u003C","<");
+                            value = value.replace("\\u003C","<")
+                                         .replace("\\n","\n")
+                                         .replace("&gt;",">");
                             if(value.contains(expectedDisplayedSubstring)) {
                                 LOGGER.debug(
                                     "Expected string %s found",
@@ -242,6 +245,9 @@ public class TECTestSuiteBase {
                 );
             };
             textView3.check(substringChecker);
+        }
+        if(screenshotContextPrefix != null) {
+            saveScreenshot(screenshotContextPrefix + "-" + pageNavigationText);
         }
     }
 

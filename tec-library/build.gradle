@@ -4,6 +4,7 @@ plugins {
     id 'com.jaredsburrows.license' version '0.9.7'
 }
 
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17

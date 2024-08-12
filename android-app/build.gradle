@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
-        minSdk 25
+        minSdk 26
         targetSdk 34
         // Google Play store requires versionCode for releases to be
         // monotonically increasing
@@ -96,6 +96,8 @@ android {
             // Bring in the XML capture files used for automated tests
             // TODO: Work out how to include these in debug builds only
             assets.srcDirs += [ '../tec-library/src/main/assets' ]
+            // Bring in the library files so we get coverage over them
+            java.srcDirs += [ '../tec-library/src/main/java' ]
         }
     }
 }
@@ -105,7 +107,7 @@ base {
 }
 
 dependencies {
-    implementation project(':tec-library')
+    //implementation project(':tec-library')
 
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"

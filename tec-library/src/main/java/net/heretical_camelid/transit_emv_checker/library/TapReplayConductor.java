@@ -155,6 +155,7 @@ public class TapReplayConductor {
         return commandsAndResponses;
     }
 
+/*
     public static void main(String[] args) {
         TapReplayConductor trc;
 
@@ -170,7 +171,7 @@ public class TapReplayConductor {
         EmvTemplate template = trc.build();
         trc.play(template);
     }
-
+*/
     public ArrayList<CommandAndResponse> getCommandsAndResponses() {
         return m_commandsAndResponses;
     }

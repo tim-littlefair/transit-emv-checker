@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This XML file was originally captured from a tap where the
+    card was detected, PPSE command and response were processed
+    but connection broke before the terminal had finished
+    sending the first SELECT APPLICATION command.
+
+    It is not known which card was tapped, but for this scenario
+    it doesn't matter much.
+-->
+<emv_medium>
+    <command_and_response step_number="1" step_name="SELECT CONTACTLESS PPSE">
+        <raw_command>
+            00 A4 04 00 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 00
+        </raw_command>
+        <interpreted_command>
+SELECT CONTACTLESS PPSE
+        </interpreted_command>
+        <raw_response>
+6F 31 84 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 A5 1F BF 0C 1C 61 1A 4F 07 A0 00 00 00 03 10 10 50 0C 56 69 73 61 20 50 72 65 70 61 69 64 87 01 01 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+6F 31 -- File Control Information (FCI) Template
+      84 0E -- Dedicated File (DF) Name
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 (BINARY)
+      A5 1F -- File Control Information (FCI) Proprietary Template
+            BF 0C 1C -- File Control Information (FCI) Issuer Discretionary Data
+                     61 1A -- Application Template
+                           4F 07 -- Application Identifier (AID) - card
+                                 A0 00 00 00 03 10 10 (BINARY)
+                           50 0C -- Application Label
+                                 56 69 73 61 20 50 72 65 70 61 69 64 (=Visa Prepaid)
+                           87 01 -- Application Priority Indicator
+                                 01 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="2" step_name="SELECT APPLICATION BY AID A0000000031010">
+        <raw_command>
+            00 A4 04 00 07 A0 00 00 00 03 10 10 00
+        </raw_command>
+        <interpreted_command>
+SELECT APPLICATION BY AID A0000000031010
+        </interpreted_command>
+        <interpreted_response_status>Exception: Tag was lost.</interpreted_response_status>
+    </command_and_response>
+    <command_and_response step_number="3" step_name="SELECT APPLICATION BY AID A000000003">
+        <raw_command>
+            00 A4 04 00 05 A0 00 00 00 03 00
+        </raw_command>
+        <interpreted_command>
+SELECT APPLICATION BY AID A000000003
+        </interpreted_command>
+        <interpreted_response_status>Exception: Tag was lost.</interpreted_response_status>
+    </command_and_response>
+    <emv_tag tag="4F" name="Application Identifier (AID) - card">
+        <value source="medium" scope="A0000000031010p01">
+            A0 00 00 00 03 10 10
+        </value>
+    </emv_tag>
+    <emv_tag tag="50" name="Application Label">
+        <value source="medium" scope="A0000000031010p01">
+            56 69 73 61 20 50 72 65 70 61 69 64
+        </value>
+    </emv_tag>
+    <emv_tag tag="84" name="Dedicated File (DF) Name">
+        <value source="medium" scope="A0000000031010p01">
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31
+        </value>
+    </emv_tag>
+    <emv_tag tag="87" name="Application Priority Indicator">
+        <value source="medium" scope="A0000000031010p01">
+            01
+        </value>
+    </emv_tag>
+</emv_medium>

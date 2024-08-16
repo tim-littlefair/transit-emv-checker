@@ -1,17 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    This XML file was originally captured using the command line 
+    This XML file was originally captured using the command line
     version of TEC from an expired live Visa card with PAN
-    4065 8900 1641 5406.
-
-    The original captured XML has been manually edited to reinstate the 
-    masked digits of the PAN, so that automated test assertions can be 
-    implemented to confirm that the masking has been successful.
-
-    Manual edits may also be added in future to enable verification
-    of correct masking of the following EMV tags:
-    0x42: Issuer identification number
-    0x5F20: Cardholder name (need to mask ASCII render as well as hex bytes)
+    4065 8900 1641 5398.
 -->
 <emv_medium>
     <command_and_response step_number="1" step_name="SELECT CONTACTLESS PPSE">
@@ -83,7 +74,7 @@ SELECT APPLICATION BY AID A0000000031010
     </command_and_response>
     <command_and_response step_number="3" step_name="GET_PROCESSING_OPTIONS for A0000000031010p01">
         <raw_command>
-            80 A8 00 00 23 83 21 21 80 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 36 00 00 00 00 00 00 36 24 05 09 00 26 D9 D9 C6 00
+            80 A8 00 00 23 83 21 21 80 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 36 00 00 00 00 00 00 36 24 06 08 00 E3 7F C6 2A 00
         </raw_command>
         <interpreted_command>
 GET_PROCESSING_OPTIONS for A0000000031010p01
@@ -94,12 +85,12 @@ tag: 9F03 length: 06 value: 00 00 00 00 00 00
 tag: 9F1A length: 02 value: 00 36
 tag: 95 length: 05 value: 00 00 00 00 00
 tag: 5F2A length: 02 value: 00 36
-tag: 9A length: 03 value: 24 05 09
+tag: 9A length: 03 value: 24 06 08
 tag: 9C length: 01 value: 00
-tag: 9F37 length: 04 value: 26 D9 D9 C6
+tag: 9F37 length: 04 value: E3 7F C6 2A
         </interpreted_command>
         <raw_response>
-77 56 82 02 20 20 94 08 18 01 01 01 10 02 05 00 57 13 40 65 89 00 16 41 54 06 D2 40 22 01 97 66 68 66 23 50 1F 5F 20 02 20 2F 5F 34 01 01 9F 10 07 06 01 12 03 A0 00 00 9F 6C 02 00 00 9F 6E 04 20 70 00 00 9F 26 08 4F BC E7 B6 D1 F3 49 0A 9F 27 01 80 9F 36 02 00 4F 90 00
+77 56 82 02 20 20 94 08 18 01 01 01 10 02 05 00 57 13 40 65 89 FF FF FF 53 98 D2 40 22 01 94 13 70 43 90 50 1F 5F 20 02 20 2F 5F 34 01 01 9F 10 07 06 01 12 03 A0 00 00 9F 6C 02 00 00 9F 6E 04 20 70 00 00 9F 26 08 C7 B7 37 99 86 D9 57 E0 9F 27 01 80 9F 36 02 00 D0 90 00
         </raw_response>
         <interpreted_response_status>SW_9000</interpreted_response_status>
         <interpreted_response_body>
@@ -109,8 +100,8 @@ tag: 9F37 length: 04 value: 26 D9 D9 C6
       94 08 -- Application File Locator (AFL)
             18 01 01 01 10 02 05 00 (BINARY)
       57 13 -- Track 2 Equivalent Data
-            40 65 89 00 16 41 54 06 D2 40 22 01 97 66 68 66
-            23 50 1F (BINARY)
+            40 65 89 FF FF FF 53 98 D2 40 22 01 94 13 70 43
+            90 50 1F (BINARY)
       5F 20 02 -- Cardholder Name
                20 2F (= /)
       5F 34 01 -- Application Primary Account Number (PAN) Sequence Number
@@ -122,11 +113,11 @@ tag: 9F37 length: 04 value: 26 D9 D9 C6
       9F 6E 04 -- Visa Low-Value Payment (VLP) Issuer Authorisation Code
                20 70 00 00 (BINARY)
       9F 26 08 -- Application Cryptogram
-               4F BC E7 B6 D1 F3 49 0A (BINARY)
+               C7 B7 37 99 86 D9 57 E0 (BINARY)
       9F 27 01 -- Cryptogram Information Data
                80 (BINARY)
       9F 36 02 -- Application Transaction Counter (ATC)
-               00 4F (BINARY)
+               00 D0 (BINARY)
         </interpreted_response_body>
     </command_and_response>
     <command_and_response step_number="4" step_name="READ_RECORD 03.01">
@@ -137,13 +128,13 @@ tag: 9F37 length: 04 value: 26 D9 D9 C6
 READ_RECORD 03.01
         </interpreted_command>
         <raw_response>
-70 14 5A 08 40 65 89 00 16 41 54 06 5F 24 03 24 02 29 9F 4A 01 82 90 00
+70 14 5A 08 40 65 89 FF FF FF 53 98 5F 24 03 24 02 29 9F 4A 01 82 90 00
         </raw_response>
         <interpreted_response_status>SW_9000</interpreted_response_status>
         <interpreted_response_body>
 70 14 -- Record Template (EMV Proprietary)
       5A 08 -- Application Primary Account Number (PAN)
-            40 65 89 00 16 41 54 06 (NUMERIC)
+            40 65 89 FF FF FF 53 98 (NUMERIC)
       5F 24 03 -- Application Expiration Date
                24 02 29 (NUMERIC)
       9F 4A 01 -- Static Data Authentication Tag List
@@ -236,7 +227,7 @@ READ_RECORD 02.04
 READ_RECORD 02.05
         </interpreted_command>
         <raw_response>
-70 81 F6 9F 32 01 03 8F 01 09 9F 46 81 B0 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 9F 47 01 03 9F 48 2A E1 A2 C2 A3 13 B0 25 DE BB 1D 13 11 06 D5 9A 4E E3 D6 2D 1C 93 D9 B2 A6 F3 F6 84 A3 5F 24 56 93 21 D6 AD 32 84 4C E4 86 8E 73 9F 69 07 01 18 80 95 3F 00 00 90 00
+70 81 F6 9F 32 01 03 8F 01 09 9F 46 81 B0 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 9F 47 01 03 9F 48 2A 7B 4C C8 96 7B BE DC 19 7A 8A 6E AA D2 EA B1 ED CC 84 BA A2 71 1C 6F A8 8C 30 4F 3E C8 3E 6C 93 A5 57 25 01 2E 19 28 35 AA BD 9F 69 07 01 1A 2A 00 BA 00 00 90 00
         </raw_response>
         <interpreted_response_status>SW_9000</interpreted_response_status>
         <interpreted_response_body>
@@ -260,11 +251,11 @@ READ_RECORD 02.05
          9F 47 01 -- ICC Public Key Exponent
                   03 (BINARY)
          9F 48 2A -- ICC Public Key Remainder
-                  E1 A2 C2 A3 13 B0 25 DE BB 1D 13 11 06 D5 9A 4E
-                  E3 D6 2D 1C 93 D9 B2 A6 F3 F6 84 A3 5F 24 56 93
-                  21 D6 AD 32 84 4C E4 86 8E 73 (BINARY)
+                  7B 4C C8 96 7B BE DC 19 7A 8A 6E AA D2 EA B1 ED
+                  CC 84 BA A2 71 1C 6F A8 8C 30 4F 3E C8 3E 6C 93
+                  A5 57 25 01 2E 19 28 35 AA BD (BINARY)
          9F 69 07 -- UDOL
-                  01 18 80 95 3F 00 00 (BINARY)
+                  01 1A 2A 00 BA 00 00 (BINARY)
         </interpreted_response_body>
     </command_and_response>
     <command_and_response step_number="9" step_name="GET_DATA for tag 9F17">
@@ -290,15 +281,15 @@ GET_DATA for tag 9F17
 GET_DATA for tag 9F36
         </interpreted_command>
         <raw_response>
-9F 36 02 00 4F 90 00
+9F 36 02 00 D0 90 00
         </raw_response>
         <interpreted_response_status>SW_9000</interpreted_response_status>
         <interpreted_response_body>
 9F 36 02 -- Application Transaction Counter (ATC)
-         00 4F (BINARY)
+         00 D0 (BINARY)
         </interpreted_response_body>
     </command_and_response>
-    <app_account_id selection_context="A0000000031010p01" account_id="406589FFFFFF5406.2402.01" />
+    <app_account_id selection_context="A0000000031010p01" account_id="406589FFFFFF5398.2402.01" />
     <emv_tag tag="4F" name="Application Identifier (AID) - card">
         <value source="medium" scope="A0000000031010p01">
             A0 00 00 00 03 10 10
@@ -311,12 +302,12 @@ GET_DATA for tag 9F36
     </emv_tag>
     <emv_tag tag="57" name="Track 2 Equivalent Data">
         <value source="medium" scope="A0000000031010p01">
-            40 65 89 00 16 41 54 06 D2 40 22 01 97 66 68 66 23 50 1F
+            40 65 89 FF FF FF 53 98 D2 40 22 01 94 13 70 43 90 50 1F
         </value>
     </emv_tag>
     <emv_tag tag="5A" name="Application Primary Account Number (PAN)">
         <value source="medium" scope="A0000000031010p01">
-            40 65 89 00 16 41 54 06
+            40 65 89 FF FF FF 53 98
         </value>
     </emv_tag>
     <emv_tag tag="5F20" name="Cardholder Name">
@@ -386,7 +377,7 @@ GET_DATA for tag 9F36
     </emv_tag>
     <emv_tag tag="9A" name="Transaction Date">
         <value source="terminal" scope="A0000000031010p01">
-            24 05 09
+            24 06 08
         </value>
     </emv_tag>
     <emv_tag tag="9C" name="Transaction Type">
@@ -431,7 +422,7 @@ GET_DATA for tag 9F36
     </emv_tag>
     <emv_tag tag="9F26" name="Application Cryptogram">
         <value source="medium" scope="A0000000031010p01">
-            4F BC E7 B6 D1 F3 49 0A
+            C7 B7 37 99 86 D9 57 E0
         </value>
     </emv_tag>
     <emv_tag tag="9F27" name="Cryptogram Information Data">
@@ -446,12 +437,12 @@ GET_DATA for tag 9F36
     </emv_tag>
     <emv_tag tag="9F36" name="Application Transaction Counter (ATC)">
         <value source="medium">
-            00 4F
+            00 D0
         </value>
     </emv_tag>
     <emv_tag tag="9F37" name="Unpredictable Number">
         <value source="terminal" scope="A0000000031010p01">
-            26 D9 D9 C6
+            E3 7F C6 2A
         </value>
     </emv_tag>
     <emv_tag tag="9F38" name="Processing Options Data Object List (PDOL)">
@@ -471,7 +462,7 @@ GET_DATA for tag 9F36
     </emv_tag>
     <emv_tag tag="9F48" name="ICC Public Key Remainder">
         <value source="medium" scope="A0000000031010p01">
-            E1 A2 C2 A3 13 B0 25 DE BB 1D 13 11 06 D5 9A 4E E3 D6 2D 1C 93 D9 B2 A6 F3 F6 84 A3 5F 24 56 93 21 D6 AD 32 84 4C E4 86 8E 73
+            7B 4C C8 96 7B BE DC 19 7A 8A 6E AA D2 EA B1 ED CC 84 BA A2 71 1C 6F A8 8C 30 4F 3E C8 3E 6C 93 A5 57 25 01 2E 19 28 35 AA BD
         </value>
     </emv_tag>
     <emv_tag tag="9F4A" name="Static Data Authentication Tag List">
@@ -496,7 +487,7 @@ GET_DATA for tag 9F36
     </emv_tag>
     <emv_tag tag="9F69" name="UDOL">
         <value source="medium" scope="A0000000031010p01">
-            01 18 80 95 3F 00 00
+            01 1A 2A 00 BA 00 00
         </value>
     </emv_tag>
     <emv_tag tag="9F6C" name="Mag Stripe Application Version Number (Card)">

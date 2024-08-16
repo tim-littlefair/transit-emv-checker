@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This XML file was originally captured using the command line
+    version of TEC from an expired dormant Visa card with PAN
+    4199 7300 8345 5720.
+    This card was mailed out as an unsolicited invitation
+    to have a Visa debit account associated with the
+    Virgin Australia Velocity frequent flyer program,
+    and had never been activated.
+-->
+<emv_medium>
+    <command_and_response step_number="1" step_name="SELECT CONTACTLESS PPSE">
+        <raw_command>
+            00 A4 04 00 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 00
+        </raw_command>
+        <interpreted_command>
+SELECT CONTACTLESS PPSE
+        </interpreted_command>
+        <raw_response>
+6F 31 84 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 A5 1F BF 0C 1C 61 1A 4F 07 A0 00 00 00 03 10 10 50 0C 56 69 73 61 20 50 72 65 70 61 69 64 87 01 01 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+6F 31 -- File Control Information (FCI) Template
+      84 0E -- Dedicated File (DF) Name
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 (BINARY)
+      A5 1F -- File Control Information (FCI) Proprietary Template
+            BF 0C 1C -- File Control Information (FCI) Issuer Discretionary Data
+                     61 1A -- Application Template
+                           4F 07 -- Application Identifier (AID) - card
+                                 A0 00 00 00 03 10 10 (BINARY)
+                           50 0C -- Application Label
+                                 56 69 73 61 20 50 72 65 70 61 69 64 (=Visa Prepaid)
+                           87 01 -- Application Priority Indicator
+                                 01 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="2" step_name="SELECT APPLICATION BY AID A0000000031010">
+        <raw_command>
+            00 A4 04 00 07 A0 00 00 00 03 10 10 00
+        </raw_command>
+        <interpreted_command>
+SELECT APPLICATION BY AID A0000000031010
+        </interpreted_command>
+        <raw_response>
+6F 30 84 07 A0 00 00 00 03 10 10 A5 25 50 0C 56 69 73 61 20 50 72 65 70 61 69 64 87 01 01 9F 38 0C 9F 66 04 9F 02 06 9F 37 04 5F 2A 02 5F 2D 02 65 6E 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+6F 30 -- File Control Information (FCI) Template
+      84 07 -- Dedicated File (DF) Name
+            A0 00 00 00 03 10 10 (BINARY)
+      A5 25 -- File Control Information (FCI) Proprietary Template
+            50 0C -- Application Label
+                  56 69 73 61 20 50 72 65 70 61 69 64 (=Visa Prepaid)
+            87 01 -- Application Priority Indicator
+                  01 (BINARY)
+            9F 38 0C -- Processing Options Data Object List (PDOL)
+                     9F 66 04 -- Terminal Transaction Qualifiers
+                     9F 02 06 -- Amount, Authorised (Numeric)
+                     9F 37 04 -- Unpredictable Number
+                     5F 2A 02 -- Transaction Currency Code
+            5F 2D 02 -- Language Preference
+                     65 6E (=en)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="3" step_name="GET_PROCESSING_OPTIONS for A0000000031010p01">
+        <raw_command>
+            80 A8 00 00 12 83 10 21 80 40 00 00 00 00 00 00 00 D3 FE 77 35 00 36 00
+        </raw_command>
+        <interpreted_command>
+GET_PROCESSING_OPTIONS for A0000000031010p01
+Tags requested in previously received PDOL:
+tag: 9F66 length: 04 value: 21 80 40 00
+tag: 9F02 length: 06 value: 00 00 00 00 00 00
+tag: 9F37 length: 04 value: D3 FE 77 35
+tag: 5F2A length: 02 value: 00 36
+        </interpreted_command>
+        <raw_response>
+77 45 82 02 00 00 57 13 41 99 73 FF FF FF 57 20 D1 81 02 21 10 08 71 82 32 38 3F 5F 20 02 20 2F 5F 34 01 00 9F 10 07 06 00 11 03 A0 00 00 9F 26 08 B3 73 99 72 3E 70 A0 0D 9F 27 01 80 9F 36 02 00 CF 9F 6C 02 30 00 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+77 45 -- Response Message Template Format 2
+      82 02 -- Application Interchange Profile
+            00 00 (BINARY)
+      57 13 -- Track 2 Equivalent Data
+            41 99 73 FF FF FF 57 20 D1 81 02 21 10 08 71 82
+            32 38 3F (BINARY)
+      5F 20 02 -- Cardholder Name
+               20 2F (= /)
+      5F 34 01 -- Application Primary Account Number (PAN) Sequence Number
+               00 (NUMERIC)
+      9F 10 07 -- Issuer Application Data
+               06 00 11 03 A0 00 00 (BINARY)
+      9F 26 08 -- Application Cryptogram
+               B3 73 99 72 3E 70 A0 0D (BINARY)
+      9F 27 01 -- Cryptogram Information Data
+               80 (BINARY)
+      9F 36 02 -- Application Transaction Counter (ATC)
+               00 CF (BINARY)
+      9F 6C 02 -- Mag Stripe Application Version Number (Card)
+               30 00 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="4" step_name="GET_DATA for tag 9F17">
+        <raw_command>
+            80 CA 9F 17 00
+        </raw_command>
+        <interpreted_command>
+GET_DATA for tag 9F17
+        </interpreted_command>
+        <raw_response>
+6A 88
+        </raw_response>
+        <interpreted_response_status>SW_6A88</interpreted_response_status>
+        <interpreted_response_body>
+6A 88 -- Referenced data not found
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="5" step_name="GET_DATA for tag 9F36">
+        <raw_command>
+            80 CA 9F 36 00
+        </raw_command>
+        <interpreted_command>
+GET_DATA for tag 9F36
+        </interpreted_command>
+        <raw_response>
+9F 36 02 00 CF 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+9F 36 02 -- Application Transaction Counter (ATC)
+         00 CF (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <app_account_id selection_context="A0000000031010p01" account_id="419973FFFFFF5720.1810.00" />
+    <emv_tag tag="4F" name="Application Identifier (AID) - card">
+        <value source="medium" scope="A0000000031010p01">
+            A0 00 00 00 03 10 10
+        </value>
+    </emv_tag>
+    <emv_tag tag="50" name="Application Label">
+        <value source="medium" scope="A0000000031010p01">
+            56 69 73 61 20 50 72 65 70 61 69 64
+        </value>
+    </emv_tag>
+    <emv_tag tag="57" name="Track 2 Equivalent Data">
+        <value source="medium" scope="A0000000031010p01">
+            41 99 73 FF FF FF 57 20 D1 81 02 21 10 08 71 82 32 38 3F
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F20" name="Cardholder Name">
+        <value source="medium" scope="A0000000031010p01">
+            20 2F
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F2A" name="Transaction Currency Code">
+        <value source="terminal" scope="A0000000031010p01">
+            00 36
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F2D" name="Language Preference">
+        <value source="medium" scope="A0000000031010p01">
+            65 6E
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F34" name="Application Primary Account Number (PAN) Sequence Number">
+        <value source="medium" scope="A0000000031010p01">
+            00
+        </value>
+    </emv_tag>
+    <emv_tag tag="82" name="Application Interchange Profile">
+        <value source="medium" scope="A0000000031010p01">
+            00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="84" name="Dedicated File (DF) Name">
+        <value source="medium" scope="A0000000031010p01">
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31
+        </value>
+    </emv_tag>
+    <emv_tag tag="87" name="Application Priority Indicator">
+        <value source="medium" scope="A0000000031010p01">
+            01
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F02" name="Amount, Authorised (Numeric)">
+        <value source="terminal" scope="A0000000031010p01">
+            00 00 00 00 00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F10" name="Issuer Application Data">
+        <value source="medium" scope="A0000000031010p01">
+            06 00 11 03 A0 00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F26" name="Application Cryptogram">
+        <value source="medium" scope="A0000000031010p01">
+            B3 73 99 72 3E 70 A0 0D
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F27" name="Cryptogram Information Data">
+        <value source="medium" scope="A0000000031010p01">
+            80
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F36" name="Application Transaction Counter (ATC)">
+        <value source="medium">
+            00 CF
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F37" name="Unpredictable Number">
+        <value source="terminal" scope="A0000000031010p01">
+            D3 FE 77 35
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F38" name="Processing Options Data Object List (PDOL)">
+        <value source="medium" scope="A0000000031010p01">
+            9F 66 04 9F 02 06 9F 37 04 5F 2A 02
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F66" name="Terminal Transaction Qualifiers">
+        <value source="terminal" scope="A0000000031010p01">
+            21 80 40 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F6C" name="Mag Stripe Application Version Number (Card)">
+        <value source="medium" scope="A0000000031010p01">
+            30 00
+        </value>
+    </emv_tag>
+</emv_medium>

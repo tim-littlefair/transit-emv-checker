@@ -142,7 +142,7 @@ public class TapReplayConductor {
                     if (elementName.equals("command_and_response")) {
                         assert carItem != null;
                         assert carItem.rawCommand != null;
-                        assert carItem.rawResponse != null;
+                        // assert carItem.rawResponse != null;
                         TapReplayConductor.LOGGER.info("Adding step: " + carItem.stepName);
                         commandsAndResponses.add(carItem);
                         carItem = null;

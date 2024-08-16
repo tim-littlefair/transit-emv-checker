@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This XML file was originally captured from a tap where the
+    card was detected but connection broke before the terminal
+    received any bytes of the PPSE response.
+
+    It is not known which card was tapped, but for this scenario
+    it doesn't matter much.
+-->
+<emv_medium>
+    <command_and_response step_number="1" step_name="SELECT CONTACTLESS PPSE">
+        <raw_command>
+            00 A4 04 00 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 00
+        </raw_command>
+        <interpreted_command>
+SELECT CONTACTLESS PPSE
+        </interpreted_command>
+        <interpreted_response_status>Exception: Tag was lost.</interpreted_response_status>
+    </command_and_response>
+</emv_medium>

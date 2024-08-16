@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This XML file was originally captured from a tap where the
+    card was detected, PPSE, SELECT APP commands and responses
+    were processed but connection broke before the card had
+    responded to the first GET PROCESSING OPTIONS command.
+
+    It is not known which card was tapped, but for this scenario
+    it doesn't matter much.
+-->
+<emv_medium>
+    <command_and_response step_number="1" step_name="SELECT CONTACTLESS PPSE">
+        <raw_command>
+            00 A4 04 00 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 00
+        </raw_command>
+        <interpreted_command>
+SELECT CONTACTLESS PPSE
+        </interpreted_command>
+        <raw_response>
+6F 31 84 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 A5 1F BF 0C 1C 61 1A 4F 07 A0 00 00 00 03 10 10 50 0C 56 69 73 61 20 50 72 65 70 61 69 64 87 01 01 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+6F 31 -- File Control Information (FCI) Template
+      84 0E -- Dedicated File (DF) Name
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 (BINARY)
+      A5 1F -- File Control Information (FCI) Proprietary Template
+            BF 0C 1C -- File Control Information (FCI) Issuer Discretionary Data
+                     61 1A -- Application Template
+                           4F 07 -- Application Identifier (AID) - card
+                                 A0 00 00 00 03 10 10 (BINARY)
+                           50 0C -- Application Label
+                                 56 69 73 61 20 50 72 65 70 61 69 64 (=Visa Prepaid)
+                           87 01 -- Application Priority Indicator
+                                 01 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="2" step_name="SELECT APPLICATION BY AID A0000000031010">
+        <raw_command>
+            00 A4 04 00 07 A0 00 00 00 03 10 10 00
+        </raw_command>
+        <interpreted_command>
+SELECT APPLICATION BY AID A0000000031010
+        </interpreted_command>
+        <raw_response>
+6F 5E 84 07 A0 00 00 00 03 10 10 A5 53 50 0C 56 69 73 61 20 50 72 65 70 61 69 64 87 01 01 5F 2D 02 65 6E 9F 12 10 56 69 73 61 20 54 72 61 76 65 6C 4D 6F 6E 65 79 9F 11 01 01 9F 38 18 9F 66 04 9F 02 06 9F 03 06 9F 1A 02 95 05 5F 2A 02 9A 03 9C 01 9F 37 04 BF 0C 08 9F 5A 05 40 00 36 00 36 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+6F 5E -- File Control Information (FCI) Template
+      84 07 -- Dedicated File (DF) Name
+            A0 00 00 00 03 10 10 (BINARY)
+      A5 53 -- File Control Information (FCI) Proprietary Template
+            50 0C -- Application Label
+                  56 69 73 61 20 50 72 65 70 61 69 64 (=Visa Prepaid)
+            87 01 -- Application Priority Indicator
+                  01 (BINARY)
+            5F 2D 02 -- Language Preference
+                     65 6E (=en)
+            9F 12 10 -- Application Preferred Name
+                     56 69 73 61 20 54 72 61 76 65 6C 4D 6F 6E 65 79 (=Visa TravelMoney)
+            9F 11 01 -- Issuer Code Table Index
+                     01 (NUMERIC)
+            9F 38 18 -- Processing Options Data Object List (PDOL)
+                     9F 66 04 -- Terminal Transaction Qualifiers
+                     9F 02 06 -- Amount, Authorised (Numeric)
+                     9F 03 06 -- Amount, Other (Numeric)
+                     9F 1A 02 -- Terminal Country Code
+                     95 05 -- Terminal Verification Results (TVR)
+                     5F 2A 02 -- Transaction Currency Code
+                     9A 03 -- Transaction Date
+                     9C 01 -- Transaction Type
+                     9F 37 04 -- Unpredictable Number
+            BF 0C 08 -- File Control Information (FCI) Issuer Discretionary Data
+                     9F 5A 05 -- Terminal transaction Type (Interac)
+                              40 00 36 00 36 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="3" step_name="GET_PROCESSING_OPTIONS for A0000000031010p01">
+        <raw_command>
+            80 A8 00 00 23 83 21 21 80 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 36 00 00 00 00 00 00 36 24 05 29 00 1D E2 8D 65 00
+        </raw_command>
+        <interpreted_command>
+GET_PROCESSING_OPTIONS for A0000000031010p01
+Tags requested in previously received PDOL:
+tag: 9F66 length: 04 value: 21 80 40 00
+tag: 9F02 length: 06 value: 00 00 00 00 00 00
+tag: 9F03 length: 06 value: 00 00 00 00 00 00
+tag: 9F1A length: 02 value: 00 36
+tag: 95 length: 05 value: 00 00 00 00 00
+tag: 5F2A length: 02 value: 00 36
+tag: 9A length: 03 value: 24 05 29
+tag: 9C length: 01 value: 00
+tag: 9F37 length: 04 value: 1D E2 8D 65
+        </interpreted_command>
+        <interpreted_response_status>Exception: Tag was lost.</interpreted_response_status>
+    </command_and_response>
+    <emv_tag tag="4F" name="Application Identifier (AID) - card">
+        <value source="medium" scope="A0000000031010p01">
+            A0 00 00 00 03 10 10
+        </value>
+    </emv_tag>
+    <emv_tag tag="50" name="Application Label">
+        <value source="medium" scope="A0000000031010p01">
+            56 69 73 61 20 50 72 65 70 61 69 64
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F2A" name="Transaction Currency Code">
+        <value source="terminal" scope="A0000000031010p01">
+            00 36
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F2D" name="Language Preference">
+        <value source="medium" scope="A0000000031010p01">
+            65 6E
+        </value>
+    </emv_tag>
+    <emv_tag tag="84" name="Dedicated File (DF) Name">
+        <value source="medium" scope="A0000000031010p01">
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31
+        </value>
+    </emv_tag>
+    <emv_tag tag="87" name="Application Priority Indicator">
+        <value source="medium" scope="A0000000031010p01">
+            01
+        </value>
+    </emv_tag>
+    <emv_tag tag="95" name="Terminal Verification Results (TVR)">
+        <value source="terminal" scope="A0000000031010p01">
+            00 00 00 00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9A" name="Transaction Date">
+        <value source="terminal" scope="A0000000031010p01">
+            24 05 29
+        </value>
+    </emv_tag>
+    <emv_tag tag="9C" name="Transaction Type">
+        <value source="terminal" scope="A0000000031010p01">
+            00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F02" name="Amount, Authorised (Numeric)">
+        <value source="terminal" scope="A0000000031010p01">
+            00 00 00 00 00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F03" name="Amount, Other (Numeric)">
+        <value source="terminal" scope="A0000000031010p01">
+            00 00 00 00 00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F11" name="Issuer Code Table Index">
+        <value source="medium" scope="A0000000031010p01">
+            01
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F12" name="Application Preferred Name">
+        <value source="medium" scope="A0000000031010p01">
+            56 69 73 61 20 54 72 61 76 65 6C 4D 6F 6E 65 79
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F1A" name="Terminal Country Code">
+        <value source="terminal" scope="A0000000031010p01">
+            00 36
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F37" name="Unpredictable Number">
+        <value source="terminal" scope="A0000000031010p01">
+            1D E2 8D 65
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F38" name="Processing Options Data Object List (PDOL)">
+        <value source="medium" scope="A0000000031010p01">
+            9F 66 04 9F 02 06 9F 03 06 9F 1A 02 95 05 5F 2A 02 9A 03 9C 01 9F 37 04
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F5A" name="Terminal transaction Type (Interac)">
+        <value source="medium" scope="A0000000031010p01">
+            40 00 36 00 36
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F66" name="Terminal Transaction Qualifiers">
+        <value source="terminal" scope="A0000000031010p01">
+            21 80 40 00
+        </value>
+    </emv_tag>
+</emv_medium>

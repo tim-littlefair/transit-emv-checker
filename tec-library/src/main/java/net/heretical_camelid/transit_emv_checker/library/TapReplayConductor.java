@@ -93,20 +93,22 @@ public class TapReplayConductor {
     public void play(EmvTemplate template) {
         try {
             EmvCard card = template.readEmvCard();
+            boolean maskingSucceeded = m_pciMaskingAgent.maskAccountData(m_apduObserver);
+            assert maskingSucceeded = true;
+
+            m_summary = m_apduObserver.summary();
+            TransitCapabilityChecker tcc = new TransitCapabilityChecker(m_apduObserver);
+            m_transitCapabilities = tcc.capabilityReport();
+            final boolean _CAPTURE_ONLY_FALSE = false;
+            m_diagnosticXml = m_apduObserver.toXmlString(_CAPTURE_ONLY_FALSE);
+            final boolean _CAPTURE_ONLY_TRUE = true;
+            m_captureOnlyXml = m_apduObserver.toXmlString(_CAPTURE_ONLY_TRUE);
         } catch (CommunicationException e) {
-            throw new RuntimeException(e);
+            // For failed connection scenarios this is acceptable
+            LOGGER.warn(e.getMessage());
         }
 
-        boolean maskingSucceeded = m_pciMaskingAgent.maskAccountData(m_apduObserver);
-        assert maskingSucceeded = true;
 
-        m_summary = m_apduObserver.summary();
-        TransitCapabilityChecker tcc = new TransitCapabilityChecker(m_apduObserver);
-        m_transitCapabilities = tcc.capabilityReport();
-        final boolean _CAPTURE_ONLY_FALSE = false;
-        m_diagnosticXml = m_apduObserver.toXmlString(_CAPTURE_ONLY_FALSE);
-        final boolean _CAPTURE_ONLY_TRUE = true;
-        m_captureOnlyXml = m_apduObserver.toXmlString(_CAPTURE_ONLY_TRUE);
     }
 
     public boolean doPCIMasking() {
@@ -131,10 +133,21 @@ public class TapReplayConductor {
                     } else {
                         if (elementName.equals("raw_command")) {
                             assert carItem != null;
-                            carItem.rawCommand = BytesUtils.fromString(reader.getElementText());
+                            String elementTextNoSpaces = reader.getElementText().replace(" ","");
+                            carItem.rawCommand = BytesUtils.fromString(elementTextNoSpaces);
                         } else if (elementName.equals("raw_response")) {
                             assert carItem != null;
-                            carItem.rawResponse = BytesUtils.fromString(reader.getElementText());
+                            String elementTextNoSpaces = reader.getElementText().replace(" ","");
+                            try {
+                                carItem.rawResponse = BytesUtils.fromString(elementTextNoSpaces);
+                            }
+                            catch(IllegalArgumentException e) {
+                                LOGGER.warn(
+                                    "elementTextNoSpaces = %s length %d",
+                                    elementTextNoSpaces, elementTextNoSpaces.length()
+                                );
+                                carItem.rawResponse = null;
+                            }
                         }
                     }
                 } else if (nextToken == XMLStreamConstants.END_ELEMENT) {

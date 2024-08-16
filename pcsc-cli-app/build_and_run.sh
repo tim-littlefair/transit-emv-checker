@@ -4,15 +4,19 @@ variant=pcsc-cli-app
 version=0.1.0
 mainclass=net.heretical_camelid.transit_emv_checker.pcsc_cli_app.Main
 
-rm -rf */build
+if [ ! "$1" = "--run-only" ]
+then
+  rm -rf */build
 
-# Using the gradlew file generated as part of the IntelliJ IDEA project
-gradle=./gradlew
+  # Using the gradlew file generated as part of the IntelliJ IDEA project
+  gradle=./gradlew
 
-$gradle clean
-
-$gradle uberJar
-gradle_status=$?
+  $gradle clean
+  $gradle uberJar
+  gradle_status=$?
+else
+  gradle_status=0
+fi
 
 if [ "$gradle_status" -eq "0 " ]
 then

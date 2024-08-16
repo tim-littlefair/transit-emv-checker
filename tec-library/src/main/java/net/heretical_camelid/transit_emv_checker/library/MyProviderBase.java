@@ -33,13 +33,17 @@ public abstract class MyProviderBase implements IProvider {
         newCommandAndResponse.rawCommand = pCommand;
 		try {
             ret = implementationTransceive(pCommand, buffer);
-            // The raw response stored in m_apduStore will be 
-            // updated to mask out PCI CHD and SAD, so we clone
-            // the original response array so that we are able
-            // to return the unmasked value to the upstream 
-            // code in package com.github.devnied.emvnfccard:library
-            // allowing the library to capture the PAN.
-            newCommandAndResponse.rawResponse = Arrays.copyOfRange(ret, 0, ret.length);
+            if(ret!=null) {
+                // The raw response stored in m_apduStore will be
+                // updated to mask out PCI CHD and SAD, so we clone
+                // the original response array so that we are able
+                // to return the unmasked value to the upstream
+                // code in package com.github.devnied.emvnfccard:library
+                // allowing the library to capture the PAN.
+                newCommandAndResponse.rawResponse = Arrays.copyOfRange(ret, 0, ret.length);
+            } else {
+                newCommandAndResponse.rawResponse = null;
+            }
 		} catch (CommunicationException e) {
             newCommandAndResponse.interpretedResponseStatus = "Exception: " + e.getMessage();
 		}

@@ -3,5 +3,5 @@
 ./gradlew clean
 ./gradlew build
 # ./gradlew defaultGoogleATDDebugAndroidTest
-./gradlew connectedDebugAndroidTest
+./gradlew createDebugCoverageReport
 

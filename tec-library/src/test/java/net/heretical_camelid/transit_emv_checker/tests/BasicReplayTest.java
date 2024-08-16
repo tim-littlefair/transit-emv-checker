@@ -17,11 +17,81 @@ public class BasicReplayTest  {
     @Test
     @Tag("run_with_gradle")
     public void testTapReplay() {
+        String mediaCaptureBasename = "visa-exp2402-5406";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+
+        /*
+         * Assertions related to the summary, transitCapabilities
+         * and diagnosticXml content
+         */
+
+        // Assertion related to summary
+        assertFalse(result.summary().contains("4065890016415406")); // Actual PAN simulated in visa-exp2402-5406.xml
+        assertTrue(result.summary().contains("406589FFFFFF5406"));  // Truncated PAN
+
+        // Assertions related to transitCapabilities
+        assertTrue(result.transitCapabilities().contains(
+            "AIP byte 1 bit 1 not set => CDA not supported (but DDA is)"
+        ));
+        assertTrue(result.transitCapabilities().contains(
+            "ODA supported - using CAPK #09"
+        ));
+        assertTrue(result.transitCapabilities().contains(
+            "Application validity period ended 24 02 29"
+        ));
+
+        // Assertions related to the diagnostic XML ()
+
+        // PAN masking
+        assertTrue(!result.diagnosticXml().contains("4065890016415406"));
+        assertTrue(result.diagnosticXml().contains("406589FFFFFF5406"));
+        assertTrue(!result.diagnosticXml().contains("40 65 89 00 16 41 54 06"));
+        assertTrue(result.diagnosticXml().contains("40 65 89 FF FF FF 54 06"));
+
+        // Cardholder name masking
+        // The rendered data in the input XML file for tag 0x5F20
+        // looks like: "20 2F (= /)"
+        // The hex bytes '20 2F' should be replaced by 'FF FF'
+        // The ASCII  rendering ' /' should be replaced by '??'
+        assertTrue(!result.diagnosticXml().contains("20 2F (= /)"));
+        assertTrue(result.diagnosticXml().contains("FF FF (=??)"));
+    }
+
+    @Test
+    @Tag("run_with_gradle")
+    public void testReplay0884() {
+        String mediaCaptureBasename = "visa-exp2202-0884";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+    }
+
+    @Test
+    @Tag("run_with_gradle")
+    public void testReplay5398() {
+        String mediaCaptureBasename = "visa-exp2402-5398";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+    }
+
+    @Test
+    @Tag("run_with_gradle")
+    public void testReplay3033() {
+        String mediaCaptureBasename = "visa_auspost-exp1708-3033";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+    }
+
+    @Test
+    @Tag("run_with_gradle")
+    public void testReplay5720() {
+        String mediaCaptureBasename = "visa_velocity-exp1810-5720";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+    }
+
+    private static Result replayMediaCapture(String mediaCaptureBasename) {
         FileInputStream captureXmlStream;
         try {
-            captureXmlStream = new FileInputStream(
-                "src/main/assets/media_captures/visa-exp2402-5406.xml"
-            );
+            captureXmlStream = new FileInputStream(String.format(
+                "src/main/assets/media_captures/%s.xml",
+                mediaCaptureBasename
+            ));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -42,42 +112,11 @@ public class BasicReplayTest  {
 
         String diagnosticXml = trc.diagnosticXml();
         System.out.println("Diagnostic XML:\n" + diagnosticXml);
+        Result result = new Result(summary, transitCapabilities, diagnosticXml);
+        return result;
+    }
 
-        /* 
-         * Assertions related to the summary, transitCapabilities 
-         * and diagnosticXml content
-         */
-
-        // Assertion related to summary
-        assertFalse(summary.contains("4065890016415406")); // Actual PAN simulated in visa-exp2402-5406.xml
-        assertTrue(summary.contains("406589FFFFFF5406"));  // Truncated PAN 
-
-        // Assertions related to transitCapabilities
-        assertTrue(transitCapabilities.contains(
-            "AIP byte 1 bit 1 not set => CDA not supported (but DDA is)"
-        ));
-        assertTrue(transitCapabilities.contains(
-            "ODA supported - using CAPK #09"
-        ));
-        assertTrue(transitCapabilities.contains(
-            "Application validity period ended 24 02 29"
-        ));
-
-        // Assertions related to the diagnostic XML ()
-
-        // PAN masking
-        assertTrue(!diagnosticXml.contains("4065890016415406"));
-        assertTrue(diagnosticXml.contains("406589FFFFFF5406"));
-        assertTrue(!diagnosticXml.contains("40 65 89 00 16 41 54 06"));
-        assertTrue(diagnosticXml.contains("40 65 89 FF FF FF 54 06"));
-
-        // Cardholder name masking
-        // The rendered data in the input XML file for tag 0x5F20 
-        // looks like: "20 2F (= /)"
-        // The hex bytes '20 2F' should be replaced by 'FF FF'
-        // The ASCII  rendering ' /' should be replaced by '??'
-        assertTrue(!diagnosticXml.contains("20 2F (= /)"));
-        assertTrue(diagnosticXml.contains("FF FF (=??)"));
+    private record Result(String summary, String transitCapabilities, String diagnosticXml) {
     }
 
 }

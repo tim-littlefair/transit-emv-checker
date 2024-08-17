@@ -2,6 +2,10 @@
 
 ./gradlew clean
 ./gradlew build
-# ./gradlew defaultGoogleATDDebugAndroidTest
-./gradlew createDebugCoverageReport
+
+# Test on a VM managed by Gradle - presently does not collect coverage
+./gradlew defaultGoogleATDDebugAndroidTest
+
+# Test on a physical device - will fail if no devices connected
+# ./gradlew createDebugCoverageReport
 

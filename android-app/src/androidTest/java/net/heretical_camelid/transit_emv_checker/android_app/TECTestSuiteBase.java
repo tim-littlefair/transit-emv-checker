@@ -64,13 +64,13 @@ public class TECTestSuiteBase {
     static final Logger LOGGER = LoggerFactory.getLogger(TEC_UiTestSuite.class);
     private static final String TEC_ANDROID_APP_PACKAGE =
         "net.heretical_camelid.transit_emv_checker.android_app";
-    private static final int _LAUNCH_TIMEOUT_SECONDS = 30;
+    private static final int _LAUNCH_TIMEOUT_SECONDS = 3;
     // At any point where we are waiting for a UI element to
     // appear, we use this timeout
-    private static final int _UI_APPEAR_TIMEOUT_SECONDS = 10;
+    private static final int _UI_APPEAR_TIMEOUT_SECONDS = 2;
     // At any point where we are waiting for a UI element to change
     // state, we use this unconditional sleep
-    protected static final int _UI_CHANGE_SLEEP_SECONDS = 2;
+    protected static final int _UI_CHANGE_SLEEP_SECONDS = 1;
     protected UiDevice mDevice;
 
     static Matcher<View> childAtPosition(
@@ -129,7 +129,7 @@ public class TECTestSuiteBase {
 
     @After
     public void waitOnFinalScreenForVisualInspection() {
-        final int _END_OF_RUN_SLEEP_SECONDS = 5;
+        final int _END_OF_RUN_SLEEP_SECONDS = 2;
         sleep(_END_OF_RUN_SLEEP_SECONDS);
     }
 
@@ -166,14 +166,10 @@ public class TECTestSuiteBase {
         String visibleButtonText;
         do {
             sleep(_UI_CHANGE_SLEEP_SECONDS);
-            sleep(_UI_CHANGE_SLEEP_SECONDS);
-            sleep(_UI_CHANGE_SLEEP_SECONDS);
             visibleButton = mDevice.wait(Until.findObject(
                 By.text(buttonPattern)
             ), _UI_APPEAR_TIMEOUT_SECONDS * 1000);
             assertThat(visibleButton, is(notNullValue()));
-            sleep(_UI_CHANGE_SLEEP_SECONDS);
-            sleep(_UI_CHANGE_SLEEP_SECONDS);
             sleep(_UI_CHANGE_SLEEP_SECONDS);
             visibleButtonText = visibleButton.getText();
             LOGGER.info("Button text: " + visibleButtonText);

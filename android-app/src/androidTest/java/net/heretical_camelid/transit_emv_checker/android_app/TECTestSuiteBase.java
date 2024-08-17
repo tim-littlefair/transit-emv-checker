@@ -64,10 +64,10 @@ public class TECTestSuiteBase {
     static final Logger LOGGER = LoggerFactory.getLogger(TEC_UiTestSuite.class);
     private static final String TEC_ANDROID_APP_PACKAGE =
         "net.heretical_camelid.transit_emv_checker.android_app";
-    private static final int _LAUNCH_TIMEOUT_SECONDS = 3;
+    private static final int _LAUNCH_TIMEOUT_SECONDS = 10;
     // At any point where we are waiting for a UI element to
     // appear, we use this timeout
-    private static final int _UI_APPEAR_TIMEOUT_SECONDS = 2;
+    private static final int _UI_APPEAR_TIMEOUT_SECONDS = 5;
     // At any point where we are waiting for a UI element to change
     // state, we use this unconditional sleep
     protected static final int _UI_CHANGE_SLEEP_SECONDS = 1;

@@ -11,7 +11,7 @@ generate_build_id() {
   if [ "$diff_hash3" = "e3b" ]
   then
     # If git diff returned an empty stream, $diff_hash3 will be 'e3b'
-    # and the build_id is just head_has7
+    # and the build_id is just $head_hash7
     build_id=$head_hash7
   else
     build_id=$head_hash7-$diff_hash3
@@ -45,6 +45,7 @@ export build_id
 echo build_id=$build_id
 build_dir=_work/tec-build-$build_id
 mkdir $build_dir
+git diff > $build_dir/$build_id.patch
 export githash=$build_id
 
 if [ "$1" = "--rehearse-release" ]
@@ -59,4 +60,3 @@ then
   build_release
 fi
 
-echo 'firefox --new-instance $build_dir 2> /dev/null'

@@ -7,29 +7,18 @@
 # if the diff is empty, the separator and the diff hash are omitted
 generate_build_id() {
   head_hash7=$(git rev-parse HEAD | cut -c1-7)
-  diff_text=$(git diff)
-  if [ -z "$diff_text" ]
+  diff_hash3=$(git diff | sha256sum - | cut -c1-3)
+  if [ "$diff_hash3" = "e3b" ]
   then
+    # If git diff returned an empty stream, $diff_hash3 will be 'e3b'
+    # and the build_id is just head_has7
     build_id=$head_hash7
   else
-    build_id=$head_hash7-$(git diff | sha256sum - | cut -c1-3)
+    build_id=$head_hash7-$diff_hash3
   fi
 }
 
-generate_build_id
-export build_id
-echo build_id=$build_id
-build_dir=_work/tec-build-$build_id
-export githash=$build_id
-
-if [ "$1" = "--rehearse-release" ]
-then
-    ./gradlew clean build bundleRelease lintVitalReportRelease
-    mkdir $build_dir
-    echo Copying artifacts to $build_dir
-    find android-app/build/outputs/bundle -name *.aab -exec cp {} $build_dir \;
-    find android-app/build/reports/*.html -exec cp {} $build_dir \;
-else
+build_debug_and_coverage() {
   ./gradlew clean
   ./gradlew build
 
@@ -44,7 +33,33 @@ else
   cp -R android-app/build/reports/lint-results-debug.html $build_dir/android-app_lint.html
   cp -R android-app/build/reports/androidTests/managedDevice/debug/allDevices android-app_tests
   cp -R android-app/build/reports/coverage/androidTest/debug/managedDevice android-app_coverage
+  find android-app/build -name *.png -exec cp -f {} $build_dir \;
+}
+
+build_release() {
+    ./gradlew build bundleRelease lintVitalReportRelease
+    echo Copying artifacts to $build_dir
+    find android-app/build/outputs/bundle -name *.aab -exec cp {} $build_dir \;
+    cp android-app/build/reports/*.html $build_dir
+}
+
+generate_build_id
+export build_id
+echo build_id=$build_id
+build_dir=_work/tec-build-$build_id
+mkdir $build_dir
+export githash=$build_id
+
+if [ "$1" = "--rehearse-release" ]
+then
+  build_release
+else
+  build_debug_and_coverage
 fi
 
+if [ "$1" = "--execute-release" ]
+then
+  build_release
+fi
 
-echo "firefox --new-instance $build_dir 2> /dev/null"
+echo 'firefox --new-instance $build_dir 2> /dev/null'

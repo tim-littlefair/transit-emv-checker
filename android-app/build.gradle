@@ -30,7 +30,7 @@ android {
         // 2 digits each for for major, minor, patch version number
         // 1 trailing digit starts at zero can be updated for successive
         // attempts within the same release number
-        versionCode 300001031
+        versionCode 300001032
         // For builds triggered under build_and_test_everything.sh
         // where the working directory exactly matches git HEAD,
         // the 7-hex-prefix of the current git HEAD hash will
@@ -170,9 +170,15 @@ licenseReport {
     useVariantSpecificAssetDirs = false
 }
 
-// Method for getting coverage data over a library from android instrumented
-// test runs
-// https://stackoverflow.com/a/58438789
+project.afterEvaluate {
+    tasks.withType(JacocoReport).configureEach {
+        println(build.dependsOn)
+        build.dependsOn.remove("connectedDebugAndroidTest")
+
+    }
+}
+
+
 apply plugin: 'jacoco'
 evaluationDependsOn ':tec-library'
 tasks.withType(JacocoReport).configureEach {
@@ -181,6 +187,7 @@ tasks.withType(JacocoReport).configureEach {
     additionalSourceDirs.from otherSourceSet.allJava
     additionalClassDirs.from otherSourceSet.output
 }
+
 
 
 

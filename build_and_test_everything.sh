@@ -22,17 +22,14 @@ build_debug_and_coverage() {
   ./gradlew clean
   ./gradlew build
 
-  # Test on a VM managed by Gradle - presently does not collect coverage
-  #./gradlew defaultGoogleATDDebugAndroidTest
-
-  # Test on a physical device - will fail if no devices connected
-  ./gradlew createDebugCoverageReport
+  # Test on a VM managed by Gradle
+  ./gradlew createManagedDeviceDebugAndroidTestCoverageReport
 
   cp -R tec-library/build/reports/tests/test $build_dir/tec-library_tests
   cp -R tec-library/build/reports/jacoco/test/html/ $build_dir/tec-library_coverage
   cp -R android-app/build/reports/lint-results-debug.html $build_dir/android-app_lint.html
-  cp -R android-app/build/reports/androidTests/managedDevice/debug/allDevices android-app_tests
-  cp -R android-app/build/reports/coverage/androidTest/debug/managedDevice android-app_coverage
+  cp -R android-app/build/reports/androidTests/managedDevice/debug/defaultGoogleATD $build_dir/android-app_tests
+  cp -R android-app/build/reports/coverage/androidTest/debug/managedDevice $build_dir/android-app_coverage
   find android-app/build -name *.png -exec cp -f {} $build_dir \;
 }
 

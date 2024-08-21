@@ -5,13 +5,13 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
-// Following recipe for keeping key secrets out of git
-// https://developer.android.com/studio/publish/app-signing#secure-shared-keystore
-// The filename in the next line will be rewritten for signed builds
+def kspath = "$System.env.kspath"
+def vname_suffix = "dirty"
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file("replace_with_keystore_properties_path")
+def keystorePropertiesFile = rootProject.file("$kspath")
 if(keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    vname_suffix="$System.env.githash"
 }
 
 android {
@@ -30,14 +30,19 @@ android {
         // 2 digits each for for major, minor, patch version number
         // 1 trailing digit starts at zero can be updated for successive
         // attempts within the same release number
-        versionCode 300001030
-        // CI script update_build.sh will substitute the 7 hex digit
-        // prefix of the current git hash in place of -dirty in the
-        // line below.
-        // For non-CI builds, the -dirty suffix will be replaced by
-        // -devbuild-{timestamp} where the version name appears
-        // in the about page.
-        versionName "0.1.3-dirty"
+        versionCode 300001031
+        // For builds triggered under build_and_test_everything.sh
+        // where the working directory exactly matches git HEAD,
+        // the 7-hex-prefix of the current git HEAD hash will
+        // be substituted for the $vname_suffix variable
+        // in the line below.
+        // For other builds, the variable may include an
+        // additional 3-hex-digit suffix derived from the
+        // hash of git HEAD, or may be the string 'dirty'.
+
+        // Builds done direcly using .gradlew will use the
+        // value 'dirty' in place of the hash suffix.
+        versionName "0.1.3-$vname_suffix"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

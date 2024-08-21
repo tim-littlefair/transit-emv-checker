@@ -170,26 +170,12 @@ licenseReport {
 // https://stackoverflow.com/a/58438789
 apply plugin: 'jacoco'
 evaluationDependsOn ':tec-library'
-tasks.withType(JacocoReport) {
+tasks.withType(JacocoReport).configureEach {
     apply plugin: 'java-library'
     def otherSourceSet = project(':tec-library').sourceSets.main
     additionalSourceDirs.from otherSourceSet.allJava
     additionalClassDirs.from otherSourceSet.output
 }
 
-/*
 
-connectedAndroidTest {
-    useJUnitPlatform {
-        includeTags "run_with_gradle"
-    }
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-    finalizedBy jacocoTestReport
-}
 
-jacocoTestReport {
-    dependsOn  connectedAndroidTest
-}
-*/

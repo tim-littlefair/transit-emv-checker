@@ -15,12 +15,13 @@ then
   $gradle uberJar
   gradle_status=$?
 else
+  shift
   gradle_status=0
 fi
 
 if [ "$gradle_status" -eq "0 " ]
 then
-    java -cp $variant/build/libs/$variant-$version-uber.jar $mainclass
+    java -cp $variant/build/libs/$variant-$version-uber.jar $mainclass $*
 else
     echo gradle_status=$gradle_status
 fi

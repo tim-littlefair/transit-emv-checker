@@ -1,5 +1,5 @@
 package net.heretical_camelid.transit_emv_checker.tests;
-import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
+import net.heretical_camelid.transit_emv_checker.library.TapConductor;
 import net.heretical_camelid.transit_emv_checker.library.APDUObserver;
 import net.heretical_camelid.transit_emv_checker.library.TransitCapabilityChecker;
 import org.junit.jupiter.api.Test;
@@ -97,8 +97,8 @@ public class BasicReplayTest  {
         }
         XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
 
-        TapReplayConductor trc = TapReplayConductor.createTapReplayConductor(
-            xmlInFact, captureXmlStream, null
+        TapConductor trc = TapConductor.createReplayTapConductor(
+            null, xmlInFact, captureXmlStream
         );
 
         assertTrue(trc.doPCIMasking());

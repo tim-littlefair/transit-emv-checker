@@ -9,13 +9,15 @@ import java.util.Arrays;
 
 public class TapReplayProvider extends MyProviderBase implements IProvider {
 
-    final TapReplayConductor m_trc;
+    final TapConductor m_trc;
+    final TapReplayAgent m_tra;
     final ArrayList<CommandAndResponse> m_commandsAndResponses;
     int m_stepIndex;
 
-    public TapReplayProvider(TapReplayConductor trc) {
+    public TapReplayProvider(TapReplayAgent tra, TapConductor trc) {
+        m_tra = tra;
         m_trc = trc;
-        m_commandsAndResponses = m_trc.getCommandsAndResponses();
+        m_commandsAndResponses = m_tra.getCommandsAndResponses();
         m_stepIndex = 0;
         setApduStore(trc.getAPDUObserver());
     }
@@ -29,7 +31,7 @@ public class TapReplayProvider extends MyProviderBase implements IProvider {
         // by the framework is used unchanged, used with substitutions,
         // or replaced entirely by the command which was captured when
         // the replay data was generated.
-        TapReplayArbiter.ReplayCompareOutcome commandOutcome = m_trc.getArbiter().compareAPDU(
+        TapReplayArbiter.ReplayCompareOutcome commandOutcome = m_tra.getArbiter().compareAPDU(
             stepCarItem.stepName,
             TapReplayArbiter.APDUDirection.TERMINAL_TO_MEDIA,
             pCommand, replayCommand
@@ -63,7 +65,7 @@ public class TapReplayProvider extends MyProviderBase implements IProvider {
         }
 
         final byte[] selectedResponse;
-        TapReplayArbiter.ReplayCompareOutcome responseOutcome = m_trc.getArbiter().compareAPDU(
+        TapReplayArbiter.ReplayCompareOutcome responseOutcome = m_tra.getArbiter().compareAPDU(
             stepCarItem.stepName,
             TapReplayArbiter.APDUDirection.MEDIA_TO_TERMINAL,
             substitutedReplayResponse, replayResponse

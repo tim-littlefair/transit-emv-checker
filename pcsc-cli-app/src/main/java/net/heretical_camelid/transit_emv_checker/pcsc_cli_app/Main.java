@@ -117,8 +117,8 @@ public class Main {
 						throw new RuntimeException(e);
 					}
 					XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
-					TapReplayConductor trc = TapReplayConductor.createTapReplayConductor(
-						xmlInFact, captureXmlStream, null
+					TapConductor trc = TapConductor.createReplayTapConductor(
+						null, xmlInFact, captureXmlStream
 					);
 					boolean pciMaskingOk = trc.doPCIMasking();
 					if (pciMaskingOk == false) {

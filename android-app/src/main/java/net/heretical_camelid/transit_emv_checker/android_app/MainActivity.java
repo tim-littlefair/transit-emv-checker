@@ -32,7 +32,8 @@ import net.heretical_camelid.transit_emv_checker.android_app.databinding.Activit
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeFragment;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeViewModel;
 import net.heretical_camelid.transit_emv_checker.android_app.ui.html.HtmlViewModel;
-import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
+import net.heretical_camelid.transit_emv_checker.library.TapConductor;
+import net.heretical_camelid.transit_emv_checker.library.TapReplayAgent;
 
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -74,16 +75,21 @@ public class MainActivity extends AppCompatActivity {
     // Ugly, will have to do until we have a better way
     static public MainActivity s_activeInstance = null;
 
-    @NonNull TapReplayConductor replayCapturedTap(String mediaAssetName, ITerminal terminal) {
-        TapReplayConductor trc;
+    @NonNull
+    TapConductor replayCapturedTap(String mediaAssetName, ITerminal terminal) {
+        TapConductor trc;
         String assetFilename = String.format("media_captures/%s.xml", mediaAssetName);
         try {
             Context context = ApplicationProvider.getApplicationContext();
             InputStream captureXmlStream = context.getAssets().open(assetFilename);
-            trc = TapReplayConductor.createTapReplayConductor(
+            TapReplayAgent tapReplayAgent=new TapReplayAgent(
                 XMLInputFactory.newInstance(),
-                captureXmlStream,
-                terminal
+                captureXmlStream
+            );
+            trc = TapConductor.createReplayTapConductor(
+                terminal,
+                XMLInputFactory.newInstance(),
+                captureXmlStream
             );
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);

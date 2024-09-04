@@ -27,30 +27,35 @@ public class TapConductor {
     private String m_captureOnlyXml = null;
 
     public TapConductor(
-        IProvider provider,
         ITerminal terminal,
+        IProvider provider,
         TapReplayAgent tapReplayAgent) {
+        m_pciMaskingAgent = new PCIMaskingAgent();
+        m_apduObserver = new APDUObserver(m_pciMaskingAgent);
+        tapReplayAgent.setTapConductor(this);
 
-        m_provider = provider;
         if(terminal!=null) {
             m_terminal = terminal;
         } else {
             m_terminal = new TransitTerminal();
         }
+
         m_tapReplayAgent = tapReplayAgent;
         if(m_tapReplayAgent != null) {
+            assert provider == null;
             m_tapReplayAgent.setTapConductor(this);
+            assert m_provider != null;
+        } else {
+            assert m_tapReplayAgent != null;
+            m_provider = provider;
         }
-
-        m_pciMaskingAgent = new PCIMaskingAgent();
-        m_apduObserver = new APDUObserver(m_pciMaskingAgent);
     }
 
     public static TapConductor createRealTapConductor(
         ITerminal terminal,
         IProvider provider
     ) {
-        TapConductor trc = new TapConductor(provider, terminal, null);
+        TapConductor trc = new TapConductor(terminal, provider, null);
         finalizeTap(trc);
         return trc;
     }
@@ -61,7 +66,7 @@ public class TapConductor {
         InputStream is
     ) {
         TapReplayAgent tra = new TapReplayAgent(xmlInputFactory, is);
-        TapConductor trc = new TapConductor(null, terminal, tra);
+        TapConductor trc = new TapConductor(terminal, null, tra);
 
         finalizeTap(trc);
         return trc;
@@ -71,6 +76,7 @@ public class TapConductor {
         EmvTemplate template = trc.build();
         try {
             trc.play(template);
+            assert true == trc.doPCIMasking();
         }
         catch(IllegalArgumentException e) {
             System.err.println(String.format("", e.getMessage()));

@@ -35,6 +35,7 @@ public class TapReplayAgent {
     public void setTapConductor(TapConductor tapConductor) {
         m_tapConductor = tapConductor;
         m_provider = new TapReplayProvider(this, m_tapConductor);
+        m_provider.setApduStore(m_tapConductor.getAPDUObserver());
         m_tapConductor.setProvider(m_provider);
     }
 

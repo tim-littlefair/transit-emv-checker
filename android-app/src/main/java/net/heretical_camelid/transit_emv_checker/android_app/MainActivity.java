@@ -82,10 +82,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             Context context = ApplicationProvider.getApplicationContext();
             InputStream captureXmlStream = context.getAssets().open(assetFilename);
-            TapReplayAgent tapReplayAgent=new TapReplayAgent(
-                XMLInputFactory.newInstance(),
-                captureXmlStream
-            );
             trc = TapConductor.createReplayTapConductor(
                 terminal,
                 XMLInputFactory.newInstance(),

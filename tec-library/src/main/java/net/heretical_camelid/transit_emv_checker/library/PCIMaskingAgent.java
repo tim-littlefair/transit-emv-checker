@@ -27,18 +27,15 @@ public class PCIMaskingAgent {
             case 0x5F22: // copy of Track 2
             case 0x9F20: // Track 2 discretionary data (includes Service Code)
             case 0x9F46: // ICC Public certificate - encrypted with known key, cleartext contains PAN
-            case 0x9F5A: // Application PAN
             case 0x9F5E: // Data Storage identifier (contains PAN)
 
-            // Tag 0x57 track 2 is not masked out at this point because the value
-            // retrieved this tag from by the upstream package com.github.devnied.emvnfccard:library
-            // will be used later to ensure that any unexpected occurrence of the PAN (even one caused 
-            // by random fate, e.g. in encrypted data) is masked before reporting is started.
-            // NB I am not yet sure whether other tags 0x57, 0x9F5A may also need to be
-            // preserved so that emvnfccard:library can access them for cards where 0x5A is not 
-            // present
+            // None of tags 0x57 track 2, 0x5A/0x9F5A application PAN  are masked out at this point
+            // because the value retrieved for these tags from by the upstream package
+            // com.github.devnied.emvnfccard:library will be used later to ensure that any unexpected
+            // occurrence of the PAN (even one caused by random fate, e.g. in encrypted data) is
+            // masked before reporting is started.
             // case 0x57: // Track 2 equivalent data - also contains PAN (=> both CHD and SAD)
-            case 0x5A: // Application PAN (CHD)
+            // case 0x5A: // Application PAN (CHD)
             // case 0x9F5A: // Application PAN (CHD)
 
             // Tag 0x5F24, (application) expiration date is listed as CHD, but is permitted 

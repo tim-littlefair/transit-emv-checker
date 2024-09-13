@@ -12,6 +12,7 @@ then
   gradle=./gradlew
 
   $gradle clean
+  $gradle build
   $gradle uberJar
   gradle_status=$?
 else

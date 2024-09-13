@@ -59,6 +59,13 @@ public class BasicReplayTest  {
 
     @Test
     @Tag("run_with_gradle")
+    public void testReplayBug20() {
+        String mediaCaptureBasename = "bug20-full";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+    }
+
+    @Test
+    @Tag("run_with_gradle")
     public void testReplay0884() {
         String mediaCaptureBasename = "visa-exp2202-0884";
         Result result = replayMediaCapture(mediaCaptureBasename);

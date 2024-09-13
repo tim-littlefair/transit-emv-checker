@@ -32,7 +32,6 @@ public class TapConductor {
         TapReplayAgent tapReplayAgent) {
         m_pciMaskingAgent = new PCIMaskingAgent();
         m_apduObserver = new APDUObserver(m_pciMaskingAgent);
-        tapReplayAgent.setTapConductor(this);
 
         if(terminal!=null) {
             m_terminal = terminal;
@@ -46,7 +45,7 @@ public class TapConductor {
             m_tapReplayAgent.setTapConductor(this);
             assert m_provider != null;
         } else {
-            assert m_tapReplayAgent != null;
+            assert provider != null;
             m_provider = provider;
         }
     }
@@ -67,7 +66,6 @@ public class TapConductor {
     ) {
         TapReplayAgent tra = new TapReplayAgent(xmlInputFactory, is);
         TapConductor trc = new TapConductor(terminal, null, tra);
-
         finalizeTap(trc);
         return trc;
     }

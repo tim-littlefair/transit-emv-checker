@@ -166,6 +166,9 @@ public class PCIMaskingAgent {
         TreeMap<String,String> maskPairs = new TreeMap<>();
     
         for(AppAccountIdentifier appAccountId: apduObserver.m_accountIdentifiers.values()) {
+            if(appAccountId.applicationPAN==null) {
+                continue;
+            }
             String panWithoutSpaces = appAccountId.applicationPAN;
             char[] maskingChars = new char[panWithoutSpaces.length()-10];
             Arrays.fill(maskingChars,'F');

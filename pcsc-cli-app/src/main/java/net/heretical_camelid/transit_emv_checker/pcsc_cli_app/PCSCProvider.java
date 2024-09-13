@@ -36,9 +36,8 @@ public class PCSCProvider extends MyProviderBase {
 	 * @param pChannel
 	 *            card channel
 	 */
-	public PCSCProvider(Card card, APDUObserver apduStore) {
+	public PCSCProvider(Card card) {
 		channel = card.getBasicChannel();
-		setApduStore(apduStore);
 	}
 
     protected byte[] implementationTransceive(final byte[] pCommand, ByteBuffer receiveBuffer) throws CommunicationException {

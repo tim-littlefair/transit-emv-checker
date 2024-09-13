@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,6 +28,12 @@ import com.github.devnied.emvnfccard.iso7816emv.TagAndLength;
 
 import fr.devnied.bitlib.BytesUtils;
 import net.sf.scuba.tlv.TLVInputStream;
+
+class AppSelectionContextError extends Exception {
+    AppSelectionContextError(String message) {
+        super(message);
+    }
+}
 
 public class APDUObserver {
 	static final Logger LOGGER = LoggerFactory.getLogger(APDUObserver.class);
@@ -83,7 +90,7 @@ public class APDUObserver {
                 new AppSelectionContext(m_currentAppSelectionContext.aid);
             if(m_accountIdentifiers.containsKey(priorIncompleteAsc)) {
                 m_accountIdentifiers.remove(priorIncompleteAsc);
-            } 
+            }
 
             // As removal and reinsertion invalidates the iterator
             // we use to scan the collection, we create a filtered 
@@ -128,7 +135,11 @@ public class APDUObserver {
     void extractTags(byte[] tlvBytes, CommandAndResponse carItem) {
 		TLVInputStream stream = new TLVInputStream(new ByteArrayInputStream(tlvBytes));
         ArrayList<EMVTagEntry> newTagList = new ArrayList<EMVTagEntry>();
-        extractTagsRecursively(stream, newTagList,carItem);
+        try {
+            extractTagsRecursively(stream, newTagList, carItem);
+        } catch (AppSelectionContextError e) {
+            LOGGER.error(e.getMessage(), e);
+        }
         for(EMVTagEntry ete: newTagList) {
             // We defer setting ete.scope until here so that m_currentAid
             // reflects all attributes of the selected AID entry
@@ -144,7 +155,9 @@ public class APDUObserver {
         }
     }
 
-    void extractTagsRecursively(TLVInputStream stream, ArrayList<EMVTagEntry> newTagList,CommandAndResponse carItem) {
+    void extractTagsRecursively(
+        TLVInputStream stream, ArrayList<EMVTagEntry> newTagList,CommandAndResponse carItem
+    ) throws AppSelectionContextError{
         try {
 			while (stream.available() > 0) {
                 stream.mark(1024);
@@ -173,7 +186,7 @@ public class APDUObserver {
             LOGGER.error(e.getMessage(), e);
         } catch (TlvException exce) {
             LOGGER.warn(exce.getMessage(), exce);
-        } 
+        }
 
         try {
             stream.close();
@@ -183,52 +196,71 @@ public class APDUObserver {
         }
     }
 
-    void reflectTagInSelectionContextAndAccountIdentifier(String tagHex, String tagValueHex) {
+    void reflectTagInSelectionContextAndAccountIdentifier(
+        String tagHex, String tagValueHex
+    ) throws AppSelectionContextError {
+        String tagValueString = new String(BytesUtils.fromString(tagValueHex), StandardCharsets.ISO_8859_1);
+        if(StandardCharsets.US_ASCII.newEncoder().canEncode(tagValueString)==false) {
+            // The string contains some non-ASCII characters
+            tagValueString = "<binary data>";
+        }
+
         tagValueHex = tagValueHex.replaceAll(" ","");
         if(tagHex.equals("4F")) {
-            openAppSelectionContext(tagValueHex.replaceAll(" ",""));
-        } else if(tagHex.equals("50")) {
-            m_currentAppSelectionContext.label = new String(
-                BytesUtils.fromString(tagValueHex)
-            );
-        } else if(tagHex.equals("87")) {
-            m_currentAppSelectionContext.priority = tagValueHex;
-        } else if(tagHex.equals("9F2A")) {
-            m_currentAppSelectionContext.appKernelId = tagValueHex;
-        } else if(tagHex.equals("9F08")) {
-            m_currentAppSelectionContext.appVersionNumber = tagValueHex;
-        } else if(tagHex.equals("9F38")) {
-            m_currentAppSelectionContext.pdol = 
-                TlvUtil.parseTagAndLength(BytesUtils.fromString(tagValueHex));
-        } else if(tagHex.equals("57") || tagHex.equals("9F6B")) {
-            // track 2 equivalent data
-            int separatorPos = tagValueHex.indexOf("D");
-            if(separatorPos > 0) {
-                m_currentAppAccountIdentifier.applicationPAN = tagValueHex.substring(0,separatorPos);
-                m_currentAppAccountIdentifier.applicationExpiryMonth = tagValueHex.substring(separatorPos+1, separatorPos+5);
-            } else {
-                LOGGER.warn("Invalid track 2 equivalent ignored");
-                return;
-            }
-        } else if(tagHex.equals("5F34")) {
-            m_currentAppAccountIdentifier.applicationPSN = tagValueHex;
+            openAppSelectionContext(tagValueHex.replaceAll(" ", ""));
         } else if(tagHex.equals("9F36")) {
             byte[] atcBytes = BytesUtils.fromString(tagValueHex);
-            m_mediumTransactionCounterNow = (0xFF&atcBytes[0]*0x100) + (0xFF&atcBytes[1]); 
+            m_mediumTransactionCounterNow = (0xFF&atcBytes[0]*0x100) + (0xFF&atcBytes[1]);
         } else if(tagHex.equals("9F17")) {
             byte[] lotcBytes = BytesUtils.fromString(tagValueHex);
             switch(lotcBytes.length) {
                 case 2:
-                    m_mediumTransactionCounterLastOnline =  (0xFF&lotcBytes[0]*0x100) + (0xFF&lotcBytes[1]); 
+                    m_mediumTransactionCounterLastOnline =  (0xFF&lotcBytes[0]*0x100) + (0xFF&lotcBytes[1]);
                     break;
                 case 1:
-                    m_mediumTransactionCounterLastOnline =  (int) lotcBytes[0]; 
+                    m_mediumTransactionCounterLastOnline =  (int) lotcBytes[0];
                     break;
                 default:
                     LOGGER.warn(
-                        "Unexpected last online transaction counter: " + 
-                        BytesUtils.bytesToString(lotcBytes)
+                        "Unexpected last online transaction counter: " +
+                            BytesUtils.bytesToString(lotcBytes)
                     );
+            }
+        } else if(tagHex.equals("84")) {
+            openAppSelectionContext(tagValueHex);
+        } else {
+            // All items below this point expect a context to be open
+            if(m_currentAppSelectionContext==null) {
+                throw new AppSelectionContextError(String.format(
+                   "Expected an app selection context to be active processing tag=%s bytes=%s string=%s",
+                   tagHex, tagValueHex, tagValueString
+                ));
+            }
+            if(tagHex.equals("50")) {
+                m_currentAppSelectionContext.label = new String(
+                    BytesUtils.fromString(tagValueHex)
+                );
+            } else if(tagHex.equals("87")) {
+                m_currentAppSelectionContext.priority = tagValueHex;
+            } else if(tagHex.equals("9F2A")) {
+                m_currentAppSelectionContext.appKernelId = tagValueHex;
+            } else if(tagHex.equals("9F08")) {
+                m_currentAppSelectionContext.appVersionNumber = tagValueHex;
+            } else if(tagHex.equals("9F38")) {
+                m_currentAppSelectionContext.pdol =
+                    TlvUtil.parseTagAndLength(BytesUtils.fromString(tagValueHex));
+            } else if(tagHex.equals("57") || tagHex.equals("9F6B")) {
+                // track 2 equivalent data
+                int separatorPos = tagValueHex.indexOf("D");
+                if(separatorPos > 0) {
+                    m_currentAppAccountIdentifier.applicationPAN = tagValueHex.substring(0,separatorPos);
+                    m_currentAppAccountIdentifier.applicationExpiryMonth = tagValueHex.substring(separatorPos+1, separatorPos+5);
+                } else {
+                    LOGGER.warn("Invalid track 2 equivalent ignored");
+                    return;
+                }
+            } else if(tagHex.equals("5F34")) {
+                m_currentAppAccountIdentifier.applicationPSN = tagValueHex;
             }
         }
 }
@@ -278,8 +310,9 @@ public class APDUObserver {
                     cr.stepName = "GET_PROCESSING_OPTIONS for unidentified application";
                 }
                 commandInterpretation.append(cr.stepName + "\n");
-
-                if(m_currentAppSelectionContext.pdol != null) {
+                if(m_currentAppSelectionContext==null) {
+                    commandInterpretation.append("No app selection context => can't dump GPO PDOL items\n");
+                } else if(m_currentAppSelectionContext.pdol != null) {
                     int gpoDolOffset = 2; // We expect that the first two bytes are 83 21
                     commandInterpretation.append("Tags requested in previously received PDOL:\n");
                     for(TagAndLength tagAndLength: m_currentAppSelectionContext.pdol) {
@@ -451,60 +484,35 @@ public class APDUObserver {
         }
         StringBuilder summarySB = new StringBuilder();
         AppAccountIdentifier mediumAccountIdentifier = primaryAccountIdentifier();
-        AppAccountIdentifier[] otherAccountIdentifiers = nonPrimaryAccountIdentifiers();
+        ArrayList<AppAccountIdentifier> otherAccountIdentifiers = nonPrimaryAccountIdentifiers();
 
-        String accountIdLabel = "Account identifier";
+        final String accountIdLabel;
         if(otherAccountIdentifiers != null) {
             accountIdLabel = "Primary account identifier";
+        } else {
+            accountIdLabel = "Account identifier";
         }
 
         if(mediumAccountIdentifier==null) {
             return "Summary not available because medium account identifier is null";
-        } else if(
-            mediumAccountIdentifier.applicationPSN==null ||
-            mediumAccountIdentifier.applicationPSN.length()==0
-        ) {
-            summarySB.append(String.format(
-                "%s:\n%sPAN=%s\n%sEXP=%s\n%s(no PSN)\n",
-                accountIdLabel,
-                indentString, mediumAccountIdentifier.applicationPAN, 
-                indentString, mediumAccountIdentifier.applicationExpiryMonth,
-                indentString
-            ));
-        } else {
-            summarySB.append(String.format(
-                "%s:\n%sMPAN=%s\n%sEXP=%s\n%sPSN=%s\n",
-                accountIdLabel,
-                indentString,mediumAccountIdentifier.applicationPAN, 
-                indentString,mediumAccountIdentifier.applicationExpiryMonth,
-                indentString,mediumAccountIdentifier.applicationPSN
-            ));
         }
+        dumpAccountKeys(mediumAccountIdentifier, accountIdLabel, summarySB, indentString);
 
-        summarySB.append("Application Configurations:\n");
-        for(AppSelectionContext ascItem: m_accountIdentifiers.keySet()) {
-            AppAccountIdentifier aai = m_accountIdentifiers.get(ascItem);
-            if(!aai.toString().equals(mediumAccountIdentifier.toString())) {
-                // This application is associated with a non-primary 
-                // account id - it will be dumped later
-                continue;
-            }
-            summarySB.append(indentString + ascItem.toString() + ":\n");
-            summarySB.append(indentString + indentString + "Label=" + ascItem.label + ":\n");
-            summarySB.append(indentString + indentString + "AID=" + ascItem.aid + "\n");
-            if(ascItem.priority.length()>0) {
-                summarySB.append(indentString + indentString + "priority=" + ascItem.priority + "\n");
-            }
-            if(ascItem.appKernelId!=null) {
-                summarySB.append(indentString + indentString + "kernelID=" + ascItem.appKernelId + "\n");
-            }
-            if(ascItem.appVersionNumber!=null) {
-                summarySB.append(indentString + indentString + "appVersionNumber=" + ascItem.appVersionNumber + "\n");
-            }
-        } 
-        
+        dumpApplicationConfigurations(summarySB, mediumAccountIdentifier, indentString);
+
         if(otherAccountIdentifiers != null) {
-            summarySB.append("TODO: handle media with non-primary account id's\n");
+            for(AppAccountIdentifier aai: otherAccountIdentifiers) {
+                if(aai.applicationPAN==null) {
+                    continue;
+                }
+                dumpAccountKeys(
+                    aai,
+                    "Non-primary account identifier",
+                    summarySB,
+                    indentString
+                );
+                dumpApplicationConfigurations(summarySB, aai, indentString);
+            }
         }
 
         if(m_mediumTransactionCounterNow != -1) {
@@ -529,6 +537,62 @@ public class APDUObserver {
         }
 
         return summarySB.toString();
+    }
+
+    private void dumpApplicationConfigurations(StringBuilder summarySB, AppAccountIdentifier mediumAccountIdentifier, String indentString) {
+        summarySB.append("Application Configurations:\n");
+        for(AppSelectionContext ascItem: m_accountIdentifiers.keySet()) {
+            AppAccountIdentifier aai = m_accountIdentifiers.get(ascItem);
+            if(!aai.toString().equals(mediumAccountIdentifier.toString())) {
+                // This application is associated with a non-primary
+                // account id - it will be dumped later
+                continue;
+            }
+            dumpAppSelectionContextAttributes(ascItem, summarySB, indentString);
+        }
+    }
+
+    private static void dumpAccountKeys(
+        AppAccountIdentifier mediumAccountIdentifier,
+        String accountIdLabel,
+        StringBuilder summarySB,
+        String indentString
+    ) {
+        if(
+            mediumAccountIdentifier.applicationPSN==null ||
+            mediumAccountIdentifier.applicationPSN.length()==0
+        ) {
+            summarySB.append(String.format(
+                "%s:\n%sPAN=%s\n%sEXP=%s\n%s(no PSN)\n",
+                accountIdLabel,
+                indentString, mediumAccountIdentifier.applicationPAN,
+                indentString, mediumAccountIdentifier.applicationExpiryMonth,
+                indentString
+            ));
+        } else {
+            summarySB.append(String.format(
+                "%s:\n%sMPAN=%s\n%sEXP=%s\n%sPSN=%s\n",
+                accountIdLabel,
+                indentString,mediumAccountIdentifier.applicationPAN,
+                indentString,mediumAccountIdentifier.applicationExpiryMonth,
+                indentString,mediumAccountIdentifier.applicationPSN
+            ));
+        }
+
+    }
+    private static void dumpAppSelectionContextAttributes(AppSelectionContext ascItem, StringBuilder summarySB, String indentString) {
+        summarySB.append(indentString + ascItem.toString() + ":\n");
+        summarySB.append(indentString + indentString + "Label=" + ascItem.label + ":\n");
+        summarySB.append(indentString + indentString + "AID=" + ascItem.aid + "\n");
+        if(ascItem.priority.length()>0) {
+            summarySB.append(indentString + indentString + "priority=" + ascItem.priority + "\n");
+        }
+        if(ascItem.appKernelId!=null) {
+            summarySB.append(indentString + indentString + "kernelID=" + ascItem.appKernelId + "\n");
+        }
+        if(ascItem.appVersionNumber!=null) {
+            summarySB.append(indentString + indentString + "appVersionNumber=" + ascItem.appVersionNumber + "\n");
+        }
     }
 
     public String toXmlString(boolean captureOnly) {
@@ -620,7 +684,7 @@ public class APDUObserver {
      * @return an array of account identifiers which differ from the primary
      *         (or null if the array would be empty)
      */
-    public AppAccountIdentifier[] nonPrimaryAccountIdentifiers() {
+    public ArrayList<AppAccountIdentifier> nonPrimaryAccountIdentifiers() {
         ArrayList<AppAccountIdentifier> retval = new ArrayList<>(m_accountIdentifiers.values());
 
         // ArrayList.remove() will only remove one instance of the primary account identifier
@@ -631,7 +695,7 @@ public class APDUObserver {
         retval.removeAll(primaryAccIdList);
 
         if(retval.size()>0) {
-            return (AppAccountIdentifier[]) retval.toArray();
+            return retval;
         } else {
             return null;
         }

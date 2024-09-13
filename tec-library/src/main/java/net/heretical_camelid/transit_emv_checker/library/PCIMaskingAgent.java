@@ -221,6 +221,9 @@ public class PCIMaskingAgent {
         TreeMap<AppSelectionContext,AppAccountIdentifier> maskedAccountIdentifiers = new TreeMap<>();
         for(AppSelectionContext ascItem: apduObserver.m_accountIdentifiers.keySet()) {
             AppAccountIdentifier appAccountId = apduObserver.m_accountIdentifiers.get(ascItem);
+            if(appAccountId.applicationPAN==null) {
+                continue;
+            }
             for(String sensitiveString: maskPairs.keySet()) {
                 String maskedString = maskPairs.get(sensitiveString);
                 appAccountId.applicationPAN = 

@@ -110,7 +110,7 @@ public class TapConductor {
         try {
             EmvCard card = template.readEmvCard();
             boolean maskingSucceeded = m_pciMaskingAgent.maskAccountData(m_apduObserver);
-            assert maskingSucceeded = true;
+            assert maskingSucceeded == true;
 
             m_summary = m_apduObserver.summary();
             TransitCapabilityChecker tcc = new TransitCapabilityChecker(m_apduObserver);

@@ -162,7 +162,7 @@ public class PCIMaskingAgent {
         // and the associated value is the masked value
         TreeMap<String,String> maskPairs = new TreeMap<>();
     
-        for(AppAccountIdentifier appAccountId: apduObserver.m_accountIdentifiers.values()) {
+        for(AppAccountIdentifier appAccountId: apduObserver.m_accountIdentifiers.keySet()) {
             if(appAccountId.applicationPAN==null) {
                 continue;
             }
@@ -218,8 +218,20 @@ public class PCIMaskingAgent {
         }
         apduObserver.m_emvTagEntries = maskedEmvTagEntries;
     
-        TreeMap<AppSelectionContext,AppAccountIdentifier> maskedAccountIdentifiers = new TreeMap<>();
-        for(AppSelectionContext ascItem: apduObserver.m_accountIdentifiers.keySet()) {
+        TreeMap<AppAccountIdentifier,AppSelectionContext> maskedAccountIdentifiers = new TreeMap<>();
+        for(AppAccountIdentifier aai: apduObserver.m_accountIdentifiers.keySet()) {
+            if(aai.applicationPAN==null) {
+                continue;
+            }
+            for(String sensitiveString: maskPairs.keySet()) {
+                String maskedString = maskPairs.get(sensitiveString);
+                aai.applicationPAN =
+                    aai.applicationPAN.replaceAll(sensitiveString,maskedString);
+            }
+            maskedAccountIdentifiers.put(aai, apduObserver.m_accountIdentifiers.get(aai));
+        }
+/*
+        for(AppSelectionContext ascItem: apduObserver.m_accountIdentifiers.values()) {
             AppAccountIdentifier appAccountId = apduObserver.m_accountIdentifiers.get(ascItem);
             if(appAccountId.applicationPAN==null) {
                 continue;
@@ -231,6 +243,7 @@ public class PCIMaskingAgent {
             }
             maskedAccountIdentifiers.put(ascItem, appAccountId);
         }
+ */
         apduObserver.m_accountIdentifiers = maskedAccountIdentifiers;
     
         // Provisionally set the flag which indicates that masking has been

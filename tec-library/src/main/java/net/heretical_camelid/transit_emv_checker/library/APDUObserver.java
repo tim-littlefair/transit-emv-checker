@@ -42,7 +42,7 @@ public class APDUObserver {
 
     ArrayList<CommandAndResponse> m_commandsAndResponses = new ArrayList<CommandAndResponse>();
     TreeSet<EMVTagEntry> m_emvTagEntries = new TreeSet<EMVTagEntry>();
-    TreeMap<AppSelectionContext,AppAccountIdentifier> m_accountIdentifiers = new TreeMap<AppSelectionContext,AppAccountIdentifier>();
+    TreeMap<AppAccountIdentifier,AppSelectionContext> m_accountIdentifiers = new TreeMap<>();
 
     AppSelectionContext m_currentAppSelectionContext = null;
     AppAccountIdentifier m_currentAppAccountIdentifier = null;
@@ -64,10 +64,15 @@ public class APDUObserver {
     }
 
     public void closeAppSelectionContext() {
-        if(m_currentAppSelectionContext == null) {
-            assert m_currentAppAccountIdentifier == null;
+        if(
+            m_currentAppAccountIdentifier == null ||
+            m_currentAppAccountIdentifier.applicationPAN == null
+
+        ) {
+            m_currentAppSelectionContext = null;
             return;
         }
+        /*
         AppSelectionContext priorIncompleteAsc =
             new AppSelectionContext(m_currentAppSelectionContext.aid);
         if(m_accountIdentifiers.containsKey(priorIncompleteAsc)) {
@@ -87,7 +92,8 @@ public class APDUObserver {
             ));
             m_accountIdentifiers.remove(priorIncompleteAsc);
         }
-        if(m_accountIdentifiers.containsKey(m_currentAppSelectionContext)) {
+         */
+        if(m_accountIdentifiers.containsKey(m_currentAppAccountIdentifier)) {
             LOGGER.warn(String.format(
                 "PPSE contains multiple records for AID %s at priority %s",
                 m_currentAppSelectionContext.aid,
@@ -126,8 +132,8 @@ public class APDUObserver {
             m_emvTagEntries = updatedEmvTagEntries;
             */
             m_accountIdentifiers.put(
-                m_currentAppSelectionContext,
-                m_currentAppAccountIdentifier
+                m_currentAppAccountIdentifier,
+                m_currentAppSelectionContext
             );
         }
         m_currentAppAccountIdentifier = null;
@@ -554,14 +560,14 @@ public class APDUObserver {
 
     private void dumpApplicationConfigurations(StringBuilder summarySB, AppAccountIdentifier mediumAccountIdentifier, String indentString) {
         summarySB.append("Application Configurations:\n");
-        for(AppSelectionContext ascItem: m_accountIdentifiers.keySet()) {
-            AppAccountIdentifier aai = m_accountIdentifiers.get(ascItem);
+        for(AppAccountIdentifier aai: m_accountIdentifiers.keySet()) {
             if(!aai.toString().equals(mediumAccountIdentifier.toString())) {
                 // This application is associated with a non-primary
                 // account id - it will be dumped later
                 continue;
             }
-            dumpAppSelectionContextAttributes(ascItem, summarySB, indentString);
+            AppSelectionContext asc = m_accountIdentifiers.get(aai);
+            dumpAppSelectionContextAttributes(asc, summarySB, indentString);
         }
     }
 
@@ -627,10 +633,11 @@ public class APDUObserver {
 
             if(captureOnly == false) {
 
-                for(AppSelectionContext asc: m_accountIdentifiers.keySet()) {
+                for(AppAccountIdentifier aai: m_accountIdentifiers.keySet()) {
+                    AppSelectionContext asc = m_accountIdentifiers.get(aai);
                     xmlBuffer.append(String.format(
                         "%s<app_account_id selection_context=\"%s\" account_id=\"%s\" />\n",
-                        indentString, asc, m_accountIdentifiers.get(asc)
+                        indentString, asc, aai
                     ));
                 }
 
@@ -681,7 +688,7 @@ public class APDUObserver {
 
     public AppAccountIdentifier primaryAccountIdentifier() {
         AppAccountIdentifier retval = null;
-        for(AppAccountIdentifier appAccId: m_accountIdentifiers.values()) {
+        for(AppAccountIdentifier appAccId: m_accountIdentifiers.keySet()) {
             // Only interested in first item returned
             retval = appAccId;
             break;
@@ -698,7 +705,7 @@ public class APDUObserver {
      *         (or null if the array would be empty)
      */
     public ArrayList<AppAccountIdentifier> nonPrimaryAccountIdentifiers() {
-        ArrayList<AppAccountIdentifier> retval = new ArrayList<>(m_accountIdentifiers.values());
+        ArrayList<AppAccountIdentifier> retval = new ArrayList<>(m_accountIdentifiers.keySet());
 
         // ArrayList.remove() will only remove one instance of the primary account identifier
         // so we use removeAll() which removes all instances, but requires a collection as 

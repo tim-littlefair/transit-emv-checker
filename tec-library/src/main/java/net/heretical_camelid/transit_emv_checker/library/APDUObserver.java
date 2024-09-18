@@ -56,19 +56,36 @@ public class APDUObserver {
     }
 
     public void openAppSelectionContext(String aid) {
-        if(m_currentAppSelectionContext == null) {
-            m_currentAppSelectionContext = new AppSelectionContext(aid);
-            m_currentAppAccountIdentifier = new AppAccountIdentifier();
-        } else if(!m_currentAppSelectionContext.aid.equals(aid)) {
+        if(m_currentAppSelectionContext != null) {
             closeAppSelectionContext();
-            m_currentAppSelectionContext = new AppSelectionContext(aid);
-            m_currentAppAccountIdentifier = new AppAccountIdentifier();
         }
+        m_currentAppSelectionContext = new AppSelectionContext(aid);
+        m_currentAppAccountIdentifier = new AppAccountIdentifier();
     }
 
     public void closeAppSelectionContext() {
         if(m_currentAppSelectionContext == null) {
+            assert m_currentAppAccountIdentifier == null;
             return;
+        }
+        AppSelectionContext priorIncompleteAsc =
+            new AppSelectionContext(m_currentAppSelectionContext.aid);
+        if(m_accountIdentifiers.containsKey(priorIncompleteAsc)) {
+            LOGGER.info(String.format(
+                "Removing prior incomplete app selection context for AID %s only",
+                m_currentAppSelectionContext.aid,
+                m_currentAppSelectionContext.priority
+            ));
+            m_accountIdentifiers.remove(priorIncompleteAsc);
+        }
+        priorIncompleteAsc.priority = m_currentAppSelectionContext.priority;
+        if(m_accountIdentifiers.containsKey(priorIncompleteAsc)) {
+            LOGGER.info(String.format(
+                "Removing prior incomplete app selection context for AID %s at priority %s",
+                m_currentAppSelectionContext.aid,
+                m_currentAppSelectionContext.priority
+            ));
+            m_accountIdentifiers.remove(priorIncompleteAsc);
         }
         if(m_accountIdentifiers.containsKey(m_currentAppSelectionContext)) {
             LOGGER.warn(String.format(
@@ -86,16 +103,12 @@ public class APDUObserver {
             // If such records do exist, they need to be removed/updated to 
             // reflect the full current selection context (which should contain 
             // an appPriorityIndicator at a minimum alongside the AID).
-            AppSelectionContext priorIncompleteAsc = 
-                new AppSelectionContext(m_currentAppSelectionContext.aid);
-            if(m_accountIdentifiers.containsKey(priorIncompleteAsc)) {
-                m_accountIdentifiers.remove(priorIncompleteAsc);
-            }
 
             // As removal and reinsertion invalidates the iterator
             // we use to scan the collection, we create a filtered 
             // copy of the original list rather than trying to change 
             // it directly.
+            /*
             TreeSet<EMVTagEntry> updatedEmvTagEntries = new TreeSet<EMVTagEntry>();
             for(EMVTagEntry ete: m_emvTagEntries) {
                 if(
@@ -111,7 +124,7 @@ public class APDUObserver {
                 }
             }
             m_emvTagEntries = updatedEmvTagEntries;
-
+            */
             m_accountIdentifiers.put(
                 m_currentAppSelectionContext,
                 m_currentAppAccountIdentifier
@@ -263,7 +276,7 @@ public class APDUObserver {
                 m_currentAppAccountIdentifier.applicationPSN = tagValueHex;
             }
         }
-}
+    }
 
     void interpretCommand(CommandAndResponse cr) {
         int cla_ins = BytesUtils.byteArrayToInt(cr.rawCommand,0,2);

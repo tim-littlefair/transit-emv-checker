@@ -2,7 +2,6 @@ package net.heretical_camelid.transit_emv_checker.library;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -42,7 +41,7 @@ public class APDUObserver {
 
     ArrayList<CommandAndResponse> m_commandsAndResponses = new ArrayList<CommandAndResponse>();
     TreeSet<EMVTagEntry> m_emvTagEntries = new TreeSet<EMVTagEntry>();
-    TreeMap<AppAccountIdentifier,AppSelectionContext> m_accountIdentifiers = new TreeMap<>();
+    TreeMap<AppAccountIdentifier,ArrayList<AppSelectionContext>> m_accountIdentifiers = new TreeMap<>();
 
     AppSelectionContext m_currentAppSelectionContext = null;
     AppAccountIdentifier m_currentAppAccountIdentifier = null;
@@ -65,44 +64,57 @@ public class APDUObserver {
 
     public void closeAppSelectionContext() {
         if(
-            m_currentAppAccountIdentifier == null ||
-            m_currentAppAccountIdentifier.applicationPAN == null
-
+            m_currentAppAccountIdentifier == null
         ) {
             m_currentAppSelectionContext = null;
             return;
         }
-        /*
-        AppSelectionContext priorIncompleteAsc =
-            new AppSelectionContext(m_currentAppSelectionContext.aid);
-        if(m_accountIdentifiers.containsKey(priorIncompleteAsc)) {
-            LOGGER.info(String.format(
-                "Removing prior incomplete app selection context for AID %s only",
-                m_currentAppSelectionContext.aid,
-                m_currentAppSelectionContext.priority
-            ));
-            m_accountIdentifiers.remove(priorIncompleteAsc);
+        // During PPSE processing, the app PAN isn't known
+        // so we store attributes temporarily using the AID and priority
+        // and are able to retrieve them during the select application
+        // step when the PAN becomes visible
+        String tempAaiKeyPrefix = String.format(
+            "%s:%s",
+            m_currentAppSelectionContext.aid,
+            m_currentAppSelectionContext.priority
+        );
+
+        dumpAppAccountIdentifiers("before " + tempAaiKeyPrefix);
+        if(m_currentAppAccountIdentifier.applicationPAN.equals("")) {
+            m_currentAppAccountIdentifier.applicationPAN = tempAaiKeyPrefix;
+        } else {
+            AppAccountIdentifier aaiToRemove = null;
+            for(AppAccountIdentifier aai: m_accountIdentifiers.keySet()) {
+                ArrayList<AppSelectionContext> tempAscList = m_accountIdentifiers.get(aai);
+                if(
+                    aai.applicationPAN.startsWith(tempAaiKeyPrefix) ||
+                    tempAaiKeyPrefix.startsWith(aai.applicationPAN)
+                ) {
+                    // A temporary record for the AID has been found
+                    assert tempAscList.size() == 1;
+                    AppSelectionContext tempAsc = tempAscList.get(0);
+                    copyAppSelectionContextAttributes(tempAsc);
+                    aaiToRemove = aai;
+                    break;
+                }
+                aai = null;
+            }
+            if(aaiToRemove != null) {
+                m_accountIdentifiers.remove(aaiToRemove);
+                ArrayList<AppSelectionContext> newAscList = new ArrayList<>();
+                newAscList.add(m_currentAppSelectionContext);
+                //m_accountIdentifiers.put(m_currentAppAccountIdentifier, newAscList);
+            }
         }
-        priorIncompleteAsc.priority = m_currentAppSelectionContext.priority;
-        if(m_accountIdentifiers.containsKey(priorIncompleteAsc)) {
-            LOGGER.info(String.format(
-                "Removing prior incomplete app selection context for AID %s at priority %s",
-                m_currentAppSelectionContext.aid,
-                m_currentAppSelectionContext.priority
-            ));
-            m_accountIdentifiers.remove(priorIncompleteAsc);
-        }
-         */
+
         if(m_accountIdentifiers.containsKey(m_currentAppAccountIdentifier)) {
-            LOGGER.warn(String.format(
-                "PPSE contains multiple records for AID %s at priority %s",
-                m_currentAppSelectionContext.aid,
-                m_currentAppSelectionContext.priority
-            ));
-            LOGGER.warn(String.format(
-                "The PPSE record for selection context %s will not be captured", 
-                m_currentAppSelectionContext.toString()
-            ));
+            ArrayList<AppSelectionContext> ascList =
+                m_accountIdentifiers.get(m_currentAppAccountIdentifier)
+            ;
+            ascList.add(m_currentAppSelectionContext);
+            m_accountIdentifiers.put(
+                m_currentAppAccountIdentifier,ascList
+            );
         } else {
             // Check whether any prior records exist in the collections with only 
             // the same AID set.
@@ -131,13 +143,35 @@ public class APDUObserver {
             }
             m_emvTagEntries = updatedEmvTagEntries;
             */
+            ArrayList<AppSelectionContext> ascList = new ArrayList<>();
+            ascList.add(m_currentAppSelectionContext);
             m_accountIdentifiers.put(
-                m_currentAppAccountIdentifier,
-                m_currentAppSelectionContext
+                m_currentAppAccountIdentifier,ascList
             );
         }
+        dumpAppAccountIdentifiers("after " + tempAaiKeyPrefix);
+
         m_currentAppAccountIdentifier = null;
         m_currentAppSelectionContext = null;
+    }
+
+    private void copyAppSelectionContextAttributes(AppSelectionContext tempAsc) {
+        if(
+            m_currentAppSelectionContext.priority==null ||
+            m_currentAppSelectionContext.priority.equals("")
+        ) {
+            m_currentAppSelectionContext.priority= tempAsc.priority;
+        }
+        if(
+            m_currentAppSelectionContext.appKernelId==null ||
+            m_currentAppSelectionContext.appKernelId.equals("")
+        ) {
+            m_currentAppSelectionContext.appKernelId= tempAsc.appKernelId;
+        }
+
+        if(m_currentAppSelectionContext.appVersionNumber==null) {
+            m_currentAppSelectionContext.appVersionNumber= tempAsc.appVersionNumber;
+        }
     }
 
     public void extractTags(CommandAndResponse carItem) {
@@ -225,7 +259,9 @@ public class APDUObserver {
         }
 
         tagValueHex = tagValueHex.replaceAll(" ","");
-        if(tagHex.equals("4F")) {
+        if(tagValueString.equals("2PAY.SYS.DDF01")) {
+            // PPSE - do nothing
+        } else if( tagHex.equals("4F")) {
             openAppSelectionContext(tagValueHex.replaceAll(" ", ""));
         } else if(tagHex.equals("9F36")) {
             byte[] atcBytes = BytesUtils.fromString(tagValueHex);
@@ -245,7 +281,7 @@ public class APDUObserver {
                             BytesUtils.bytesToString(lotcBytes)
                     );
             }
-        } else if(tagHex.equals("84")) {
+        } else if( tagHex.equals("84") ) {
             openAppSelectionContext(tagValueHex);
         } else {
             // All items below this point expect a context to be open
@@ -456,7 +492,6 @@ public class APDUObserver {
     void interpretResponse(CommandAndResponse cr) {
         if(cr.interpretedResponseStatus != null) {
             // If this is already filled in it describes an exception,
-            // there is nothing more to be done
             return;
         }
         SwEnum swval = SwEnum.getSW(cr.rawResponse);
@@ -483,6 +518,14 @@ public class APDUObserver {
     }
 
     String hexReinsertSpacesBetweenBytes(String hexWithoutSpaces) {
+        if(hexWithoutSpaces.contains(":")) {
+            // This string is probably an app selection context key
+            // (format AID{:priority}{:kernel}{:version})
+            // temporarily stored in an applicationPAN slot during PPSE
+            // processing pending discovery of the PAN which should
+            // ultimately be associated with the AID/priority/kernel/version
+            return null;
+        }
         StringBuilder hexWithSpacesSB = new StringBuilder();
         while(true) {
             hexWithSpacesSB.append(hexWithoutSpaces.substring(0,2));
@@ -507,9 +550,9 @@ public class APDUObserver {
 
         final String accountIdLabel;
         if(otherAccountIdentifiers != null) {
-            accountIdLabel = "Primary account identifier";
+            accountIdLabel = "Primary account Identifier";
         } else {
-            accountIdLabel = "Account identifier";
+            accountIdLabel = "Account Identifier";
         }
 
         if(mediumAccountIdentifier==null) {
@@ -526,7 +569,7 @@ public class APDUObserver {
                 }
                 dumpAccountKeys(
                     aai,
-                    "Non-primary account identifier",
+                    "Non-primary Account Identifier",
                     summarySB,
                     indentString
                 );
@@ -566,8 +609,10 @@ public class APDUObserver {
                 // account id - it will be dumped later
                 continue;
             }
-            AppSelectionContext asc = m_accountIdentifiers.get(aai);
-            dumpAppSelectionContextAttributes(asc, summarySB, indentString);
+            ArrayList<AppSelectionContext> ascList = m_accountIdentifiers.get(aai);
+            for(AppSelectionContext asc: ascList) {
+                dumpAppSelectionContextAttributes(asc, summarySB, indentString);
+            }
         }
     }
 
@@ -634,11 +679,13 @@ public class APDUObserver {
             if(captureOnly == false) {
 
                 for(AppAccountIdentifier aai: m_accountIdentifiers.keySet()) {
-                    AppSelectionContext asc = m_accountIdentifiers.get(aai);
-                    xmlBuffer.append(String.format(
-                        "%s<app_account_id selection_context=\"%s\" account_id=\"%s\" />\n",
-                        indentString, asc, aai
-                    ));
+                    ArrayList<AppSelectionContext> ascList = m_accountIdentifiers.get(aai);
+                    for(AppSelectionContext asc: ascList) {
+                        xmlBuffer.append(String.format(
+                            "%s<app_account_id selection_context=\"%s\" account_id=\"%s\" />\n",
+                            indentString, asc, aai
+                        ));
+                    }
                 }
 
                 String currentTagHex = "";
@@ -730,6 +777,16 @@ public class APDUObserver {
             );
         } else {
             return String.format("incomplete_media-" + LocalDateTime.now().toString());
+        }
+    }
+
+    private void dumpAppAccountIdentifiers(String when) {
+        LOGGER.debug("App Account Identifiers " + when);
+        for(AppAccountIdentifier aai: m_accountIdentifiers.navigableKeySet()) {
+            LOGGER.debug(" " + aai.toString());
+            for(AppSelectionContext asc: m_accountIdentifiers.get(aai)) {
+                LOGGER.debug("  " + asc.toString());
+            }
         }
     }
 }

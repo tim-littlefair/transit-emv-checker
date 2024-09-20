@@ -75,6 +75,9 @@ public class TapReplayAgent {
                                 );
                                 carItem.rawResponse = null;
                             }
+                        } else if (elementName.equals("interpreted_response_status")) {
+                            assert carItem != null;
+                            carItem.interpretedResponseStatus = reader.getElementText();
                         }
                     }
                 } else if (nextToken == XMLStreamConstants.END_ELEMENT) {

@@ -30,4 +30,6 @@ local.properties
 _work/
 android-app/release
 *.hprof
+tec-library/bin
+
 

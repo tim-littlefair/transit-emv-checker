@@ -163,7 +163,10 @@ public class PCIMaskingAgent {
         TreeMap<String,String> maskPairs = new TreeMap<>();
     
         for(AppAccountIdentifier appAccountId: apduObserver.m_accountIdentifiers.keySet()) {
-            if(appAccountId.applicationPAN==null) {
+            if(
+                appAccountId.applicationPAN==null ||
+                appAccountId.applicationPAN.length()==0
+            ) {
                 continue;
             }
             String panWithoutSpaces = appAccountId.applicationPAN;
@@ -198,8 +201,12 @@ public class PCIMaskingAgent {
     
                 String sensitiveStringWithSpaces = apduObserver.hexReinsertSpacesBetweenBytes(sensitiveString);
                 String maskedStringWithSpaces = apduObserver.hexReinsertSpacesBetweenBytes(maskedString);
-                carItem.interpretedResponseBody = 
-                    carItem.interpretedResponseBody.replaceAll(sensitiveStringWithSpaces,maskedStringWithSpaces);
+                if(maskedStringWithSpaces!=null) {
+                    carItem.interpretedResponseBody =
+                        carItem.interpretedResponseBody.replaceAll(
+                            sensitiveStringWithSpaces, maskedStringWithSpaces
+                        );
+                }
             }
             maskedCommandsAndResponses.add(carItem);
         }
@@ -211,14 +218,16 @@ public class PCIMaskingAgent {
                 String maskedString = maskPairs.get(sensitiveString);
                 String sensitiveStringWithSpaces = apduObserver.hexReinsertSpacesBetweenBytes(sensitiveString);
                 String maskedStringWithSpaces = apduObserver.hexReinsertSpacesBetweenBytes(maskedString);
-                ete.valueHex = 
-                    ete.valueHex.replaceAll(sensitiveStringWithSpaces,maskedStringWithSpaces);
+                if(sensitiveStringWithSpaces!=null) {
+                    ete.valueHex =
+                        ete.valueHex.replaceAll(sensitiveStringWithSpaces, maskedStringWithSpaces);
+                }
             }
             maskedEmvTagEntries.add(ete);
         }
         apduObserver.m_emvTagEntries = maskedEmvTagEntries;
     
-        TreeMap<AppAccountIdentifier,AppSelectionContext> maskedAccountIdentifiers = new TreeMap<>();
+        TreeMap<AppAccountIdentifier, ArrayList<AppSelectionContext>> maskedAccountIdentifiers = new TreeMap<>();
         for(AppAccountIdentifier aai: apduObserver.m_accountIdentifiers.keySet()) {
             if(aai.applicationPAN==null) {
                 continue;
@@ -258,7 +267,11 @@ public class PCIMaskingAgent {
             String xmlLine = xmlLines[xmlLineNumber];
             for(String sensitiveString: maskPairs.keySet()) {
                 String sensitiveStringWithSpaces = apduObserver.hexReinsertSpacesBetweenBytes(sensitiveString);
-                if(
+                if(sensitiveStringWithSpaces==null) {
+                    // A null value implies that the string is not sensitive
+                    // (generally because it is an AID:priority pair stored
+                    // pending discovery of the PAN)
+                } else if(
                     xmlLine.contains(sensitiveString) || 
                     xmlLine.contains(sensitiveStringWithSpaces) 
                 ) {

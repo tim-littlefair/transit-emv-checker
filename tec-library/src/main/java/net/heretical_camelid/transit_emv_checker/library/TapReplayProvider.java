@@ -58,12 +58,13 @@ public class TapReplayProvider extends MyProviderBase implements IProvider {
 
         byte[] replayResponse = stepCarItem.rawResponse;
         byte[] substitutedReplayResponse = null;
-        if(replayResponse != null) {
-            substitutedReplayResponse = Arrays.copyOf(
-                replayResponse, replayResponse.length
-            );
+        if(replayResponse == null) {
+            throw new CommunicationException(stepCarItem.interpretedResponseStatus);
         }
 
+        substitutedReplayResponse = Arrays.copyOf(
+            replayResponse, replayResponse.length
+        );
         final byte[] selectedResponse;
         TapReplayArbiter.ReplayCompareOutcome responseOutcome = m_tra.getArbiter().compareAPDU(
             stepCarItem.stepName,

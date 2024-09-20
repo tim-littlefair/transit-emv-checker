@@ -10,8 +10,8 @@ package net.heretical_camelid.transit_emv_checker.library;
  * values and the ApduObserver stores these in a 
  */
 class AppAccountIdentifier implements Comparable<AppAccountIdentifier> {
-    String applicationPAN = null;
-    String applicationExpiryMonth = null;
+    String applicationPAN = "";
+    String applicationExpiryMonth = "";
     // If the PSN is not explicitly set we implicitly set it to 
     // the empty string (as null would not be comparable)
     String applicationPSN = "";
@@ -25,6 +25,8 @@ class AppAccountIdentifier implements Comparable<AppAccountIdentifier> {
     }
 
     public int compareTo(AppAccountIdentifier other) {
+        return this.toString().compareTo(other.toString());
+/*
         int compareResult = applicationPAN.compareTo(other.applicationPAN);
         if(compareResult == 0) {
             compareResult = applicationPSN.compareTo(other.applicationPSN);
@@ -32,6 +34,7 @@ class AppAccountIdentifier implements Comparable<AppAccountIdentifier> {
         if(compareResult == 0) {
             compareResult = applicationExpiryMonth.compareTo(other.applicationExpiryMonth);
         }
-        return compareResult;        
+        return compareResult;
+ */
     }
 }

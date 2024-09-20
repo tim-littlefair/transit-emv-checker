@@ -1,5 +1,6 @@
 .gradle
 **/build/
+**/*.class
 !src/**/build/
 
 # Ignore Gradle GUI config
@@ -29,4 +30,6 @@ local.properties
 _work/
 android-app/release
 *.hprof
+tec-library/bin
+
 

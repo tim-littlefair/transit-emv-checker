@@ -40,7 +40,7 @@ android {
         // additional 3-hex-digit suffix derived from the
         // hash of git HEAD, or may be the string 'dirty'.
 
-        // Builds done direcly using .gradlew will use the
+        // Builds done directly using .gradlew will use the
         // value 'dirty' in place of the hash suffix.
         versionName "0.1.4-$vname_suffix"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -183,9 +183,13 @@ apply plugin: 'jacoco'
 evaluationDependsOn ':tec-library'
 tasks.withType(JacocoReport).configureEach {
     apply plugin: 'java-library'
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
     def otherSourceSet = project(':tec-library').sourceSets.main
-    additionalSourceDirs.from otherSourceSet.allJava
-    additionalClassDirs.from otherSourceSet.output
+    additionalSourceDirs = otherSourceSet.allJava
+    additionalClassDirs = otherSourceSet.output
+    //additionalSourceDirs.from otherSourceSet.allJava
+    //additionalClassDirs.from otherSourceSet.output
 }
 
 

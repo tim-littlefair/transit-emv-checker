@@ -12,7 +12,7 @@ import androidx.test.filters.SdkSuppress;
 
 import com.github.devnied.emvnfccard.iso7816emv.ITerminal;
 
-import net.heretical_camelid.transit_emv_checker.library.TapReplayConductor;
+import net.heretical_camelid.transit_emv_checker.library.TapConductor;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -166,7 +166,7 @@ public class TEC_MediaTestSuite extends TECTestSuiteBase {
         MainActivity mainActivity = MainActivity.s_activeInstance;
         assert mainActivity != null;
 
-        TapReplayConductor trc = mainActivity.replayCapturedTap(mediaAssetName, terminal);
+        TapConductor trc = mainActivity.replayCapturedTap(mediaAssetName, terminal);
 
         // Providing we reach this point the tap replay conductor has not only been constructed
         // but has also replayed the tap, masked all of the PCI data, and can be used

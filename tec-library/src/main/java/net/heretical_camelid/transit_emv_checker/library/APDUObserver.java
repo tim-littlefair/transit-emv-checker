@@ -219,11 +219,11 @@ public class APDUObserver {
                     stream.reset();
                     byte[] dataAtTlvFail = new byte[stream.available()]; 
                     stream.read(dataAtTlvFail);
-					LOGGER.warn(String.format(
+                    LOGGER.warn(String.format(
                         "TLV format error processing %s",BytesUtils.bytesToString(dataAtTlvFail)
                     ));
-					break;
-				} else if(tlv.getTag().isConstructed()) {
+                    break;
+                } else if(tlv.getTag().isConstructed()) {
                     TLVInputStream stream2 = new TLVInputStream(new ByteArrayInputStream(tlv.getValueBytes()));
                     extractTagsRecursively(stream2,newTagList,carItem);
                 } else {
@@ -505,7 +505,7 @@ public class APDUObserver {
             if(lastCarriageReturnPosition > 0) {
                 prettyApdu = prettyApdu.substring(0,lastCarriageReturnPosition);
             }
-    		cr.interpretedResponseBody = prettyApdu;
+            cr.interpretedResponseBody = prettyApdu;
         } else {
             cr.interpretedResponseStatus = "Status word not found";
             cr.interpretedResponseBody = "Not parsed";

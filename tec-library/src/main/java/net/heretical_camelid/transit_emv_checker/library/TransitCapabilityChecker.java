@@ -2,6 +2,7 @@ package net.heretical_camelid.transit_emv_checker.library;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -153,7 +154,9 @@ public class TransitCapabilityChecker {
         int vpOutcomeIndex = 0;
         String appExpiryHex = getValueHex(ascKey, "5F24");
         String appEffectiveHex = getValueHex(ascKey, "5F25");
-        String currentDateString = new SimpleDateFormat("yyMMdd").format(new Date());
+        String currentDateString = new SimpleDateFormat(
+            "yyMMdd", Locale.ENGLISH
+        ).format(new Date());
 
         if(appExpiryHex==null) {
             capabilityNotes.append("Application Expiry Date not found\n");

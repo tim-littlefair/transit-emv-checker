@@ -242,6 +242,7 @@ public class MainActivity extends AppCompatActivity {
                 "-dirty",
                 "-devbuild"
             );
+            //noinspection
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // Add a timestamp if the API makes it easy to do so
                 versionString += "-" +

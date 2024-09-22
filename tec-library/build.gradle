@@ -20,7 +20,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.13.0'
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
     implementation "org.slf4j:slf4j-api:2.0.13"
-    implementation "org.slf4j:slf4j-reload4j:2.0.13"
+    testImplementation "org.slf4j:slf4j-reload4j:2.0.13"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

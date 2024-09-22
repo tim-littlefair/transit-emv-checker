@@ -1,7 +1,7 @@
 #!/bin/sh
 
 variant=pcsc-cli-app
-version=0.1.0
+version=0.2.0
 mainclass=net.heretical_camelid.transit_emv_checker.pcsc_cli_app.Main
 
 if [ ! "$1" = "--run-only" ]

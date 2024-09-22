@@ -120,6 +120,13 @@ public class BasicReplayTest  {
 
     @Test
     @Tag("run_with_gradle")
+    public void testReplay_mc_0385() {
+        String mediaCaptureBasename = "mc-exp2403-0385";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+    }
+
+    @Test
+    @Tag("run_with_gradle")
     public void testReplay_ConnectionLostBeforeGPOResponse() {
         String mediaCaptureBasename = "connection_lost_before_GPO_response";
         Result result = replayMediaCapture(mediaCaptureBasename);
@@ -160,7 +167,6 @@ public class BasicReplayTest  {
         return result;
     }
 
-    private record Result(String summary, String transitCapabilities, String diagnosticXml) {
-    }
+    private record Result(String summary, String transitCapabilities, String diagnosticXml) { }
 
 }

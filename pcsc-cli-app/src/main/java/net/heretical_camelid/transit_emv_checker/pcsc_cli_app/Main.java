@@ -35,29 +35,6 @@ public class Main {
 	public static void main(final String[] args) {
 
 		System.out.println("");
-/*
-		// Define config
-		Config config;
-		config = EmvTemplate.Config()
-							.setContactLess(true)
-							.setReadAllAids(true)
-							.setReadTransactions(false)
-							.setReadAt(false)
-							// Reading CPLC is presently disabled for two reasons:
-							// 1) It is not interesting for the purposes of this application
-							// 2) With some of the cards I have to hand, devnied's implementation
-							//    in v3.0.2-SNAPSHOT of this throws an exception because the
-							//    two byte pattern 0xFF 0xFF is not accepted as a placeholder
-							//    for an undefined date.  I plan to raise a PR on devnied's
-							//    github project to tolerate this value in the same way the value
-							//    0x00 0x00 is tolerated.
-							.setReadCplc(false)
-							// This application substitutes an alternate implementation of
-							// the parser, see the comment on MyParser.extractCommonsCardData
-							// for why the local implementation is chosen over devnied's
-							// EmvParser.
-							.setRemoveDefaultParsers(true);
-*/
 
 		try {
 			TapConductor tc;
@@ -65,7 +42,7 @@ public class Main {
 			ITerminal transitTerminal = new TransitTerminal();
 			if (args.length == 0) {
 				tc = getTapConductorForPhysicalCard(transitTerminal);
-			} else if (args.length ==1){
+			} else if (args.length == 1){
 				XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
 				FileInputStream fis = new FileInputStream(args[0]);
 				tc = TapConductor.createReplayTapConductor(
@@ -77,32 +54,6 @@ public class Main {
 				return;
 			}
 			APDUObserver apduObserver = tc.getAPDUObserver();
-/*
-			EmvTemplate template = EmvTemplate.Builder() //
-									   .setProvider(provider) // Define provider
-									   .setConfig(config) // Define config
-									   .setTerminal(new TransitTerminal())
-									   .build();
-			template.addParsers(new MyParser(template, apduObserver));
-
-			// Read card
-			EmvCard emvCard = template.readEmvCard();
-
-			// Disconnect the card
-			// card.disconnect(false);
-
-			// At this point apduObserver contains raw data relating to the
-			// transaction - before we can dump this in a PCI-compliant
-			// environment we need to mask all occurrences of the PAN
-			// and the cardholder name.
-			APDUObserver[] apduObserverRef = new APDUObserver[]{apduObserver};
-			boolean pciMaskingOk = thePCIMaskingAgent.maskAccountData(apduObserver);
-
-			if (pciMaskingOk == false) {
-				LOGGER.info("No summary or tap dumps because PCI masking failed");
-				return;
-			}
-*/
 
 			// TODO?: Allow args to control XML output directory/filename
 			System.out.println("Summary:\n\n" + apduObserver.summary());
@@ -143,7 +94,7 @@ public class Main {
 		try {
 			TerminalFactory factory = TerminalFactory.getDefault();
 			List<CardTerminal> terminals = factory.terminals().list();
-			if (terminals == null || terminals.isEmpty()) {
+			if (terminals == null) {
 				LOGGER.error("Null PCSC reader list returned - check your hardware supports PCSC");
 				return null;
 			} else if (terminals.isEmpty()) {
@@ -166,21 +117,7 @@ public class Main {
 		}
 		return null;
 	}
-/*
-	private static IProvider getProviderForTapReplay(APDUObserver apduObserver, String tapXmlPath) {
-		FileInputStream captureXmlStream;
-		try {
-			captureXmlStream = new FileInputStream(tapXmlPath);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		XMLInputFactory xmlInFact = XMLInputFactory.newFactory();
-		TapConductor trc = TapConductor.createReplayTapConductor(
-			null, xmlInFact, captureXmlStream
-		);
-		return trc.getProvider();
-	}
-*/
+
 	private static void reportException(Throwable e) {
 		System.err.println("Caught exception with message '" + e.getMessage() + "'");
 		System.err.println("Stack trace:");

@@ -77,7 +77,7 @@ android {
         buildConfig true
     }
     lint {
-        disable += [ 'DefaultLocale', 'ObsoleteSdkInt' ]
+        disable += [ 'DefaultLocale', 'ObsoleteSdkInt', 'VectorPath', 'UnusedResources' ]
     }
     testOptions {
         unitTests {

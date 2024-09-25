@@ -84,6 +84,7 @@ public class APDUObserver {
             m_currentAppAccountIdentifier.applicationPAN = tempAaiKeyPrefix;
         } else {
             AppAccountIdentifier aaiToRemove = null;
+            String ascToBeUpdated = null;
             for(AppAccountIdentifier aai: m_accountIdentifiers.keySet()) {
                 ArrayList<AppSelectionContext> tempAscList = m_accountIdentifiers.get(aai);
                 if(
@@ -94,12 +95,31 @@ public class APDUObserver {
                     assert tempAscList.size() == 1;
                     AppSelectionContext tempAsc = tempAscList.get(0);
                     copyAppSelectionContextAttributes(tempAsc);
+                    ascToBeUpdated = tempAsc.toString();
                     aaiToRemove = aai;
                     break;
                 }
                 aai = null;
             }
             if(aaiToRemove != null) {
+
+/*
+                // We need to scan the collection of EMV tag entries and
+                // update any that have their scope set to the incomplete
+                // app selection context, or a prefix of it.
+                assert ascToBeUpdated != null;
+                for(EMVTagEntry ete: m_emvTagEntries) {
+                    if(
+                        ete.scope != null && (
+                            ascToBeUpdated.startsWith(ete.scope) ||
+                            ete.scope.startsWith(ascToBeUpdated)
+                        )
+                    ) {
+                        ete.scope = m_currentAppSelectionContext.toString();
+                    }
+                }
+ */
+
                 m_accountIdentifiers.remove(aaiToRemove);
                 ArrayList<AppSelectionContext> newAscList = new ArrayList<>();
                 newAscList.add(m_currentAppSelectionContext);
@@ -122,27 +142,6 @@ public class APDUObserver {
             // reflect the full current selection context (which should contain 
             // an appPriorityIndicator at a minimum alongside the AID).
 
-            // As removal and reinsertion invalidates the iterator
-            // we use to scan the collection, we create a filtered 
-            // copy of the original list rather than trying to change 
-            // it directly.
-            /*
-            TreeSet<EMVTagEntry> updatedEmvTagEntries = new TreeSet<EMVTagEntry>();
-            for(EMVTagEntry ete: m_emvTagEntries) {
-                if(
-                    ( ete.scope != null ) &&
-                    ( ete.scope.equals(priorIncompleteAsc.toString()) )
-                ) {
-                    // Update the scope on the item before copying it across
-                    ete.scope = m_currentAppSelectionContext.toString();
-                    updatedEmvTagEntries.add(ete);
-                } else {
-                    // Copy the item across unchanged
-                    updatedEmvTagEntries.add(ete);
-                }
-            }
-            m_emvTagEntries = updatedEmvTagEntries;
-            */
             ArrayList<AppSelectionContext> ascList = new ArrayList<>();
             ascList.add(m_currentAppSelectionContext);
             m_accountIdentifiers.put(
@@ -219,11 +218,11 @@ public class APDUObserver {
                     stream.reset();
                     byte[] dataAtTlvFail = new byte[stream.available()]; 
                     stream.read(dataAtTlvFail);
-					LOGGER.warn(String.format(
+                    LOGGER.warn(String.format(
                         "TLV format error processing %s",BytesUtils.bytesToString(dataAtTlvFail)
                     ));
-					break;
-				} else if(tlv.getTag().isConstructed()) {
+                    break;
+                } else if(tlv.getTag().isConstructed()) {
                     TLVInputStream stream2 = new TLVInputStream(new ByteArrayInputStream(tlv.getValueBytes()));
                     extractTagsRecursively(stream2,newTagList,carItem);
                 } else {
@@ -261,6 +260,11 @@ public class APDUObserver {
         tagValueHex = tagValueHex.replaceAll(" ","");
         if(tagValueString.equals("2PAY.SYS.DDF01")) {
             // PPSE - do nothing
+        } else if( tagHex.equals("61")) {
+            // The PPSE usually contains the FCI Proprietary Template
+            // which can contain information about multiple applications,
+            // prefixed/separated by tag 61
+            closeAppSelectionContext();
         } else if( tagHex.equals("4F")) {
             openAppSelectionContext(tagValueHex.replaceAll(" ", ""));
         } else if(tagHex.equals("9F36")) {
@@ -505,7 +509,7 @@ public class APDUObserver {
             if(lastCarriageReturnPosition > 0) {
                 prettyApdu = prettyApdu.substring(0,lastCarriageReturnPosition);
             }
-    		cr.interpretedResponseBody = prettyApdu;
+            cr.interpretedResponseBody = prettyApdu;
         } else {
             cr.interpretedResponseStatus = "Status word not found";
             cr.interpretedResponseBody = "Not parsed";

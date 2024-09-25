@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
+<emv_medium>
+    <command_and_response step_number="1" step_name="SELECT CONTACTLESS PPSE">
+        <raw_command>
+            00 A4 04 00 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 00
+        </raw_command>
+        <interpreted_command>
+SELECT CONTACTLESS PPSE
+        </interpreted_command>
+        <raw_response>
+6F 34 84 0E 32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 A5 22 BF 0C 1F 61 18 4F 07 A0 00 00 00 04 10 10 50 0A 4D 61 73 74 65 72 63 61 72 64 87 01 01 42 03 FF FF FF 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+6F 34 -- File Control Information (FCI) Template
+      84 0E -- Dedicated File (DF) Name
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31 (BINARY)
+      A5 22 -- File Control Information (FCI) Proprietary Template
+            BF 0C 1F -- File Control Information (FCI) Issuer Discretionary Data
+                     61 18 -- Application Template
+                           4F 07 -- Application Identifier (AID) - card
+                                 A0 00 00 00 04 10 10 (BINARY)
+                           50 0A -- Application Label
+                                 4D 61 73 74 65 72 63 61 72 64 (=Mastercard)
+                           87 01 -- Application Priority Indicator
+                                 01 (BINARY)
+                     42 03 -- Issuer Identification Number (IIN)
+                           FF FF FF (NUMERIC)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="2" step_name="SELECT APPLICATION BY AID A0000000041010">
+        <raw_command>
+            00 A4 04 00 07 A0 00 00 00 04 10 10 00
+        </raw_command>
+        <interpreted_command>
+SELECT APPLICATION BY AID A0000000041010
+        </interpreted_command>
+        <raw_response>
+6F 47 84 07 A0 00 00 00 04 10 10 A5 3C 50 0A 4D 61 73 74 65 72 63 61 72 64 87 01 01 5F 2D 02 65 6E 9F 11 01 01 9F 12 0F 42 61 6E 6B 77 65 73 74 20 43 72 65 64 69 74 BF 0C 0F 9F 4D 02 0B 0A 9F 6E 07 00 36 00 00 30 30 00 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+6F 47 -- File Control Information (FCI) Template
+      84 07 -- Dedicated File (DF) Name
+            A0 00 00 00 04 10 10 (BINARY)
+      A5 3C -- File Control Information (FCI) Proprietary Template
+            50 0A -- Application Label
+                  4D 61 73 74 65 72 63 61 72 64 (=Mastercard)
+            87 01 -- Application Priority Indicator
+                  01 (BINARY)
+            5F 2D 02 -- Language Preference
+                     65 6E (=en)
+            9F 11 01 -- Issuer Code Table Index
+                     01 (NUMERIC)
+            9F 12 0F -- Application Preferred Name
+                     42 61 6E 6B 77 65 73 74 20 43 72 65 64 69 74 (=Bankwest Credit)
+            BF 0C 0F -- File Control Information (FCI) Issuer Discretionary Data
+                     9F 4D 02 -- Log Entry
+                              0B 0A (BINARY)
+                     9F 6E 07 -- Visa Low-Value Payment (VLP) Issuer Authorisation Code
+                              00 36 00 00 30 30 00 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="3" step_name="GET_PROCESSING_OPTIONS for A0000000041010p01">
+        <raw_command>
+            80 A8 00 00 02 83 00 00
+        </raw_command>
+        <interpreted_command>
+GET_PROCESSING_OPTIONS for A0000000041010p01
+        </interpreted_command>
+        <raw_response>
+77 12 82 02 19 80 94 0C 08 01 01 00 10 01 01 01 20 01 03 00 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+77 12 -- Response Message Template Format 2
+      82 02 -- Application Interchange Profile
+            19 80 (BINARY)
+      94 0C -- Application File Locator (AFL)
+            08 01 01 00 10 01 01 01 20 01 03 00 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="4" step_name="READ_RECORD 01.01">
+        <raw_command>
+            00 B2 01 0C 00
+        </raw_command>
+        <interpreted_command>
+READ_RECORD 01.01
+        </interpreted_command>
+        <raw_response>
+70 75 9F 6C 02 00 01 9F 62 06 00 00 00 03 80 00 9F 63 06 00 00 00 E0 70 00 56 34 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 9F 64 01 03 9F 65 02 00 70 9F 66 02 1C 0E 9F 6B 13 54 13 33 99 99 99 03 85 D2 80 72 01 00 00 01 00 00 00 0F 9F 67 01 03 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+70 75 -- Record Template (EMV Proprietary)
+      9F 6C 02 -- Mag Stripe Application Version Number (Card)
+               00 01 (BINARY)
+      9F 62 06 -- Track 1 bit map for CVC3
+               00 00 00 03 80 00 (BINARY)
+      9F 63 06 -- Track 1 bit map for UN and ATC
+               00 00 00 E0 70 00 (BINARY)
+      56 34 -- Track 1 Data
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+            FF FF FF FF (BINARY)
+      9F 64 01 -- Track 1 number of ATC digits
+               03 (BINARY)
+      9F 65 02 -- Track 2 bit map for CVC3
+               00 70 (BINARY)
+      9F 66 02 -- Terminal Transaction Qualifiers
+               1C 0E (BINARY)
+      9F 6B 13 -- Track 2 Data
+               54 13 33 99 99 99 03 85 D2 80 72 01 00 00 01 00
+               00 00 0F (BINARY)
+      9F 67 01 -- Track 2 number of ATC digits
+               03 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="5" step_name="READ_RECORD 01.01">
+        <raw_command>
+            00 B2 01 0C 00
+        </raw_command>
+        <interpreted_command>
+READ_RECORD 01.01
+        </interpreted_command>
+        <raw_response>
+70 75 9F 6C 02 00 01 9F 62 06 00 00 00 03 80 00 9F 63 06 00 00 00 E0 70 00 56 34 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 9F 64 01 03 9F 65 02 00 70 9F 66 02 1C 0E 9F 6B 13 54 13 33 99 99 99 03 85 D2 80 72 01 00 00 01 00 00 00 0F 9F 67 01 03 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+70 75 -- Record Template (EMV Proprietary)
+      9F 6C 02 -- Mag Stripe Application Version Number (Card)
+               00 01 (BINARY)
+      9F 62 06 -- Track 1 bit map for CVC3
+               00 00 00 03 80 00 (BINARY)
+      9F 63 06 -- Track 1 bit map for UN and ATC
+               00 00 00 E0 70 00 (BINARY)
+      56 34 -- Track 1 Data
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+            FF FF FF FF (BINARY)
+      9F 64 01 -- Track 1 number of ATC digits
+               03 (BINARY)
+      9F 65 02 -- Track 2 bit map for CVC3
+               00 70 (BINARY)
+      9F 66 02 -- Terminal Transaction Qualifiers
+               1C 0E (BINARY)
+      9F 6B 13 -- Track 2 Data
+               54 13 33 99 99 99 03 85 D2 80 72 01 00 00 01 00
+               00 00 0F (BINARY)
+      9F 67 01 -- Track 2 number of ATC digits
+               03 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="6" step_name="READ_RECORD 02.01">
+        <raw_command>
+            00 B2 01 14 00
+        </raw_command>
+        <interpreted_command>
+READ_RECORD 02.01
+        </interpreted_command>
+        <raw_response>
+70 81 A6 57 13 54 13 33 99 99 99 03 85 D2 80 72 01 13 59 81 45 14 59 8F 5A 08 54 13 33 99 99 99 03 85 5F 24 03 24 03 31 5F 25 03 23 08 01 5F 28 02 00 36 5F 34 01 01 8C 27 9F 02 06 9F 03 06 9F 1A 02 95 05 5F 2A 02 9A 03 9C 01 9F 37 04 9F 35 01 9F 45 02 9F 4C 08 9F 34 03 9F 21 03 9F 7C 14 8D 0C 91 0A 8A 02 95 05 9F 37 04 9F 4C 08 8E 0E 00 00 00 00 00 00 00 00 02 03 1E 03 1F 03 9F 07 02 FF 00 9F 08 02 00 02 9F 0D 05 B4 50 84 00 00 9F 0E 05 00 00 00 00 00 9F 0F 05 B4 70 84 80 00 9F 42 02 00 36 9F 4A 01 82 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+70 81 A6 -- Record Template (EMV Proprietary)
+         57 13 -- Track 2 Equivalent Data
+               54 13 33 99 99 99 03 85 D2 80 72 01 13 59 81 45
+               14 59 8F (BINARY)
+         5A 08 -- Application Primary Account Number (PAN)
+               54 13 33 99 99 99 03 85 (NUMERIC)
+         5F 24 03 -- Application Expiration Date
+                  24 03 31 (NUMERIC)
+         5F 25 03 -- Application Effective Date
+                  23 08 01 (NUMERIC)
+         5F 28 02 -- Issuer Country Code
+                  00 36 (NUMERIC)
+         5F 34 01 -- Application Primary Account Number (PAN) Sequence Number
+                  01 (NUMERIC)
+         8C 27 -- Card Risk Management Data Object List 1 (CDOL1)
+               9F 02 06 -- Amount, Authorised (Numeric)
+               9F 03 06 -- Amount, Other (Numeric)
+               9F 1A 02 -- Terminal Country Code
+               95 05 -- Terminal Verification Results (TVR)
+               5F 2A 02 -- Transaction Currency Code
+               9A 03 -- Transaction Date
+               9C 01 -- Transaction Type
+               9F 37 04 -- Unpredictable Number
+               9F 35 01 -- Terminal Type
+               9F 45 02 -- Data Authentication Code
+               9F 4C 08 -- ICC Dynamic Number
+               9F 34 03 -- Cardholder Verification (CVM) Results
+               9F 21 03 -- Transaction Time (HHMMSS)
+               9F 7C 14 -- Merchant Custom Data
+         8D 0C -- Card Risk Management Data Object List 2 (CDOL2)
+               91 0a -- Issuer Authentication Data
+               8A 02 -- Authorisation Response Code
+               95 05 -- Terminal Verification Results (TVR)
+               9F 37 04 -- Unpredictable Number
+               9F 4C 08 -- ICC Dynamic Number
+         8E 0E -- Cardholder Verification Method (CVM) List
+               00 00 00 00 00 00 00 00 02 03 1E 03 1F 03 (BINARY)
+         9F 07 02 -- Application Usage Control
+                  FF 00 (BINARY)
+         9F 08 02 -- Application Version Number - card
+                  00 02 (BINARY)
+         9F 0D 05 -- Issuer Action Code - Default
+                  B4 50 84 00 00 (BINARY)
+         9F 0E 05 -- Issuer Action Code - Denial
+                  00 00 00 00 00 (BINARY)
+         9F 0F 05 -- Issuer Action Code - Online
+                  B4 70 84 80 00 (BINARY)
+         9F 42 02 -- Application Currency Code
+                  00 36 (NUMERIC)
+         9F 4A 01 -- Static Data Authentication Tag List
+                  82 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="7" step_name="READ_RECORD 04.01">
+        <raw_command>
+            00 B2 01 24 00
+        </raw_command>
+        <interpreted_command>
+READ_RECORD 04.01
+        </interpreted_command>
+        <raw_response>
+70 81 FB 9F 46 81 F7 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+70 81 FB -- Record Template (EMV Proprietary)
+         9F 46 81 F7 -- ICC Public Key Certificate
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+                     FF FF FF FF FF FF FF (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="8" step_name="READ_RECORD 04.02">
+        <raw_command>
+            00 B2 02 24 00
+        </raw_command>
+        <interpreted_command>
+READ_RECORD 04.02
+        </interpreted_command>
+        <raw_response>
+70 81 FB 90 81 F8 02 7F 15 5B 25 E4 7D C2 43 C6 5F 15 C5 7E 7C 2F FA 6A B3 5F CE 4F 64 BC E2 D0 49 25 04 8E 8E B3 A7 8D DA 3B CF 4C A5 F0 8A 33 D0 7D F3 E1 A7 3A BB 17 DE 76 E7 0B A6 4D 43 B9 17 29 92 01 12 43 40 A0 F9 06 81 F3 34 AF DF 48 39 D8 3A BF D2 4C D1 D9 9F 88 71 DE 49 3D AD 2F 1C BC 71 CC 1B FF A2 6F 58 EA 82 FD C0 60 9D EF 50 BD 17 05 03 79 17 98 58 55 AE DA 69 1D 33 72 56 A7 33 4D 6C 58 D6 CB 11 E6 E1 C0 9E E6 12 27 1E 50 C1 2C 43 FC 2E 80 66 5F 3E 48 EF A6 A4 0B BC 82 08 16 41 85 33 39 F7 84 02 57 5E 8A 5F 92 FD 79 79 BA DA 06 80 D7 E2 6B 4C 28 D0 B4 AA 63 5C 30 EE 53 E3 99 18 D6 1B E5 FF 1D 0A 0D FF 28 C1 95 C2 53 F3 5D 50 C7 A5 01 D6 D5 07 1E 45 4B 5B B7 03 2C 83 3B C4 C4 08 49 55 48 4B 18 84 D6 8A 1F 79 54 05 21 D7 58 4A 0C 16 D6 9E 8A 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+70 81 FB -- Record Template (EMV Proprietary)
+         90 81 F8 -- Issuer Public Key Certificate
+                  02 7F 15 5B 25 E4 7D C2 43 C6 5F 15 C5 7E 7C 2F
+                  FA 6A B3 5F CE 4F 64 BC E2 D0 49 25 04 8E 8E B3
+                  A7 8D DA 3B CF 4C A5 F0 8A 33 D0 7D F3 E1 A7 3A
+                  BB 17 DE 76 E7 0B A6 4D 43 B9 17 29 92 01 12 43
+                  40 A0 F9 06 81 F3 34 AF DF 48 39 D8 3A BF D2 4C
+                  D1 D9 9F 88 71 DE 49 3D AD 2F 1C BC 71 CC 1B FF
+                  A2 6F 58 EA 82 FD C0 60 9D EF 50 BD 17 05 03 79
+                  17 98 58 55 AE DA 69 1D 33 72 56 A7 33 4D 6C 58
+                  D6 CB 11 E6 E1 C0 9E E6 12 27 1E 50 C1 2C 43 FC
+                  2E 80 66 5F 3E 48 EF A6 A4 0B BC 82 08 16 41 85
+                  33 39 F7 84 02 57 5E 8A 5F 92 FD 79 79 BA DA 06
+                  80 D7 E2 6B 4C 28 D0 B4 AA 63 5C 30 EE 53 E3 99
+                  18 D6 1B E5 FF 1D 0A 0D FF 28 C1 95 C2 53 F3 5D
+                  50 C7 A5 01 D6 D5 07 1E 45 4B 5B B7 03 2C 83 3B
+                  C4 C4 08 49 55 48 4B 18 84 D6 8A 1F 79 54 05 21
+                  D7 58 4A 0C 16 D6 9E 8A (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="9" step_name="READ_RECORD 04.03">
+        <raw_command>
+            00 B2 03 24 00
+        </raw_command>
+        <interpreted_command>
+READ_RECORD 04.03
+        </interpreted_command>
+        <raw_response>
+70 30 8F 01 06 92 23 77 EF 91 4A 17 D4 C9 ED 02 41 B0 16 72 50 6B A0 EB 12 31 8B 1E FC 03 96 52 43 02 8B 7C 07 CD D0 13 CC BB 9F 32 01 03 9F 47 01 03 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+70 30 -- Record Template (EMV Proprietary)
+      8F 01 -- Certification Authority Public Key Index - card
+            06 (BINARY)
+      92 23 -- Issuer Public Key Remainder
+            77 EF 91 4A 17 D4 C9 ED 02 41 B0 16 72 50 6B A0
+            EB 12 31 8B 1E FC 03 96 52 43 02 8B 7C 07 CD D0
+            13 CC BB (BINARY)
+      9F 32 01 -- Issuer Public Key Exponent
+               03 (BINARY)
+      9F 47 01 -- ICC Public Key Exponent
+               03 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="10" step_name="GET_DATA for tag 9F17">
+        <raw_command>
+            80 CA 9F 17 00
+        </raw_command>
+        <interpreted_command>
+GET_DATA for tag 9F17
+        </interpreted_command>
+        <raw_response>
+9F 17 01 01 90 00
+        </raw_response>
+        <interpreted_response_status>SW_9000</interpreted_response_status>
+        <interpreted_response_body>
+9F 17 01 -- Personal Identification Number (PIN) Try Counter
+         01 (BINARY)
+        </interpreted_response_body>
+    </command_and_response>
+    <command_and_response step_number="11" step_name="GET_DATA for tag 9F36">
+        <raw_command>
+            80 CA 9F 36 00
+        </raw_command>
+        <interpreted_command>
+GET_DATA for tag 9F36
+        </interpreted_command>
+        <raw_response>
+6A 88
+        </raw_response>
+        <interpreted_response_status>SW_6A88</interpreted_response_status>
+        <interpreted_response_body>
+6A 88 -- Referenced data not found
+        </interpreted_response_body>
+    </command_and_response>
+    <app_account_id selection_context="A0000000041010v0002p01" account_id="522980FFFFFF0385.2807.01" />
+    <emv_tag tag="42" name="Issuer Identification Number (IIN)">
+        <value source="medium" scope="A0000000041010p01">
+            FF FF FF
+        </value>
+    </emv_tag>
+    <emv_tag tag="4F" name="Application Identifier (AID) - card">
+        <value source="medium" scope="A0000000041010p01">
+            A0 00 00 00 04 10 10
+        </value>
+    </emv_tag>
+    <emv_tag tag="50" name="Application Label">
+        <value source="medium" scope="A0000000041010p01">
+            4D 61 73 74 65 72 63 61 72 64
+        </value>
+    </emv_tag>
+    <emv_tag tag="56" name="Track 1 Data">
+        <value source="medium" scope="A0000000041010p01">
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+        </value>
+    </emv_tag>
+    <emv_tag tag="57" name="Track 2 Equivalent Data">
+        <value source="medium" scope="A0000000041010v0002p01">
+            54 13 33 99 99 99 03 85 D2 80 72 01 13 59 81 45 14 59 8F
+        </value>
+    </emv_tag>
+    <emv_tag tag="5A" name="Application Primary Account Number (PAN)">
+        <value source="medium" scope="A0000000041010v0002p01">
+            54 13 33 99 99 99 03 85
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F24" name="Application Expiration Date">
+        <value source="medium" scope="A0000000041010v0002p01">
+            24 03 31
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F25" name="Application Effective Date">
+        <value source="medium" scope="A0000000041010v0002p01">
+            23 08 01
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F28" name="Issuer Country Code">
+        <value source="medium" scope="A0000000041010v0002p01">
+            00 36
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F2D" name="Language Preference">
+        <value source="medium" scope="A0000000041010p01">
+            65 6E
+        </value>
+    </emv_tag>
+    <emv_tag tag="5F34" name="Application Primary Account Number (PAN) Sequence Number">
+        <value source="medium" scope="A0000000041010v0002p01">
+            01
+        </value>
+    </emv_tag>
+    <emv_tag tag="82" name="Application Interchange Profile">
+        <value source="medium" scope="A0000000041010p01">
+            19 80
+        </value>
+    </emv_tag>
+    <emv_tag tag="84" name="Dedicated File (DF) Name">
+        <value source="medium" scope="A0000000041010p01">
+            32 50 41 59 2E 53 59 53 2E 44 44 46 30 31
+        </value>
+    </emv_tag>
+    <emv_tag tag="87" name="Application Priority Indicator">
+        <value source="medium" scope="A0000000041010p01">
+            01
+        </value>
+    </emv_tag>
+    <emv_tag tag="8C" name="Card Risk Management Data Object List 1 (CDOL1)">
+        <value source="medium" scope="A0000000041010v0002p01">
+            9F 02 06 9F 03 06 9F 1A 02 95 05 5F 2A 02 9A 03 9C 01 9F 37 04 9F 35 01 9F 45 02 9F 4C 08 9F 34 03 9F 21 03 9F 7C 14
+        </value>
+    </emv_tag>
+    <emv_tag tag="8D" name="Card Risk Management Data Object List 2 (CDOL2)">
+        <value source="medium" scope="A0000000041010v0002p01">
+            91 0A 8A 02 95 05 9F 37 04 9F 4C 08
+        </value>
+    </emv_tag>
+    <emv_tag tag="8E" name="Cardholder Verification Method (CVM) List">
+        <value source="medium" scope="A0000000041010v0002p01">
+            00 00 00 00 00 00 00 00 02 03 1E 03 1F 03
+        </value>
+    </emv_tag>
+    <emv_tag tag="8F" name="Certification Authority Public Key Index - card">
+        <value source="medium" scope="A0000000041010v0002p01">
+            06
+        </value>
+    </emv_tag>
+    <emv_tag tag="90" name="Issuer Public Key Certificate">
+        <value source="medium" scope="A0000000041010v0002p01">
+            02 7F 15 5B 25 E4 7D C2 43 C6 5F 15 C5 7E 7C 2F FA 6A B3 5F CE 4F 64 BC E2 D0 49 25 04 8E 8E B3 A7 8D DA 3B CF 4C A5 F0 8A 33 D0 7D F3 E1 A7 3A BB 17 DE 76 E7 0B A6 4D 43 B9 17 29 92 01 12 43 40 A0 F9 06 81 F3 34 AF DF 48 39 D8 3A BF D2 4C D1 D9 9F 88 71 DE 49 3D AD 2F 1C BC 71 CC 1B FF A2 6F 58 EA 82 FD C0 60 9D EF 50 BD 17 05 03 79 17 98 58 55 AE DA 69 1D 33 72 56 A7 33 4D 6C 58 D6 CB 11 E6 E1 C0 9E E6 12 27 1E 50 C1 2C 43 FC 2E 80 66 5F 3E 48 EF A6 A4 0B BC 82 08 16 41 85 33 39 F7 84 02 57 5E 8A 5F 92 FD 79 79 BA DA 06 80 D7 E2 6B 4C 28 D0 B4 AA 63 5C 30 EE 53 E3 99 18 D6 1B E5 FF 1D 0A 0D FF 28 C1 95 C2 53 F3 5D 50 C7 A5 01 D6 D5 07 1E 45 4B 5B B7 03 2C 83 3B C4 C4 08 49 55 48 4B 18 84 D6 8A 1F 79 54 05 21 D7 58 4A 0C 16 D6 9E 8A
+        </value>
+    </emv_tag>
+    <emv_tag tag="92" name="Issuer Public Key Remainder">
+        <value source="medium" scope="A0000000041010v0002p01">
+            77 EF 91 4A 17 D4 C9 ED 02 41 B0 16 72 50 6B A0 EB 12 31 8B 1E FC 03 96 52 43 02 8B 7C 07 CD D0 13 CC BB
+        </value>
+    </emv_tag>
+    <emv_tag tag="94" name="Application File Locator (AFL)">
+        <value source="medium" scope="A0000000041010p01">
+            08 01 01 00 10 01 01 01 20 01 03 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F07" name="Application Usage Control">
+        <value source="medium" scope="A0000000041010v0002p01">
+            FF 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F08" name="Application Version Number - card">
+        <value source="medium" scope="A0000000041010v0002p01">
+            00 02
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F0D" name="Issuer Action Code - Default">
+        <value source="medium" scope="A0000000041010v0002p01">
+            B4 50 84 00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F0E" name="Issuer Action Code - Denial">
+        <value source="medium" scope="A0000000041010v0002p01">
+            00 00 00 00 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F0F" name="Issuer Action Code - Online">
+        <value source="medium" scope="A0000000041010v0002p01">
+            B4 70 84 80 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F11" name="Issuer Code Table Index">
+        <value source="medium" scope="A0000000041010p01">
+            01
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F12" name="Application Preferred Name">
+        <value source="medium" scope="A0000000041010p01">
+            42 61 6E 6B 77 65 73 74 20 43 72 65 64 69 74
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F17" name="Personal Identification Number (PIN) Try Counter">
+        <value source="medium">
+            01
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F32" name="Issuer Public Key Exponent">
+        <value source="medium" scope="A0000000041010v0002p01">
+            03
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F42" name="Application Currency Code">
+        <value source="medium" scope="A0000000041010v0002p01">
+            00 36
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F46" name="ICC Public Key Certificate">
+        <value source="medium" scope="A0000000041010v0002p01">
+            FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F47" name="ICC Public Key Exponent">
+        <value source="medium" scope="A0000000041010v0002p01">
+            03
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F4A" name="Static Data Authentication Tag List">
+        <value source="medium" scope="A0000000041010v0002p01">
+            82
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F4D" name="Log Entry">
+        <value source="medium" scope="A0000000041010p01">
+            0B 0A
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F62" name="Track 1 bit map for CVC3">
+        <value source="medium" scope="A0000000041010p01">
+            00 00 00 03 80 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F63" name="Track 1 bit map for UN and ATC">
+        <value source="medium" scope="A0000000041010p01">
+            00 00 00 E0 70 00
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F64" name="Track 1 number of ATC digits">
+        <value source="medium" scope="A0000000041010p01">
+            03
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F65" name="Track 2 bit map for CVC3">
+        <value source="medium" scope="A0000000041010p01">
+            00 70
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F66" name="Terminal Transaction Qualifiers">
+        <value source="medium" scope="A0000000041010p01">
+            1C 0E
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F67" name="Track 2 number of ATC digits">
+        <value source="medium" scope="A0000000041010p01">
+            03
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F6B" name="Track 2 Data">
+        <value source="medium" scope="A0000000041010p01">
+            54 13 33 99 99 99 03 85 D2 80 72 01 00 00 01 00 00 00 0F
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F6C" name="Mag Stripe Application Version Number (Card)">
+        <value source="medium" scope="A0000000041010p01">
+            00 01
+        </value>
+    </emv_tag>
+    <emv_tag tag="9F6E" name="Visa Low-Value Payment (VLP) Issuer Authorisation Code">
+        <value source="medium" scope="A0000000041010p01">
+            00 36 00 00 30 30 00
+        </value>
+    </emv_tag>
+</emv_medium>

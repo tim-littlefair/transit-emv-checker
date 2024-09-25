@@ -88,6 +88,18 @@ public class BasicReplayTest  {
         assertTrue(result.summary.contains("priority=02"));
         assertTrue(result.summary.contains("A00000038410"));
         assertTrue(result.summary.contains("priority=02"));
+
+        // application selection context A0000000041010p01 is
+        // created early during processing, but when the
+        // kernel version number 0002 is seen all references
+        // to this should be updated to A0000000041010v0002p01
+        assertFalse(result.transitCapabilities.contains("A0000000041010p01"));
+
+        // there is also a current problem with failure to merge the app selection
+        // contexts A00000038410v0100 and A00000038410v0100p02 which
+        // can cause this message to appear
+        assertFalse(result.transitCapabilities.contains("AIP not found"));
+
     }
 
     @Test
@@ -95,6 +107,9 @@ public class BasicReplayTest  {
     public void testReplay_0884() {
         String mediaCaptureBasename = "visa-exp2202-0884";
         Result result = replayMediaCapture(mediaCaptureBasename);
+        // The rule about AUC byte 1 bit 1 is in EMV CLess book C2
+        // and does not apply to Visa/book C3 cards
+        assertFalse(result.transitCapabilities.contains("AUC byte 1 bit 1 not set"));
     }
 
     @Test
@@ -102,6 +117,9 @@ public class BasicReplayTest  {
     public void testReplay_5398() {
         String mediaCaptureBasename = "visa-exp2402-5398";
         Result result = replayMediaCapture(mediaCaptureBasename);
+        // The rule about AUC byte 1 bit 1 is in EMV CLess book C2
+        // and does not apply to Visa/book C3 cards
+        assertFalse(result.transitCapabilities.contains("AUC byte 1 bit 1 not set"));
     }
 
     @Test
@@ -116,6 +134,26 @@ public class BasicReplayTest  {
     public void testReplay_5720() {
         String mediaCaptureBasename = "visa_velocity-exp1810-5720";
         Result result = replayMediaCapture(mediaCaptureBasename);
+        assertTrue(result.transitCapabilities.contains("AIP byte 1 bits 1 and 6 not set"));
+    }
+
+    @Test
+    @Tag("run_with_gradle")
+    public void testReplay_mc_0385() {
+        String mediaCaptureBasename = "mc-exp2403-0385";
+        Result result = replayMediaCapture(mediaCaptureBasename);
+        // application selection context A0000000041010p01 is
+        // created early during processing, but when the
+        // kernel version number 0002 is seen all references
+        // to this should be updated to A0000000041010v0002p01
+        assertFalse(result.transitCapabilities.contains("A0000000041010p01"));
+
+        // there is also a current problem with failure to merge the app selection
+        // contexts A00000038410v0100 and A00000038410v0100p02 which
+        // can cause this message to appear
+        assertFalse(result.transitCapabilities.contains("AIP not found"));
+
+        assertTrue(result.transitCapabilities.contains("Application validity period ended 24 03 31"));
     }
 
     @Test
@@ -124,7 +162,6 @@ public class BasicReplayTest  {
         String mediaCaptureBasename = "connection_lost_before_GPO_response";
         Result result = replayMediaCapture(mediaCaptureBasename);
     }
-
 
     private static Result replayMediaCapture(String mediaCaptureBasename) {
         Logger.getLogger(
@@ -156,11 +193,18 @@ public class BasicReplayTest  {
 
         String diagnosticXml = trc.diagnosticXml();
         System.out.println("Diagnostic XML:\n" + diagnosticXml);
+
+        /*
+         * TBD: Sort out connection lost handling so that we can enable these
+        assert summary!=null && summary.length()>0;
+        assert transitCapabilities!=null && transitCapabilities.length()>0;
+        assert diagnosticXml!=null && diagnosticXml.length()>0;
+         */
+
         Result result = new Result(summary, transitCapabilities, diagnosticXml);
         return result;
     }
 
-    private record Result(String summary, String transitCapabilities, String diagnosticXml) {
-    }
+    private record Result(String summary, String transitCapabilities, String diagnosticXml) { }
 
 }

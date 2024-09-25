@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -100,7 +101,9 @@ public class TransitTerminal implements ITerminal {
                 pTagAndLength.getLength() * 2, "0"
             ));
         } else if (pTagAndLength.getTag() == EmvTags.TRANSACTION_DATE) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd");
+            SimpleDateFormat sdf = new SimpleDateFormat(
+                "yyMMdd", Locale.ENGLISH
+            );
             val = BytesUtils.fromString(sdf.format(new Date()));
         } else if (
             pTagAndLength.getTag() == EmvTags.TRANSACTION_TYPE || 

@@ -31,7 +31,7 @@ public abstract class MyProviderBase implements IProvider {
 		byte[] ret = null;
 		buffer.clear();
         newCommandAndResponse.rawCommand = pCommand;
-		try {
+        try {
             ret = implementationTransceive(pCommand, buffer);
             if(ret!=null) {
                 // The raw response stored in m_apduStore will be
@@ -67,10 +67,9 @@ public abstract class MyProviderBase implements IProvider {
                 );
             }
         }
+        return ret;
+    }
 
-		return ret;
-	}
-
-	abstract public byte[] getAt();    
+    abstract public byte[] getAt();
 
 }

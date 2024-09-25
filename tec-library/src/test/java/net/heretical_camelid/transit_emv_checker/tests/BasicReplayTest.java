@@ -61,7 +61,7 @@ public class BasicReplayTest  {
     }
 
     @Test
-    @Tag("run_with_gradle")
+    // @Tag("run_with_gradle")
     public void testReplayBug20() {
         // This bug can be reproduced by replaying a simulated
         // card containing the following applications:
@@ -88,6 +88,18 @@ public class BasicReplayTest  {
         assertTrue(result.summary.contains("priority=02"));
         assertTrue(result.summary.contains("A00000038410"));
         assertTrue(result.summary.contains("priority=02"));
+
+        // application selection context A0000000041010p01 is
+        // created early during processing, but when the
+        // kernel version number 0002 is seen all references
+        // to this should be updated to A0000000041010v0002p01
+        assertFalse(result.transitCapabilities.contains("A0000000041010p01"));
+
+        // there is also a current problem with failure to merge the app selection
+        // contexts A00000038410v0100 and A00000038410v0100p02 which
+        // can cause this message to appear
+        assertFalse(result.transitCapabilities.contains("AIP not found"));
+
     }
 
     @Test
@@ -119,10 +131,20 @@ public class BasicReplayTest  {
     }
 
     @Test
-    @Tag("run_with_gradle")
+    // @Tag("run_with_gradle")
     public void testReplay_mc_0385() {
         String mediaCaptureBasename = "mc-exp2403-0385";
         Result result = replayMediaCapture(mediaCaptureBasename);
+        // application selection context A0000000041010p01 is
+        // created early during processing, but when the
+        // kernel version number 0002 is seen all references
+        // to this should be updated to A0000000041010v0002p01
+        assertFalse(result.transitCapabilities.contains("A0000000041010p01"));
+
+        // there is also a current problem with failure to merge the app selection
+        // contexts A00000038410v0100 and A00000038410v0100p02 which
+        // can cause this message to appear
+        assertFalse(result.transitCapabilities.contains("AIP not found"));
     }
 
     @Test

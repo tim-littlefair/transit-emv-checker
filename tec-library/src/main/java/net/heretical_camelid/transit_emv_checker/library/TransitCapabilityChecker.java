@@ -3,6 +3,7 @@ package net.heretical_camelid.transit_emv_checker.library;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -119,16 +120,21 @@ public class TransitCapabilityChecker {
 
     public TransitCapabilityChecker(APDUObserver apduObserver) {
         m_appSelectionContexts = new TreeSet<>();
+        for(AppAccountIdentifier aai: apduObserver.m_accountIdentifiers.navigableKeySet()) {
+            for(AppSelectionContext asc: apduObserver.m_accountIdentifiers.get(aai)) {
+                assert asc!=null;
+                m_appSelectionContexts.add(asc.toString());
+            }
+        }
         m_emvTagEntryIndex = new TreeMap<>();
         for(EMVTagEntry ete: apduObserver.m_emvTagEntries) {
             String eteScope = ete.scope;
             if(eteScope == null) {
-                // counters - maybe relevant for velocity checks
-            } else if(!m_appSelectionContexts.contains(eteScope)) {
-                m_appSelectionContexts.add(eteScope);
+                // counters - maybe relevant for velocity checks?
+            } else {
+                String eteKey = ete.scope + "." + ete.tagHex;
+                m_emvTagEntryIndex.put(eteKey, ete.valueHex);
             }
-            String eteKey = ete.scope + "." + ete.tagHex;
-            m_emvTagEntryIndex.put(eteKey,ete.valueHex);
         }
     }
 
@@ -193,7 +199,14 @@ public class TransitCapabilityChecker {
     }
 
     private String getValueHex(String scope, String tagHexString) {
-        return m_emvTagEntryIndex.get(scope + "." + tagHexString);
+        AppSelectionContext scopeAsc = new AppSelectionContext(scope);
+        for(String scopeToCheck: scopeAsc.getInheritedScopes()) {
+            String tagValueHex = m_emvTagEntryIndex.get(scopeToCheck + "." + tagHexString);
+            if(tagValueHex != null) {
+                return tagValueHex;
+            }
+        }
+        return null;
     }
 
     private byte[] getValueBytes(String scope, String tagHexString) {

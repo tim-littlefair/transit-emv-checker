@@ -61,7 +61,7 @@ public class BasicReplayTest  {
     }
 
     @Test
-    // @Tag("run_with_gradle")
+    @Tag("run_with_gradle")
     public void testReplayBug20() {
         // This bug can be reproduced by replaying a simulated
         // card containing the following applications:

@@ -43,27 +43,8 @@ class ApplicationCapabilityCheckerBase {
         String capkIndexHex, byte[] aipValueBytes
     ) {
         int odaOutcomeIndex = 0;
-        if(aipValueBytes == null) {
-            capabilityNotes.append("AIP not found => unable to check if CDA supported\n");
-            odaOutcomeIndex = 1;
-        } else if(aipValueBytes.length != 2) {
-            capabilityNotes.append("AIP has unexpected length => unable to check if CDA supported\n");
-            odaOutcomeIndex = 1;
-        } else if( (aipValueBytes[0]&0x21) == 0x00 ) {
-            capabilityNotes.append("AIP byte 1 bits 1 and 6 not set => neither CDA nor DDA supported\n");
-            odaOutcomeIndex = 2;
-        } else if( (aipValueBytes[0]&0x01) == 0x00 ) {
-            capabilityNotes.append("AIP byte 1 bit 1 not set => CDA not supported (but DDA is)\n");
-            odaOutcomeIndex = 1;
-        } else if( (aipValueBytes[1]&(byte)0x80) == 0x00) {
-            capabilityNotes.append("AIP byte 2 bit 8 not set => MSD only, EMV not supported\n");
-            odaOutcomeIndex = 2;
-        }
-        if(odaOutcomeIndex==2) {
-            // We already know that ODA will not be supported so
-            // there's no point in checking whether the CAPK index
-            // is found.
-        } else if (capkIndexHex == null) {
+
+        if (capkIndexHex == null) {
             capabilityNotes.append(
                 "ODA not supported - CAPK index not found\n"
             );
@@ -112,6 +93,43 @@ class ApplicationCapabilityCheckerBase {
 }
 
 class VisaPaywaveApplicationCapabilityChecker extends ApplicationCapabilityCheckerBase {
+    @Override
+    int checkODACapability(
+        int outcomeIndex, StringBuilder capabilityNotes,
+        String capkIndexHex, byte[] aipValueBytes
+    ) {
+        int odaOutcomeIndex = 0;
+        // AIP checking for ODA capability seems to be Visa-specific, not required for Mastercard,
+        // TBD to determine if it is required for other brands
+        if(aipValueBytes == null) {
+            capabilityNotes.append("AIP not found => unable to check if CDA supported\n");
+            odaOutcomeIndex = 1;
+        } else if(aipValueBytes.length != 2) {
+            capabilityNotes.append("AIP has unexpected length => unable to check if CDA supported\n");
+            odaOutcomeIndex = 1;
+        } else if( (aipValueBytes[0]&0x21) == 0x00 ) {
+            capabilityNotes.append("AIP byte 1 bits 1 and 6 not set => neither CDA nor DDA supported\n");
+            odaOutcomeIndex = 2;
+        } else if( (aipValueBytes[0]&0x01) == 0x00 ) {
+            capabilityNotes.append("AIP byte 1 bit 1 not set => CDA not supported (but DDA is)\n");
+            odaOutcomeIndex = 1;
+        } else if( (aipValueBytes[1]&(byte)0x80) == 0x00) {
+            capabilityNotes.append("AIP byte 2 bit 8 not set => MSD only, EMV not supported\n");
+            odaOutcomeIndex = 2;
+        }
+        // If we already know that ODA is disabled due to AIP absence or value there is
+        // no point doing the generic check for whether there is an index for the CAPK
+        if(odaOutcomeIndex<2) {
+            odaOutcomeIndex = super.checkODACapability(
+                odaOutcomeIndex, capabilityNotes, capkIndexHex, aipValueBytes
+            );
+        }
+        return Math.max(outcomeIndex,odaOutcomeIndex);
+    }
+
+}
+
+class MastercardPaypassApplicationCapabilityChecker extends ApplicationCapabilityCheckerBase {
 }
 
 public class TransitCapabilityChecker {
@@ -165,7 +183,7 @@ public class TransitCapabilityChecker {
         } else if (
             ascKey.startsWith("A000000004")
         ) {
-            appCapabilityChecker = new ApplicationCapabilityCheckerBase();
+            appCapabilityChecker = new MastercardPaypassApplicationCapabilityChecker();
         } else {
             appCapabilityChecker = new ApplicationCapabilityCheckerBase();
         }

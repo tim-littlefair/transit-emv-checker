@@ -131,7 +131,7 @@ public class BasicReplayTest  {
     }
 
     @Test
-    // @Tag("run_with_gradle")
+    @Tag("run_with_gradle")
     public void testReplay_mc_0385() {
         String mediaCaptureBasename = "mc-exp2403-0385";
         Result result = replayMediaCapture(mediaCaptureBasename);
@@ -153,7 +153,6 @@ public class BasicReplayTest  {
         String mediaCaptureBasename = "connection_lost_before_GPO_response";
         Result result = replayMediaCapture(mediaCaptureBasename);
     }
-
 
     private static Result replayMediaCapture(String mediaCaptureBasename) {
         Logger.getLogger(
@@ -185,6 +184,14 @@ public class BasicReplayTest  {
 
         String diagnosticXml = trc.diagnosticXml();
         System.out.println("Diagnostic XML:\n" + diagnosticXml);
+
+        /*
+         * TBD: Sort out connection lost handling so that we can enable these
+        assert summary!=null && summary.length()>0;
+        assert transitCapabilities!=null && transitCapabilities.length()>0;
+        assert diagnosticXml!=null && diagnosticXml.length()>0;
+         */
+
         Result result = new Result(summary, transitCapabilities, diagnosticXml);
         return result;
     }

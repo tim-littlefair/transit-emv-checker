@@ -134,6 +134,7 @@ public class BasicReplayTest  {
     public void testReplay_5720() {
         String mediaCaptureBasename = "visa_velocity-exp1810-5720";
         Result result = replayMediaCapture(mediaCaptureBasename);
+        assertTrue(result.transitCapabilities.contains("AIP byte 1 bits 1 and 6 not set"));
     }
 
     @Test
@@ -151,6 +152,8 @@ public class BasicReplayTest  {
         // contexts A00000038410v0100 and A00000038410v0100p02 which
         // can cause this message to appear
         assertFalse(result.transitCapabilities.contains("AIP not found"));
+
+        assertTrue(result.transitCapabilities.contains("Application validity period ended 24 03 31"));
     }
 
     @Test

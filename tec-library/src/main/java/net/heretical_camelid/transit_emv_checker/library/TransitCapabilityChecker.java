@@ -64,28 +64,19 @@ class ApplicationCapabilityCheckerBase {
         int usageOutcomeIndex = 0;
 
         if (aucValueBytes == null) {
-            capabilityNotes.append("AUC not found => unable to check if CDA supported\n");
+            capabilityNotes.append("AUC not found => unable to check usage restrictions\n");
             usageOutcomeIndex = 1;
         } else if (aucValueBytes.length != 2) {
             capabilityNotes.append("AUC has unexpected length => unable to check usage restrictions\n");
             usageOutcomeIndex = 1;
-            // None of the conditions checked below are relevant to Visa applications
-            // byte 1 bit 1 'valid at ATMs' is RFU(0)
-            // byte 1 bits 6-3 are not used for kernel 3
-            // Ref EMVCo Book C-3 v2.11 page 87
-        } else if ((aucValueBytes[0] & 0x01) == 0x00) {
-            capabilityNotes.append("AUC byte 1 bit 1 not set => medium only valid at ATMs\n");
-            usageOutcomeIndex = 2;
-        } else if ((aucValueBytes[0] & 0x0C) == 0x00) {
-            capabilityNotes.append("AUC byte 1 bits 3 and 4 not set => medium not valid for services anywhere\n");
-            usageOutcomeIndex = 2;
-        } else if ((aucValueBytes[0] & 0x0C) == 0x00) {
-            capabilityNotes.append(
-                "AUC byte 1 bit 3 not set => medium not valid for services outside country of issue\n"
-            );
-            capabilityNotes.append("(ISO code for country of issue: " + countryISOCodeValueHex + ")\n");
-            usageOutcomeIndex = 1;
         }
+
+        // AUC byte 1 bits 8, 7 and byte 2 bits 8, 7 are interpreted
+        // consistently between Mastercard book C2 and Visa book C3,
+        // but none of these bits affect transit capability.
+
+        // There are no other bits in the Visa/C3 definition which need checking,
+        // but this function will be overridden for Mastercard/C2
 
         return Math.max(usageOutcomeIndex,outcomeIndex);
 
@@ -130,6 +121,35 @@ class VisaPaywaveApplicationCapabilityChecker extends ApplicationCapabilityCheck
 }
 
 class MastercardPaypassApplicationCapabilityChecker extends ApplicationCapabilityCheckerBase {
+    @Override
+    int checkUsageRestrictions(
+        int outcomeIndex, StringBuilder capabilityNotes,
+        byte[] aipValueBytes, byte[] aucValueBytes,
+        String countryISOCodeValueHex) {
+
+        // The superclass only checks whether the AUC tag is present and the expected length
+        int usageOutcomeIndex = super.checkUsageRestrictions(
+            outcomeIndex, capabilityNotes, aipValueBytes, aucValueBytes, countryISOCodeValueHex
+        );
+
+        if(usageOutcomeIndex==1) {
+            // The AUC EMV tag was either not found or unexpected length, so we can't check it
+        }  else if ((aucValueBytes[0] & 0x01) == 0x00) {
+            capabilityNotes.append("AUC byte 1 bit 1 not set => medium only valid at ATMs\n");
+            usageOutcomeIndex = 2;
+        } else if ((aucValueBytes[0] & 0x0C) == 0x00) {
+            capabilityNotes.append("AUC byte 1 bits 3 and 4 not set => medium not valid for services anywhere\n");
+            usageOutcomeIndex = 2;
+        } else if ((aucValueBytes[0] & 0x0C) == 0x00) {
+            capabilityNotes.append(
+                "AUC byte 1 bit 3 not set => medium not valid for services outside country of issue\n"
+            );
+            capabilityNotes.append("(ISO code for country of issue: " + countryISOCodeValueHex + ")\n");
+            usageOutcomeIndex = 1;
+        }
+        return Math.max(outcomeIndex,usageOutcomeIndex);
+    }
+
 }
 
 public class TransitCapabilityChecker {

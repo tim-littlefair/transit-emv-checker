@@ -107,6 +107,9 @@ public class BasicReplayTest  {
     public void testReplay_0884() {
         String mediaCaptureBasename = "visa-exp2202-0884";
         Result result = replayMediaCapture(mediaCaptureBasename);
+        // The rule about AUC byte 1 bit 1 is in EMV CLess book C2
+        // and does not apply to Visa/book C3 cards
+        assertFalse(result.transitCapabilities.contains("AUC byte 1 bit 1 not set"));
     }
 
     @Test
@@ -114,6 +117,9 @@ public class BasicReplayTest  {
     public void testReplay_5398() {
         String mediaCaptureBasename = "visa-exp2402-5398";
         Result result = replayMediaCapture(mediaCaptureBasename);
+        // The rule about AUC byte 1 bit 1 is in EMV CLess book C2
+        // and does not apply to Visa/book C3 cards
+        assertFalse(result.transitCapabilities.contains("AUC byte 1 bit 1 not set"));
     }
 
     @Test

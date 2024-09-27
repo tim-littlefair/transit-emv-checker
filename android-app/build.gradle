@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
-        minSdk 26
+        minSdk 25
         targetSdk 34
         // Google Play store requires versionCode for releases to be
         // monotonically increasing
@@ -30,7 +30,7 @@ android {
         // 2 digits each for for major, minor, patch version number
         // 1 trailing digit starts at zero can be updated for successive
         // attempts within the same release number
-        versionCode 300001040
+        versionCode 300002000
         // For builds triggered under build_and_test_everything.sh
         // where the working directory exactly matches git HEAD,
         // the 7-hex-prefix of the current git HEAD hash will
@@ -42,7 +42,7 @@ android {
 
         // Builds done directly using .gradlew will use the
         // value 'dirty' in place of the hash suffix.
-        versionName "0.1.4-$vname_suffix"
+        versionName "0.2.x-$vname_suffix"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -71,6 +71,8 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
+        // desugaring required to use LocalDateTime at minSdk 25
+        coreLibraryDesugaringEnabled true
     }
     buildFeatures {
         viewBinding true
@@ -113,6 +115,9 @@ base {
 }
 
 dependencies {
+    // Desugaring is required to allow android
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
+
     //implementation project(':tec-library')
 
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
@@ -149,8 +154,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation('androidx.test.uiautomator:uiautomator:2.3.0')
 
-    implementation platform('com.google.firebase:firebase-bom:33.3.0')
-    implementation 'com.google.firebase:firebase-analytics'
+    //implementation platform('com.google.firebase:firebase-bom:33.3.0')
+    //implementation 'com.google.firebase:firebase-analytics'
 
     // refs:
     // https://github.com/FasterXML/jackson-dataformat-xml/issues/533

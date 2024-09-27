@@ -5,7 +5,13 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="?attr/actionBarSize">
+        android:paddingTop="10dp">
+    <!--
+        android:paddingTop in the preceding element previously
+        held the value "?attr/actionBarSize"
+        changing it to 10dp closed up an unused space of about
+        8mm on the Nexus 5X display (5.2 inch/~132mm)
+      -->
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment_activity_main"

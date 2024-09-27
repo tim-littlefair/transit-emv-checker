@@ -780,7 +780,11 @@ public class APDUObserver {
                 mediumAccountIdentifier,m_mediumTransactionCounterNow
             );
         } else {
-            return String.format("incomplete_media-" + LocalDateTime.now().toString());
+            String timestamp = LocalDateTime.now().toString();
+            timestamp = timestamp.substring(0,16);
+            timestamp = timestamp.replace(":","");
+            timestamp = timestamp.replace( "-", "");
+            return String.format("incomplete_media-" + timestamp);
         }
     }
 

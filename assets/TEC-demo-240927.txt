@@ -1,0 +1,44 @@
+Transit EMV Checker demo video 27/09/2024
+=========================================
+
+The MP4 video in this directory was created using the development version of the TEC Android app
+on this date.
+
+The steps in the demo are as follows:
+
+1) The app is started from the Android home screen
+
+2) The app displays the short disclaimer discouraging users from tapping live EMV cards too often.
+This disclaimer is displayed every time the app is started.
+
+3) The user clicks 'I UNDERSTAND AND AGREE'.
+
+4) The app displays its home screen.
+
+5) Normally the next step would be to click "START EMV MEDIA DETECTION" and present a card, but
+in this demo, before doing this the user clicks the 'info' icon to go to the 'About' tab which
+displays HTML text about the app, including a longer disclaimer about PCI and tapping live cards.
+The video shows scrolling through this text, but the files about.pdf and long_disclaimer.pdf
+are shared on the same Google Drive folder as the video and this file to make it easier to read
+them.
+
+6) The user returns to the home tab, clicks "START EMV MEDIA DETECTION" and presents a card
+to the device.
+
+7) When the card is detected messages appear in the home window, followed by a recommendation
+to navigate to the 'Transit Capabilities' tab for analysis of issues likely to affect use of the
+card in a transit setting.  The icon for this tab shows a pair of transit vehicles.
+
+8) The user navigates to the tab and sees a short analysis of the card.
+
+9) The user navigates to the 'EMV Details' tab and sees a short report containing the masked PAN,
+PSN (if returned by the card) and expiry date.  This tab also contains a button which allows a
+more detailed diagnostic report to be saved.
+
+10) The user clicks on the button to save the diagnostic report in XML format, and the device
+saves it in its externally accessible 'Downloads' directory.  The file saved in this demo has been
+copied from the device over USB and is also in the Google Drive folder.
+
+Please contact the developer, Tim Littlefair if you have any questions.
+Tim can be contacted via the email tim.littlefair@gmail.com.
+

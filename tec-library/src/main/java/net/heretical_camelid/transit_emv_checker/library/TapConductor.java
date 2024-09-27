@@ -20,7 +20,7 @@ public class TapConductor {
     private final APDUObserver m_apduObserver;
     private final TapReplayAgent m_tapReplayAgent;
     private final ITerminal m_terminal;
-    private IProvider m_provider;
+    private MyProviderBase m_provider;
     private String m_summary = null;
     private String m_transitCapabilities = null;
     private String m_diagnosticXml = null;
@@ -28,7 +28,7 @@ public class TapConductor {
 
     public TapConductor(
         ITerminal terminal,
-        IProvider provider,
+        MyProviderBase provider,
         TapReplayAgent tapReplayAgent) {
         m_pciMaskingAgent = new PCIMaskingAgent();
         m_apduObserver = new APDUObserver(m_pciMaskingAgent);
@@ -47,12 +47,13 @@ public class TapConductor {
         } else {
             assert provider != null;
             m_provider = provider;
+            m_provider.setApduStore(m_apduObserver);
         }
     }
 
     public static TapConductor createRealTapConductor(
         ITerminal terminal,
-        IProvider provider
+        MyProviderBase provider
     ) {
         TapConductor trc = new TapConductor(terminal, provider, null);
         finalizeTap(trc);
@@ -137,7 +138,7 @@ public class TapConductor {
     public String diagnosticXml() { return m_diagnosticXml; }
     public String captureOnlyXml() { return m_captureOnlyXml; }
 
-    public void setProvider(IProvider provider) {
+    public void setProvider(MyProviderBase provider) {
         m_provider = provider;
     }
 }

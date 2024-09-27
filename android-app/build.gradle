@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
-        minSdk 25
+        minSdk 26
         targetSdk 34
         // Google Play store requires versionCode for releases to be
         // monotonically increasing
@@ -115,7 +115,7 @@ base {
 }
 
 dependencies {
-    // Desugaring is required to allow android
+    // desugaring required to use LocalDateTime at minSdk 25
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
 
     //implementation project(':tec-library')
@@ -154,8 +154,12 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation('androidx.test.uiautomator:uiautomator:2.3.0')
 
-    //implementation platform('com.google.firebase:firebase-bom:33.3.0')
-    //implementation 'com.google.firebase:firebase-analytics'
+    // firebase libraries don't seem to be compatible with a
+    // desugared build to allow minSdk 25 to be supported.
+    // TBD decide whether to bring these back, remove the desugaring
+    // and give up on minSdk 25 support
+    // implementation platform('com.google.firebase:firebase-bom:33.3.0')
+    // implementation 'com.google.firebase:firebase-analytics'
 
     // refs:
     // https://github.com/FasterXML/jackson-dataformat-xml/issues/533

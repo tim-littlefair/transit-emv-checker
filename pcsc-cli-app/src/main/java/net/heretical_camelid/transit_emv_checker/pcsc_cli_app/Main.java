@@ -18,8 +18,13 @@ import javax.smartcardio.CardChannel;
 import javax.xml.stream.XMLInputFactory;
 
 import net.heretical_camelid.transit_emv_checker.library.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
+//import org.sl4j.Logger;
+//import org.sl4j.Level;
+//import org.sl4j.LoggerFactory;
 
 import com.github.devnied.emvnfccard.exception.CommunicationException;
 import com.github.devnied.emvnfccard.iso7816emv.ITerminal;
@@ -30,12 +35,10 @@ import com.github.devnied.emvnfccard.parser.IProvider;
 
 @SuppressWarnings("restriction")
 public class Main {
-	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+	private static final Logger LOGGER = Logger.getLogger(Main.class);
 
 	public static void main(final String[] args) {
-
-		System.out.println("");
-
+		Logger.getRootLogger().setLevel(Level.DEBUG);
 		try {
 			TapConductor tc;
 
@@ -56,7 +59,8 @@ public class Main {
 			APDUObserver apduObserver = tc.getAPDUObserver();
 
 			// TODO?: Allow args to control XML output directory/filename
-			System.out.println("Summary:\n\n" + apduObserver.summary());
+			LOGGER.info("Summary:");
+			LOGGER.info(apduObserver.summary());
 
 			String outDirName = "_work/";
 
@@ -71,21 +75,21 @@ public class Main {
 				String captureOnlyXmlText = apduObserver.toXmlString(true);
 				writeReportToFile(outPathPrefix + "-capture.xml", captureOnlyXmlText);
 
-				System.out.println(
-					"Full and capture-only reports have been dumped to:\n" +
-						outPathPrefix + "-*.xml"
+				//System.out.println(
+				LOGGER.info(
+					"Full and capture-only reports have been dumped to: " +
+					outPathPrefix + "-*.xml"
 				);
 
 				TransitCapabilityChecker tcc = new TransitCapabilityChecker(apduObserver);
-				System.out.println("\n\nTransit capabilities:\n\n" + tcc.capabilityReport());
-				System.out.println("");
+				LOGGER.info("Transit capabilities:");
+				LOGGER.info(tcc.capabilityReport());
 			} catch (IOException e) {
-				LOGGER.error("Problem writing reports out");
-				e.printStackTrace();
+				LOGGER.error("Problem writing reports out",e);
 				System.exit(1002);
 			}
 		} catch (IOException e) {
-			reportException(e);
+			LOGGER.error("Problem before attempting to write reports out",e);
 			System.exit(1003);
 		}
 	}
@@ -110,7 +114,7 @@ public class Main {
 			Card card = terminal.connect("*");
 			PCSCProvider pcscProvider = new PCSCProvider(card);
 			TapConductor tc = TapConductor.createRealTapConductor(emvTerminal, pcscProvider);
-			pcscProvider.setApduStore(tc.getAPDUObserver());
+			//pcscProvider.setApduStore(tc.getAPDUObserver());
 			return tc;
 		} catch (CardException e) {
 			reportException(e);
@@ -119,9 +123,7 @@ public class Main {
 	}
 
 	private static void reportException(Throwable e) {
-		System.err.println("Caught exception with message '" + e.getMessage() + "'");
-		System.err.println("Stack trace:");
-		e.printStackTrace(System.err);
+		LOGGER.error("Caught exception",e);
 	}
 
 	private static void writeReportToFile(String outPath, String outXmlText) throws IOException {

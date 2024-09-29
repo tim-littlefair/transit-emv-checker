@@ -16,14 +16,6 @@ plugins {
 // 2 digits each for for major, minor, patch version number
 // 1 trailing digit starts at zero can be updated for successive
 // attempts within the same release number
-// For builds triggered under build_and_test_everything.sh
-// where the working directory exactly matches git HEAD,
-// the 7-hex-prefix of the current git HEAD hash will
-// be substituted for the $vname_suffix variable
-// in the line below.
-// For other builds, the variable may include an
-// additional 3-hex-digit suffix derived from the
-// hash of git HEAD, or may be the string 'dirty'.
-ext.versionCode=300002011
+ext.versionCode=300002012
 
 ext.versionName="0.2.1"

@@ -4,7 +4,9 @@
     <item
             android:id="@+id/navigation_home"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="@string/title_home"/>
+            android:title="@string/title_home"
+            android:contentDescription="Navigate to home tab"
+        />
 
     <item
             android:id="@+id/navigation_transit"

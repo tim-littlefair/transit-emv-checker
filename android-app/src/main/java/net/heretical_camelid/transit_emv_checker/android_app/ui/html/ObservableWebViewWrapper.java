@@ -1,11 +1,13 @@
 package net.heretical_camelid.transit_emv_checker.android_app.ui.html;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -25,12 +27,17 @@ public class ObservableWebViewWrapper extends WebViewClient implements Handler.C
     public ObservableWebViewWrapper(WebView webView, MainActivity activity) {
         m_mainActivity = activity;
         m_webView = webView;
+
         // I have no reason to want Javascript enabled,
         // but running with it disabled triggers large
         // stack traces in logcat.
         // ref: https://stackoverflow.com/q/74198645
         m_webView.getSettings().setJavaScriptEnabled(true);
         m_webView.addJavascriptInterface(this,"observer");
+
+        // Pushing the text size up a little from the default
+        m_webView.getSettings().setTextZoom(125);
+
         m_webView.setWebViewClient(this);
     }
 

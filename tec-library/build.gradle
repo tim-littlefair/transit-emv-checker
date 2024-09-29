@@ -10,7 +10,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 group = 'net.heretical_camelid.transit_emv_checker.library'
-version = '0.1.0'
+version = rootProject.ext.versionName
 
 dependencies {
     implementation "com.github.devnied.emvnfccard:library:3.0.1"

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 variant=tec-library
-version=0.1.0
+version=0.2.1
 mainclass=net.heretical_camelid.transit_emv_checker.library.TapReplayConductor
 args=tec-library/src/main/assets/visa-exp2402-5406.xml
 

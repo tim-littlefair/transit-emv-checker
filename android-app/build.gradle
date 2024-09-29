@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'base'
     id 'com.jaredsburrows.license' version '0.9.7'
-    id 'com.google.gms.google-services'
 }
 
 def kspath = "$System.env.kspath"

@@ -24,6 +24,6 @@ plugins {
 // For other builds, the variable may include an
 // additional 3-hex-digit suffix derived from the
 // hash of git HEAD, or may be the string 'dirty'.
-ext.versionCode=300002010
+ext.versionCode=300002011
 
 ext.versionName="0.2.1"

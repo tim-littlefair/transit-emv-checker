@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'net.heretical_camelid.transit_emv_checker.pcsc_cli_app'
-version = '0.2.0'
+version = rootProject.ext.versionName
 
 dependencies {
     implementation project(':tec-library')

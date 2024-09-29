@@ -21,27 +21,11 @@ android {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
         minSdk 26
         targetSdk 34
-        // Google Play store requires versionCode for releases to be
-        // monotonically increasing
-        // as I had already used versionCode 235097892 before I found
-        // this out, the pattern is now
-        // prefix 30
-        // 2 digits each for for major, minor, patch version number
-        // 1 trailing digit starts at zero can be updated for successive
-        // attempts within the same release number
-        versionCode 300002000
-        // For builds triggered under build_and_test_everything.sh
-        // where the working directory exactly matches git HEAD,
-        // the 7-hex-prefix of the current git HEAD hash will
-        // be substituted for the $vname_suffix variable
-        // in the line below.
-        // For other builds, the variable may include an
-        // additional 3-hex-digit suffix derived from the
-        // hash of git HEAD, or may be the string 'dirty'.
 
-        // Builds done directly using .gradlew will use the
-        // value 'dirty' in place of the hash suffix.
-        versionName "0.2.x-$vname_suffix"
+        // Version name and number are managed in the root build.gradle file
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName+"-$vname_suffix"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

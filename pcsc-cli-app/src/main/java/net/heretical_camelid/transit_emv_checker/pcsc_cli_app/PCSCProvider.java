@@ -29,13 +29,6 @@ public class PCSCProvider extends MyProviderBase {
 	 */
 	private final CardChannel channel;
 
-
-	/**Source option 5 is no longer supported. Use 7 or later.
-	 * Constructor using field
-	 *
-	 * @param pChannel
-	 *            card channel
-	 */
 	public PCSCProvider(Card card) {
 		channel = card.getBasicChannel();
 	}

@@ -9,6 +9,7 @@
             android:id="@+id/navigation_home"
             android:name="net.heretical_camelid.transit_emv_checker.android_app.ui.home.HomeFragment"
             android:label="@string/title_home"
+            android:contentDescription="Navigate to home tab"
             tools:layout="@layout/fragment_home"/>
 
     <fragment

@@ -7,7 +7,7 @@
 # if the diff is empty, the separator and the diff hash are omitted
 generate_build_id() {
   head_hash7=$(git rev-parse HEAD | cut -c1-7)
-  diff_hash3=$(git diff | sha256sum - | cut -c1-3)
+  diff_hash3=$(git diff HEAD | sha256sum - | cut -c1-3)
   if [ "$diff_hash3" = "e3b" ]
   then
     # If git diff returned an empty stream, $diff_hash3 will be 'e3b'

@@ -19,11 +19,18 @@ android {
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
-        minSdk 26
+        minSdk 25
         targetSdk 34
 
         // Version name and number are managed in the root build.gradle file
+
         versionCode rootProject.ext.versionCode
+        // For builds triggered under build_and_test_everything.sh
+        // where the working directory exactly matches git HEAD,
+        // the 7-hex-prefix of the current git HEAD hash will
+        // be substituted for the $vname_suffix variable
+        // in the line below.
+        // For other builds, the variable will be the string 'dirty'.
         versionName rootProject.ext.versionName+"-$vname_suffix"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

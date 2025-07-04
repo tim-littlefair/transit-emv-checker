@@ -5,7 +5,7 @@
             android:id="@+id/navigation_home"
             android:icon="@drawable/ic_home_black_24dp"
             android:title="@string/title_home"
-            android:contentDescription="Navigate to home tab"
+            android:contentDescription="@string/navigate_to_home_tab"
         />
 
     <item

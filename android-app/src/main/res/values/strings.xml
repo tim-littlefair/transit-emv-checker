@@ -12,4 +12,5 @@
     <string name="start_emv_media_detection">Start EMV Media Detection</string>
     <string name="waiting_for_emv_media">Waiting for EMV media</string>
     <string name="i_understand_and_agree">I understand and agree</string>
+    <string name="navigate_to_home_tab">Navigate to home tab</string>
 </resources>

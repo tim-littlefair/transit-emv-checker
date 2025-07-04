@@ -14,13 +14,13 @@ if(keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace 'net.heretical_camelid.transit_emv_checker.android_app'
-    compileSdk 36
+    namespace = 'net.heretical_camelid.transit_emv_checker.android_app'
+    compileSdk = 36
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
-        minSdk 25
-        targetSdk 36
+        minSdk = 25
+        targetSdk = 36
 
         // Version name and number are managed in the root build.gradle file
 
@@ -54,19 +54,19 @@ android {
             }
         }
         debug {
-            enableUnitTestCoverage true
-            enableAndroidTestCoverage true
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
         // desugaring required to use LocalDateTime at minSdk 25
-        coreLibraryDesugaringEnabled true
+        coreLibraryDesugaringEnabled = true
     }
     buildFeatures {
-        viewBinding true
-        buildConfig true
+        viewBinding = true
+        buildConfig = true
     }
     lint {
         disable += [ 'DefaultLocale', 'ObsoleteSdkInt', 'VectorPath', 'UnusedResources' ]
@@ -129,9 +129,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.9.1'
     implementation 'androidx.navigation:navigation-ui:2.9.1'
 
-    // The following line ensures that a report is generated
-    // listing dependency copyrights and licenses
-    implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
 
     implementation "org.slf4j:slf4j-simple:2.0.17"
 
@@ -168,6 +165,15 @@ dependencies {
     androidTestImplementation 'io.netty:netty-codec-http2:4.1.100.Final'
     androidTestImplementation 'io.netty:netty-handler:4.1.110.Final'
     androidTestImplementation 'io.netty:netty-codec-http:4.1.100.Final'
+
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/14
+    // The following line ensures that a report is generated
+    // listing dependency copyrights and licenses
+    // implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
+
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
+    androidTestImplementation 'org.apache.commons:commons-compress:1.27.1'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
     androidTestImplementation 'com.google.protobuf:protobuf-kotlin:4.31.1'

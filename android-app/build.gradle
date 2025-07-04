@@ -135,8 +135,9 @@ dependencies {
 
     implementation "org.slf4j:slf4j-simple:2.0.17"
 
+    implementation "androidx.test:core:1.6.1"
+
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation "androidx.test:core:1.6.1"
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test:runner:1.6.2'
     androidTestImplementation 'androidx.test:rules:1.6.1'
@@ -158,14 +159,19 @@ dependencies {
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8
     androidTestImplementation 'org.jsoup:jsoup:1.21.1'
 
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/11
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/17
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/24
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/25
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/26
+    androidTestImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
+    androidTestImplementation 'io.netty:netty-codec-http2:4.1.100.Final'
+    androidTestImplementation 'io.netty:netty-handler:4.1.110.Final'
+    androidTestImplementation 'io.netty:netty-codec-http:4.1.100.Final'
+
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
-    androidTestImplementation 'com.google.protobuf:protobuf-kotlin:3.25.5'
-    androidTestImplementation 'com.google.protobuf:protobuf-java:3.25.5'
-
-
-
-
-
+    androidTestImplementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
+    androidTestImplementation 'com.google.protobuf:protobuf-java:4.31.1'
 }
 
 licenseReport {

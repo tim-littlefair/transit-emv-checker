@@ -106,28 +106,28 @@ base {
 
 dependencies {
     // desugaring required to use LocalDateTime at minSdk 25
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
     //implementation project(':tec-library')
 
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"
-    implementation "org.apache.commons:commons-lang3:3.8.1"
+    implementation "org.apache.commons:commons-lang3:3.14.0"
     implementation "org.apache.commons:commons-collections4:4.3"
-    implementation "commons-io:commons-io:2.13.0"
+    implementation "commons-io:commons-io:2.16.1"
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
 
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
     // Can update 2.7.0 to 2.8.0 for this block of components
     // when navigation-fragment and navigation-ui have a released
     // 2.8.0
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.6'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6'
-    implementation 'androidx.navigation:navigation-fragment:2.8.1'
-    implementation 'androidx.navigation:navigation-ui:2.8.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1'
+    implementation 'androidx.navigation:navigation-fragment:2.9.1'
+    implementation 'androidx.navigation:navigation-ui:2.9.1'
 
     // The following line ensures that a report is generated
     // listing dependency copyrights and licenses
@@ -139,7 +139,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation "androidx.test:core:1.6.1"
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test:runner:1.6.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
     androidTestImplementation 'androidx.test:rules:1.6.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation('androidx.test.uiautomator:uiautomator:2.3.0')

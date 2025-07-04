@@ -134,7 +134,6 @@ dependencies {
     implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
 
     implementation "org.slf4j:slf4j-simple:2.0.17"
-    implementation 'androidx.test.espresso:espresso-accessibility:3.6.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation "androidx.test:core:1.6.1"
@@ -143,6 +142,7 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.6.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.6.1'
 
 
     // refs:
@@ -155,8 +155,16 @@ dependencies {
 
     // Versions for transitive dependencies picked up by GitHub dependabot
 
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8
+    androidTestImplementation 'org.jsoup:jsoup:1.21.1'
+
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
-    androidTestImplementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
+    androidTestImplementation 'com.google.protobuf:protobuf-kotlin:3.25.5'
+    androidTestImplementation 'com.google.protobuf:protobuf-java:3.25.5'
+
+
+
+
 
 }
 

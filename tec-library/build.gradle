@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'jacoco'
-    id 'com.jaredsburrows.license' version '0.9.8'
 }
 
 
@@ -56,6 +55,8 @@ tasks.register('uberJar', Jar) {
     }
 }
 
+/*
+// License reporting presently disabled to clear a dependabot warning
 licenseReport {
     generateHtmlReport = true
     generateCsvReport = false
@@ -64,4 +65,5 @@ licenseReport {
     copyHtmlReportToAssets = true
     useVariantSpecificAssetDirs = false
 }
+ */
 

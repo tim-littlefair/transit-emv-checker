@@ -1,7 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'base'
-    id 'com.jaredsburrows.license' version '0.9.8'
+    // license reporting presently disabled to avoid a dependabot warning
+    // id 'com.jaredsburrows.license' version '0.9.8'
 }
 
 def kspath = "$System.env.kspath"
@@ -95,7 +96,7 @@ android {
             // TODO: Work out how to include these in debug builds only
             assets.srcDirs += [ '../tec-library/src/main/assets' ]
             // Bring in the library files so we get coverage over them
-            java.srcDirs += [ '../tec-library/src/main/java' ]
+            //java.srcDirs += [ '../tec-library/src/main/java' ]
         }
     }
 }
@@ -108,7 +109,7 @@ dependencies {
     // desugaring required to use LocalDateTime at minSdk 25
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
-    //implementation project(':tec-library')
+    implementation project(':tec-library')
 
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"
@@ -120,10 +121,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-
-    // Can update 2.7.0 to 2.8.0 for this block of components
-    // when navigation-fragment and navigation-ui have a released
-    // 2.8.0
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1'
     implementation 'androidx.navigation:navigation-fragment:2.9.1'
@@ -167,8 +164,6 @@ dependencies {
     androidTestImplementation 'io.netty:netty-codec-http:4.1.100.Final'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/14
-    // The following line ensures that a report is generated
-    // listing dependency copyrights and licenses
     // implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
@@ -180,6 +175,8 @@ dependencies {
     androidTestImplementation 'com.google.protobuf:protobuf-java:4.31.1'
 }
 
+/*
+// license reporting presently disabled to avoid a dependabot warning
 licenseReport {
     generateHtmlReport = true
     generateCsvReport = false
@@ -188,6 +185,7 @@ licenseReport {
     copyHtmlReportToAssets = true
     useVariantSpecificAssetDirs = false
 }
+*/
 
 project.afterEvaluate {
     tasks.withType(JacocoReport).configureEach {
@@ -204,11 +202,9 @@ tasks.withType(JacocoReport).configureEach {
     apply plugin: 'java-library'
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
-    /*
     def otherSourceSet = project(':tec-library').sourceSets.main
     additionalSourceDirs = otherSourceSet.allJava
     additionalClassDirs = otherSourceSet.output
-     */
 
     //additionalSourceDirs.from otherSourceSet.allJava
     //additionalClassDirs.from otherSourceSet.output

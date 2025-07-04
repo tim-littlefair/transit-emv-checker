@@ -15,12 +15,12 @@ if(keystorePropertiesFile.exists()) {
 
 android {
     namespace 'net.heretical_camelid.transit_emv_checker.android_app'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
         minSdk 25
-        targetSdk 34
+        targetSdk 35
 
         // Version name and number are managed in the root build.gradle file
 

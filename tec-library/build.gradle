@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'jacoco'
-    id 'com.jaredsburrows.license' version '0.9.7'
+    id 'com.jaredsburrows.license' version '0.9.8'
 }
 
 
@@ -15,14 +15,14 @@ version = rootProject.ext.versionName
 dependencies {
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"
-    implementation "org.apache.commons:commons-lang3:3.8.1"
-    implementation 'org.apache.commons:commons-collections4:4.3'
-    implementation 'commons-io:commons-io:2.13.0'
-    implementation "net.sf.scuba:scuba-smartcards:0.0.18"
-    implementation "org.slf4j:slf4j-api:2.0.13"
-    testImplementation "org.slf4j:slf4j-reload4j:2.0.13"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    implementation "org.apache.commons:commons-lang3:3.17.0"
+    implementation 'org.apache.commons:commons-collections4:4.5.0'
+    implementation 'commons-io:commons-io:2.19.0'
+    implementation "net.sf.scuba:scuba-smartcards:0.0.20"
+    implementation "org.slf4j:slf4j-api:2.0.17"
+    testImplementation "org.slf4j:slf4j-reload4j:2.0.17"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.13.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // The following line ensures that a report is generated

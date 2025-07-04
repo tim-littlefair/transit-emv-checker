@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id 'com.android.application' version '8.11.0' apply false
-    id 'com.google.gms.google-services' version '4.4.2' apply false
+    id 'com.google.gms.google-services' version '4.4.3' apply false
 }
 
 // Version numbering mainly relates to the android-app subproject
@@ -16,6 +16,6 @@ plugins {
 // 2 digits each for for major, minor, patch version number
 // 1 trailing digit starts at zero can be updated for successive
 // attempts within the same release number
-ext.versionCode=300002013
+ext.versionCode=300001050
 
-ext.versionName="0.2.1"
+ext.versionName="0.1.5"

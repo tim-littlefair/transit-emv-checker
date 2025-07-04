@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'base'
-    id 'com.jaredsburrows.license' version '0.9.7'
+    id 'com.jaredsburrows.license' version '0.9.8'
 }
 
 def kspath = "$System.env.kspath"
@@ -15,12 +15,12 @@ if(keystorePropertiesFile.exists()) {
 
 android {
     namespace 'net.heretical_camelid.transit_emv_checker.android_app'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "net.heretical_camelid.transit_emv_checker.android_app"
         minSdk 25
-        targetSdk 35
+        targetSdk 36
 
         // Version name and number are managed in the root build.gradle file
 
@@ -112,9 +112,9 @@ dependencies {
 
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"
-    implementation "org.apache.commons:commons-lang3:3.14.0"
-    implementation "org.apache.commons:commons-collections4:4.3"
-    implementation "commons-io:commons-io:2.16.1"
+    implementation "org.apache.commons:commons-lang3:3.17.0"
+    implementation "org.apache.commons:commons-collections4:4.5.0"
+    implementation "commons-io:commons-io:2.19.0"
     implementation "net.sf.scuba:scuba-smartcards:0.0.18"
 
     implementation 'androidx.appcompat:appcompat:1.7.1'
@@ -131,9 +131,9 @@ dependencies {
 
     // The following line ensures that a report is generated
     // listing dependency copyrights and licenses
-    implementation 'com.jaredsburrows:gradle-license-plugin:0.9.7'
+    implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
 
-    implementation "org.slf4j:slf4j-simple:2.0.13"
+    implementation "org.slf4j:slf4j-simple:2.0.17"
     implementation 'androidx.test.espresso:espresso-accessibility:3.6.1'
 
     testImplementation 'junit:junit:4.13.2'
@@ -157,7 +157,7 @@ dependencies {
     // Android does not have javax.xml by default, but can
     // bring in a suitable substitute like this:
     implementation 'javax.xml.stream:stax-api:1.0-2'
-    implementation 'com.fasterxml:aalto-xml:1.3.1'
+    implementation 'com.fasterxml:aalto-xml:1.3.3'
 }
 
 licenseReport {
@@ -184,9 +184,12 @@ tasks.withType(JacocoReport).configureEach {
     apply plugin: 'java-library'
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+    /*
     def otherSourceSet = project(':tec-library').sourceSets.main
     additionalSourceDirs = otherSourceSet.allJava
     additionalClassDirs = otherSourceSet.output
+     */
+
     //additionalSourceDirs.from otherSourceSet.allJava
     //additionalClassDirs.from otherSourceSet.output
 }

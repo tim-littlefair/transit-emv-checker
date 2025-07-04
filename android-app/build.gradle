@@ -115,7 +115,7 @@ dependencies {
     implementation "org.apache.commons:commons-lang3:3.17.0"
     implementation "org.apache.commons:commons-collections4:4.5.0"
     implementation "commons-io:commons-io:2.19.0"
-    implementation "net.sf.scuba:scuba-smartcards:0.0.18"
+    implementation "net.sf.scuba:scuba-smartcards:0.0.20"
 
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'
@@ -142,14 +142,8 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.6.2'
     androidTestImplementation 'androidx.test:rules:1.6.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-    androidTestImplementation('androidx.test.uiautomator:uiautomator:2.3.0')
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0'
 
-    // firebase libraries don't seem to be compatible with a
-    // desugared build to allow minSdk 25 to be supported.
-    // TBD decide whether to bring these back, remove the desugaring
-    // and give up on minSdk 25 support
-    // implementation platform('com.google.firebase:firebase-bom:33.3.0')
-    // implementation 'com.google.firebase:firebase-analytics'
 
     // refs:
     // https://github.com/FasterXML/jackson-dataformat-xml/issues/533
@@ -158,6 +152,12 @@ dependencies {
     // bring in a suitable substitute like this:
     implementation 'javax.xml.stream:stax-api:1.0-2'
     implementation 'com.fasterxml:aalto-xml:1.3.3'
+
+    // Versions for transitive dependencies picked up by GitHub dependabot
+
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
+    androidTestImplementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
+
 }
 
 licenseReport {

@@ -1,8 +1,5 @@
 plugins {
     id 'com.android.application' version '8.11.0'
-
-    // license reporting presently disabled to avoid a dependabot warning
-    // id 'com.jaredsburrows.license' version '0.9.8'
 }
 
 def kspath = "$System.env.kspath"
@@ -123,11 +120,12 @@ dependencies {
     androidTestImplementation 'io.netty:netty-common:4.1.118.Final'
     androidTestImplementation 'io.netty:netty-handler:4.1.118.Final'
     androidTestImplementation 'io.netty:netty-codec-http:4.1.108.Final'
-    androidTestImplementation 'io.netty:netty-codec-http2:4.1.100.Final'
+    androidTestImplementation 'io.netty:netty-codec-http2:4.1.108.Final'
     //androidTestImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
 
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/14
-    // implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/12
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/13
+    androidTestImplementation 'com.google.guava:guava:33.4.8-android'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
@@ -185,18 +183,6 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
-/*
-// license reporting presently disabled to avoid a dependabot warning
-licenseReport {
-    generateHtmlReport = true
-    generateCsvReport = false
-    generateJsonReport = false
-    generateTextReport = false
-    copyHtmlReportToAssets = true
-    useVariantSpecificAssetDirs = false
-}
-*/
-
 project.afterEvaluate {
     tasks.withType(JacocoReport).configureEach {
         println(build.dependsOn)
@@ -215,9 +201,6 @@ tasks.withType(JacocoReport).configureEach {
     def otherSourceSet = project(':tec-library').sourceSets.main
     additionalSourceDirs = otherSourceSet.allJava
     additionalClassDirs = otherSourceSet.output
-
-    //additionalSourceDirs.from otherSourceSet.allJava
-    //additionalClassDirs.from otherSourceSet.output
 }
 
 

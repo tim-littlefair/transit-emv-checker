@@ -114,6 +114,7 @@ dependencies {
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8
     androidTestImplementation 'org.jsoup:jsoup:1.21.1'
 
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/10
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/11
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/17
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/24
@@ -123,7 +124,7 @@ dependencies {
     androidTestImplementation 'io.netty:netty-handler:4.1.118.Final'
     androidTestImplementation 'io.netty:netty-codec-http:4.1.108.Final'
     androidTestImplementation 'io.netty:netty-codec-http2:4.1.100.Final'
-    androidTestImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
+    //androidTestImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/14
     // implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'

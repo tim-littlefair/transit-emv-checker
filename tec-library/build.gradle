@@ -61,4 +61,13 @@ tasks.register('uberJar', Jar) {
     }
 }
 
+licenseReport {
+    generateHtmlReport = true
+    generateCsvReport = true
+    generateJsonReport = false
+    generateTextReport = false
+    copyHtmlReportToAssets = false
+    useVariantSpecificAssetDirs = false
+    showVersions = true
+}
 

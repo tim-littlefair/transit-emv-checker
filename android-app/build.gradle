@@ -109,7 +109,7 @@ dependencies {
 
     implementation project(':tec-library')
 
-    // /*
+    /*
     // Versions for transitive dependencies picked up by GitHub dependabot
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8

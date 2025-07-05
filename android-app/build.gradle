@@ -1,6 +1,6 @@
 plugins {
-    id 'com.android.application'
-    id 'base'
+    id 'com.android.application' version '8.11.0'
+
     // license reporting presently disabled to avoid a dependabot warning
     // id 'com.jaredsburrows.license' version '0.9.8'
 }
@@ -109,33 +109,37 @@ dependencies {
 
     implementation project(':tec-library')
 
-    /*
+    // /*
     // Versions for transitive dependencies picked up by GitHub dependabot
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8
-    implementation 'org.jsoup:jsoup:1.21.1'
+    testImplementation 'org.jsoup:jsoup:1.21.1'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/11
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/17
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/24
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/25
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/26
-    implementation 'io.netty:netty-common:4.1.118.Final'
-    implementation 'io.netty:netty-handler:4.1.118.Final'
-    implementation 'io.netty:netty-codec-http:4.1.108.Final'
-    implementation 'io.netty:netty-codec-http2:4.1.100.Final'
-    implementation 'com.google.testing.platform:core:0.0.9-alpha03'
+    testImplementation 'io.netty:netty-common:4.1.118.Final'
+    testImplementation 'io.netty:netty-handler:4.1.118.Final'
+    testImplementation 'io.netty:netty-codec-http:4.1.108.Final'
+    testImplementation 'io.netty:netty-codec-http2:4.1.100.Final'
+    testImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/14
     // implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
-    implementation 'org.apache.commons:commons-compress:1.27.1'
+    testImplementation 'org.apache.commons:commons-compress:1.27.1'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
-    implementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
-    implementation 'com.google.protobuf:protobuf-java:4.31.1'
+    testImplementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
+    testImplementation 'com.google.protobuf:protobuf-java:4.31.1'
+
+    // End of explicit dependencies to force transitive dependencies to
+    // patched versions  and supress dependabot warnings
+
     // */
 
     // Real dependencies start here
@@ -153,7 +157,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1'
     implementation 'androidx.navigation:navigation-fragment:2.9.1'
     implementation 'androidx.navigation:navigation-ui:2.9.1'
-
 
     implementation "org.slf4j:slf4j-simple:2.0.17"
 

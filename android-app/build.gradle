@@ -106,13 +106,10 @@ base {
 }
 
 dependencies {
-    // desugaring required to use LocalDateTime at minSdk 25
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
     implementation project(':tec-library')
 
-
-
+    // /*
     // Versions for transitive dependencies picked up by GitHub dependabot
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8
@@ -139,6 +136,7 @@ dependencies {
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
     implementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
     implementation 'com.google.protobuf:protobuf-java:4.31.1'
+    // */
 
     // Real dependencies start here
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
@@ -178,6 +176,8 @@ dependencies {
     implementation 'javax.xml.stream:stax-api:1.0-2'
     implementation 'com.fasterxml:aalto-xml:1.3.3'
 
+    // desugaring required to use LocalDateTime at minSdk 25
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
 /*

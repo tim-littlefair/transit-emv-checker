@@ -121,9 +121,9 @@ dependencies {
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/25
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/26
     implementation 'io.netty:netty-common:4.1.118.Final'
+    implementation 'io.netty:netty-handler:4.1.118.Final'
+    implementation 'io.netty:netty-codec-http:4.1.108.Final'
     implementation 'io.netty:netty-codec-http2:4.1.100.Final'
-    implementation 'io.netty:netty-handler:4.1.110.Final'
-    implementation 'io.netty:netty-codec-http:4.1.100.Final'
     implementation 'com.google.testing.platform:core:0.0.9-alpha03'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/14

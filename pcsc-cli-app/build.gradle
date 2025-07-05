@@ -2,10 +2,19 @@ plugins {
     id 'java'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 group = 'net.heretical_camelid.transit_emv_checker.pcsc_cli_app'
 version = rootProject.ext.versionName
 
 dependencies {
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
+    implementation 'org.apache.commons:commons-compress:1.27.1'
+
     implementation project(':tec-library')
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"
@@ -34,3 +43,4 @@ tasks.register('uberJar', Jar) {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
 }
+

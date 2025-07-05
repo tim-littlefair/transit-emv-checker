@@ -15,7 +15,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "transit-emv-checker"
 include ':tec-library'
-include ':pcsc-cli-app'
 include ':android-app'
+include ':pcsc-cli-app'
 
 

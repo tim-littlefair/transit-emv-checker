@@ -107,40 +107,41 @@ base {
 
 dependencies {
 
-    implementation project(':tec-library')
 
     // /*
     // Versions for transitive dependencies picked up by GitHub dependabot
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8
-    testImplementation 'org.jsoup:jsoup:1.21.1'
+    androidTestImplementation 'org.jsoup:jsoup:1.21.1'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/11
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/17
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/24
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/25
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/26
-    testImplementation 'io.netty:netty-common:4.1.118.Final'
-    testImplementation 'io.netty:netty-handler:4.1.118.Final'
-    testImplementation 'io.netty:netty-codec-http:4.1.108.Final'
-    testImplementation 'io.netty:netty-codec-http2:4.1.100.Final'
-    testImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
+    androidTestImplementation 'io.netty:netty-common:4.1.118.Final'
+    androidTestImplementation 'io.netty:netty-handler:4.1.118.Final'
+    androidTestImplementation 'io.netty:netty-codec-http:4.1.108.Final'
+    androidTestImplementation 'io.netty:netty-codec-http2:4.1.100.Final'
+    androidTestImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/14
     // implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
-    testImplementation 'org.apache.commons:commons-compress:1.27.1'
+    androidTestImplementation 'org.apache.commons:commons-compress:1.27.1'
 
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
-    testImplementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
-    testImplementation 'com.google.protobuf:protobuf-java:4.31.1'
+    androidTestImplementation 'com.google.protobuf:protobuf-kotlin:4.31.1'
+    androidTestImplementation 'com.google.protobuf:protobuf-java:4.31.1'
 
     // End of explicit dependencies to force transitive dependencies to
     // patched versions  and supress dependabot warnings
 
     // */
+
+    implementation project(':tec-library')
 
     // Real dependencies start here
     implementation "com.github.devnied.emvnfccard:library:3.0.1"

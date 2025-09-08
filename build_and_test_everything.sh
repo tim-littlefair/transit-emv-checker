@@ -68,6 +68,6 @@ then
   # build_debug_and_coverage will already have been done
   sh devenv/update_build.sh
   build_release
-  restore build.gradle
+  git restore build.gradle
 fi
 

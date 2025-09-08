@@ -25,14 +25,10 @@ else
   exit 1
 fi
 
-# For the moment we are only marking up the Android app but we could
-# apply the same change to products in other directories in the future
-# shellcheck disable=SC2043
-for d in android-app ; do
-  git restore $d/build.gradle
-  # Using '#' as sed delimiter to avoid a lot of escaping in file path in second command
-  /usr/bin/sed -r -e "/versionName/s#-dirty#-$hash7_as_hex#" "$sed_inplace_arg" $d/build.gradle
-  /usr/bin/sed -r -e "s#replace_with_keystore_properties_path#/tmp/hc_keys/hc-playstore-upload-2024_keystore.properties#" "$sed_inplace_arg" $d/build.gradle
-done
+# Version number and name are in the top-level build.gradle
+git restore build.gradle
+# Using '#' as sed delimiter to avoid a lot of escaping in file path in second command
+/usr/bin/sed -r -e "/versionName/s#-dirty#-$hash7_as_hex#" "$sed_inplace_arg" build.gradle
+/usr/bin/sed -r -e "s#replace_with_keystore_properties_path#/tmp/hc_keys/hc-playstore-upload-2024_keystore.properties#" "$sed_inplace_arg" android-app/build.gradle
 
 git diff -U0 | grep -e versionName -e versionCode -e keystorePropertiesFile

@@ -4,6 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    target-branch: "250704-target_api_35"
+    target-branch: "main"
 
 

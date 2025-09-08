@@ -1,5 +1,5 @@
 plugins {
-    id 'java-library'
+    id 'java'
     id 'jacoco'
     id 'com.jaredsburrows.license' version '0.9.8'
 }
@@ -13,11 +13,6 @@ group = 'net.heretical_camelid.transit_emv_checker.library'
 version = rootProject.ext.versionName
 
 dependencies {
-
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
-    implementation 'org.apache.commons:commons-compress:1.27.1'
-
     implementation "com.github.devnied.emvnfccard:library:3.0.1"
     implementation "com.github.devnied:bit-lib4j:1.5.2"
     implementation "org.apache.commons:commons-lang3:3.17.0"
@@ -32,7 +27,7 @@ dependencies {
 
     // The following line ensures that a report is generated
     // listing dependency copyrights and licenses
-    implementation 'com.jaredsburrows:gradle-license-plugin:0.9.8'
+    implementation 'com.jaredsburrows:gradle-license-plugin:0.9.7'
 }
 
 test {
@@ -63,11 +58,10 @@ tasks.register('uberJar', Jar) {
 
 licenseReport {
     generateHtmlReport = true
-    generateCsvReport = true
+    generateCsvReport = false
     generateJsonReport = false
     generateTextReport = false
-    copyHtmlReportToAssets = false
+    copyHtmlReportToAssets = true
     useVariantSpecificAssetDirs = false
-    showVersions = true
 }
 

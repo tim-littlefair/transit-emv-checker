@@ -17,4 +17,4 @@ plugins {
 // build attempts within the same release number
 ext.versionCode=300020201
 
-ext.versionName="0.2.2-69f1dd0"
+ext.versionName="0.2.2-dirty"

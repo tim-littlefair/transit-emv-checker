@@ -103,47 +103,26 @@ base {
 }
 
 dependencies {
+    implementation project(':tec-library')
 
-
-    // /*
-    // Versions for transitive dependencies picked up by GitHub dependabot
-
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/8
-    androidTestImplementation 'org.jsoup:jsoup:1.21.1'
-
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/10
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/11
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/17
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/24
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/25
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/26
-    // 29, 30
+    // The following transitive dependencies have been made explicit against
+    // specific versions in order to address GitHub dependabot issues raised
+    // against the outdated default versions of these libraries imported by
+    // via the normal transitive dependency process.
+    // Issues are:
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/XX
+    // for XX in 8, 10, 11, 12, 13, 15, 16, 17, 24, 25, 26, 27, 29, 30
+    androidTestImplementation 'org.jsoup:jsoup:1.21.2'
     androidTestImplementation 'io.netty:netty-common:4.1.125.Final'
     androidTestImplementation 'io.netty:netty-handler:4.1.125.Final'
     androidTestImplementation 'io.netty:netty-codec-http:4.1.108.Final'
     androidTestImplementation 'io.netty:netty-codec-http2:4.1.108.Final'
-    //androidTestImplementation 'com.google.testing.platform:core:0.0.9-alpha03'
-
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/12
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/13
     androidTestImplementation 'com.google.guava:guava:33.4.8-android'
-
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
     androidTestImplementation 'org.apache.commons:commons-compress:1.28.0'
-
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/27
     androidTestImplementation 'com.google.protobuf:protobuf-kotlin:4.32.0'
     androidTestImplementation 'com.google.protobuf:protobuf-java:4.32.0'
 
-    // End of explicit dependencies to force transitive dependencies to
-    // patched versions  and supress dependabot warnings
-
-    // */
-
-    implementation project(':tec-library')
-
-    // Real dependencies start here
+    // Direct dependencies start here
     implementation "org.apache.commons:commons-lang3:3.18.0"
     implementation "org.apache.commons:commons-collections4:4.5.0"
     implementation "commons-io:commons-io:2.20.0"

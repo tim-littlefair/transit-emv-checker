@@ -14,8 +14,11 @@ version = rootProject.ext.versionName
 
 dependencies {
 
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
+    // The following dependencies have been made explicit in order to
+    // address transitive dependency issues picked up by GitHub dependabot.
+    // Issues are:
+    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/XX
+    // for XX in 15, 16
     implementation 'org.apache.commons:commons-compress:1.28.0'
     implementation "org.apache.commons:commons-lang3:3.18.0"
     implementation 'org.apache.commons:commons-collections4:4.5.0'

@@ -84,7 +84,7 @@ mv cmdline-tools/* ./latest
 mv ./latest cmdline-tools
 
 yes | ./cmdline-tools/latest/bin/sdkmanager --licenses > cmdline-tools/licenses.txt
-./cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" "emulator"
+./cmdline-tools/latest/bin/sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools" "emulator"
 ./cmdline-tools/latest/bin/sdkmanager --list_installed
 
 cd $startdir

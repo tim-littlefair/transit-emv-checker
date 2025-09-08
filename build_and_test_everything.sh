@@ -66,6 +66,8 @@ fi
 if [ "$1" = "--execute-release" ]
 then
   # build_debug_and_coverage will already have been done
+  sh devenv/update_build.sh
   build_release
+  restore build.gradle
 fi
 

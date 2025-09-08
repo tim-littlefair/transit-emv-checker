@@ -38,11 +38,15 @@ build_debug_and_coverage() {
 }
 
 build_release() {
-    ./gradlew build bundleRelease lintVitalReportRelease
+    git restore build.gradle android-app/build.gradle
+    sh devenv/update_build.sh
+    ./gradlew clean build bundleRelease lintVitalReportRelease
     echo Copying artifacts to $build_dir
     find android-app/build/outputs -name *.aab -exec cp {} $build_dir \;
     find android-app/build/outputs -name *.apk -exec cp {} $build_dir \;
     cp android-app/build/reports/*.html $build_dir
+    git restore build.gradle android-app/build.gradle
+    ls -l $build_dir
 }
 
 generate_build_id
@@ -53,20 +57,8 @@ mkdir $build_dir
 git diff > $build_dir/$build_id.patch
 export githash=$build_id
 
-if [ "$1" = "--rehearse-release" ]
-then
-  # This option builds the software and the release directory
-  # but skips the defaultGoogleATD test set which
-  # speeds the build up considerably
-  build_release
-else
-  build_debug_and_coverage
-fi
-
 if [ "$1" = "--execute-release" ]
 then
-  # build_debug_and_coverage will already have been done
-  sh devenv/update_build.sh
   build_release
   git restore build.gradle
 fi

@@ -26,9 +26,7 @@ else
 fi
 
 # Version number and name are in the top-level build.gradle
-git restore build.gradle
 # Using '#' as sed delimiter to avoid a lot of escaping in file path in second command
 /usr/bin/sed -r -e "/versionName/s#-dirty#-$hash7_as_hex#" "$sed_inplace_arg" build.gradle
-/usr/bin/sed -r -e "s#replace_with_keystore_properties_path#/tmp/hc_keys/hc-playstore-upload-2024_keystore.properties#" "$sed_inplace_arg" android-app/build.gradle
-
+/usr/bin/sed -r -e "s#replace_with_keystore_properties_path#/media/tim/hc-playstore-upload-2024_keystore.properties#" "$sed_inplace_arg" android-app/build.gradle
 git diff -U0 | grep -e versionName -e versionCode -e keystorePropertiesFile

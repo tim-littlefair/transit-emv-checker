@@ -10,5 +10,4 @@ This project is in an inception phase, there are no supported versions yet.
 
 ## Reporting a Vulnerability
 
-Please report vulnerabilities via GitHub messaging, or via
-my project email address heretical.camelid@github.com.
+Please report vulnerabilities via tec-vuln-5386@heretical-camelid.net.

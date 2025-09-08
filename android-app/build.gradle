@@ -144,12 +144,13 @@ dependencies {
     implementation project(':tec-library')
 
     // Real dependencies start here
-    implementation "com.github.devnied.emvnfccard:library:3.0.1"
-    implementation "com.github.devnied:bit-lib4j:1.5.2"
     implementation "org.apache.commons:commons-lang3:3.18.0"
     implementation "org.apache.commons:commons-collections4:4.5.0"
     implementation "commons-io:commons-io:2.20.0"
     implementation "net.sf.scuba:scuba-smartcards:0.0.20"
+
+    implementation "com.github.devnied.emvnfccard:library:3.0.1"
+    implementation "com.github.devnied:bit-lib4j:1.5.2"
 
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.13.0'

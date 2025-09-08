@@ -117,8 +117,9 @@ dependencies {
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/24
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/25
     // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/26
-    androidTestImplementation 'io.netty:netty-common:4.1.118.Final'
-    androidTestImplementation 'io.netty:netty-handler:4.1.118.Final'
+    // 29, 30
+    androidTestImplementation 'io.netty:netty-common:4.1.125.Final'
+    androidTestImplementation 'io.netty:netty-handler:4.1.125.Final'
     androidTestImplementation 'io.netty:netty-codec-http:4.1.108.Final'
     androidTestImplementation 'io.netty:netty-codec-http2:4.1.108.Final'
     //androidTestImplementation 'com.google.testing.platform:core:0.0.9-alpha03'

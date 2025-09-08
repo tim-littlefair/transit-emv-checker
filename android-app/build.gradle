@@ -22,7 +22,8 @@ android {
 
         // Version name and number are managed in the root build.gradle file
 
-        versionCode rootProject.ext.versionCode
+        versionCode = rootProject.ext.versionCode
+
         // For builds triggered under build_and_test_everything.sh
         // where the working directory exactly matches git HEAD,
         // the 7-hex-prefix of the current git HEAD hash will
@@ -73,19 +74,22 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+        /*
         managedDevices {
             localDevices {
-                defaultGoogleATD /*(com.android.build.api.dsl.ManagedVirtualDevice)*/ {
+                // com.android.build.api.dsl.ManagedVirtualDevice
+                defaultGoogleATD  {
                     // A lower resolution device is used here for better emulator performance
                     device = "Pixel 6"
-                    apiLevel = 34
+                    apiLevel = 36
                     // The 'google' image is required because 'aosp-atd' does not contain
                     // the system file picker
                     systemImageSource = "google"
-                    // abi = "x86_64"
+                    testedAbi = "x86_64"
                 }
             }
         }
+         */
     }
     sourceSets {
         main {

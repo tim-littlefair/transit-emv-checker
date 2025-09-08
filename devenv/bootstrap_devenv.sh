@@ -29,7 +29,7 @@ dl_repo=https://dl.google.com/android/repository
 
 # As at June 2024 this is the value of seq on the first page
 # referenced above
-seq=11076708
+seq=113114758
 
 # Work out which OS we are on using uname
 uname_osname=$(uname -s)

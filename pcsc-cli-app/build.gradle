@@ -11,10 +11,6 @@ group = 'net.heretical_camelid.transit_emv_checker.pcsc_cli_app'
 version = rootProject.ext.versionName
 
 dependencies {
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/15
-    // https://github.com/tim-littlefair/transit-emv-checker/security/dependabot/16
-    implementation 'org.apache.commons:commons-compress:1.27.1'
-
     implementation project(':tec-library')
 
     // The following dependencies have been made explicit in order to

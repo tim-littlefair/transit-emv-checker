@@ -3,7 +3,6 @@ plugins {
 }
 
 def kspath = "$System.env.kspath"
-def vname_suffix = "dirty"
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file("$kspath")
 if(keystorePropertiesFile.exists()) {
@@ -30,7 +29,7 @@ android {
         // be substituted for the $vname_suffix variable
         // in the line below.
         // For other builds, the variable will be the string 'dirty'.
-        versionName rootProject.ext.versionName+"-$vname_suffix"
+        versionName rootProject.ext.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

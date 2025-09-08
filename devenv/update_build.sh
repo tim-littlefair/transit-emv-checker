@@ -9,8 +9,6 @@
 # be rendered back to hex as part of a version string.
 
 hash7_as_hex=$(git rev-parse HEAD | cut -c1-7)
-hash7_as_decimal=$(printf "%d" "0x$hash7_as_hex")
-/bin/echo "git hash7 = $hash7_as_hex -\> $hash7_as_decimal"
 
 short_osname=$(uname -s)
 if [ "$short_osname" = "Linux" ] ; then

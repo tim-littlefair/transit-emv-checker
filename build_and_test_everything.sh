@@ -40,12 +40,13 @@ build_debug_and_coverage() {
 build_release() {
     git restore build.gradle android-app/build.gradle
     sh devenv/update_build.sh
+    exit
     ./gradlew clean build bundleRelease lintVitalReportRelease
     echo Copying artifacts to $build_dir
     find android-app/build/outputs -name *.aab -exec cp {} $build_dir \;
     find android-app/build/outputs -name *.apk -exec cp {} $build_dir \;
     cp android-app/build/reports/*.html $build_dir
-    git restore build.gradle android-app/build.gradle
+    # git restore build.gradle android-app/build.gradle
     ls -l $build_dir
 }
 

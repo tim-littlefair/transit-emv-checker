@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: "maven" 
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "250704-target_api_35"
+
+

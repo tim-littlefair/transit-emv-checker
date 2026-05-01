@@ -1,4 +1,24 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        // google()
+        mavenCentral()
+        //gradlePluginPortal()
+    }
+    dependencies {
+        // Some dependencies are registered here so that they are resolved
+        // before the AGP activates, as AGP has transitive dependencies
+        // to versions of these libraries reported as vulnerable by GitHub
+        // dependabot.
+        classpath 'org.jdom:jdom2:2.0.6.1'
+        classpath 'io.netty:netty-codec-http:4.1.132.Final'
+        classpath 'io.netty:netty-codec-http2:4.1.132.Final'
+        classpath 'org.bitbucket.b_c:jose4j:0.9.6'
+        classpath 'org.codehaus.plexus:plexus-utils:4.0.3'
+        classpath 'org.bouncycastle:bcprov-jdk18on:1.84'
+    }
+}
+
 plugins {
     // No global plugins
 }
@@ -18,3 +38,5 @@ plugins {
 ext.versionCode=300030001
 
 ext.versionName="0.3.0"
+
+

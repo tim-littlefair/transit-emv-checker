@@ -118,8 +118,6 @@ dependencies {
     androidTestImplementation 'org.jsoup:jsoup:1.22.2'
     androidTestImplementation 'io.netty:netty-common:4.1.125.Final'
     androidTestImplementation 'io.netty:netty-handler:4.1.125.Final'
-    androidTestImplementation 'io.netty:netty-codec-http:4.1.124.Final'
-    androidTestImplementation 'io.netty:netty-codec-http2:4.1.124.Final'
     androidTestImplementation 'com.google.guava:guava:33.6.0-android'
     androidTestImplementation 'org.apache.commons:commons-compress:1.28.0'
     androidTestImplementation 'com.google.protobuf:protobuf-kotlin:4.34.1'

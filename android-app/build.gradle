@@ -108,6 +108,16 @@ base {
 dependencies {
     implementation project(':tec-library')
 
+    constraints {
+        // Some dependencies are registered here so that they are resolved
+        // before the AGP activates, as AGP has transitive dependencies
+        // to versions of these libraries reported as vulnerable by GitHub
+        // dependabot.
+        api 'org.jdom:jdom2:2.0.6.1'
+        api 'io.netty:netty-codec-http:4.1.132.Final'
+        api 'io.netty:netty-codec-http2:4.1.132.Final'
+    }
+
     // The following transitive dependencies have been made explicit against
     // specific versions in order to address GitHub dependabot issues raised
     // against the outdated default versions of these libraries imported by
